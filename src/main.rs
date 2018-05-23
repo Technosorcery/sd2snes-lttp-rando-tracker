@@ -1,20 +1,28 @@
-#![feature(try_from)]
+#![feature(try_from,plugin)]
+#![plugin(rocket_codegen)]
 
-#[macro_use]
-extern crate bitflags;
 #[macro_use]
 extern crate clap;
 #[macro_use]
 extern crate failure;
 #[macro_use]
 extern crate lazy_static;
+extern crate rocket;
+#[macro_use]
+extern crate rocket_contrib;
+#[macro_use]
+extern crate serde_derive;
 extern crate serial;
 
 use clap::{Arg, App};
 
+use rocket::response::NamedFile;
+use rocket_contrib::Json;
+
 use std::convert::TryFrom;
 use std::io;
 use std::fs::File;
+use std::path::{Path, PathBuf};
 use std::sync::Mutex;
 use std::time::Duration;
 use std::{thread, time};
@@ -72,7 +80,7 @@ pub enum ServerFlag {
     DATA64B = 128,
 }
 
-#[derive(Debug, Default, Clone, Copy)]
+#[derive(Debug, Default, Clone, Copy, Serialize)]
 struct BigKey {
     // Light world
     eastern_palace: bool,
@@ -89,14 +97,14 @@ struct BigKey {
     gannons_tower: bool,
 }
 
-#[derive(Debug, Default, Clone, Copy)]
+#[derive(Debug, Default, Clone, Copy, Serialize)]
 struct Pendant {
     red: bool,
     blue: bool,
     green: bool,
 }
 
-#[derive(Debug, Default, Clone, Copy)]
+#[derive(Debug, Default, Clone, Copy, Serialize)]
 struct Crystal {
     one: bool,
     two: bool,
@@ -107,7 +115,7 @@ struct Crystal {
     seven: bool,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Copy, Clone, Serialize)]
 enum BowFlags {
     None             = 0,
     Wood             = 1,
@@ -135,7 +143,7 @@ impl TryFrom<u8> for BowFlags {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Copy, Clone, Serialize)]
 enum BoomerangFlags {
     None = 0,
     Blue = 1,
@@ -159,7 +167,7 @@ impl TryFrom<u8> for BoomerangFlags {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Copy, Clone, Serialize)]
 enum GenericItemFlags {
     None = 0,
     Have = 1,
@@ -181,7 +189,7 @@ impl TryFrom<u8> for GenericItemFlags {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Copy, Clone, Serialize)]
 enum ShroomPowderFlags {
     None   = 0,
     Shroom = 1,
@@ -205,7 +213,7 @@ impl TryFrom<u8> for ShroomPowderFlags {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Copy, Clone, Serialize)]
 enum FluteShovelFlags {
     None         = 0,
     Shovel       = 1,
@@ -231,7 +239,7 @@ impl TryFrom<u8> for FluteShovelFlags {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Copy, Clone, Serialize)]
 enum MirrorFlags {
     None = 0,
     Have = 2,
@@ -253,7 +261,7 @@ impl TryFrom<u8> for MirrorFlags {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Copy, Clone, Serialize)]
 enum GlovesFlags {
     None       = 0,
     PowerGlove = 1,
@@ -277,7 +285,7 @@ impl TryFrom<u8> for GlovesFlags {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Copy, Clone, Serialize)]
 enum SwordFlags {
     None          = 0,
     FightersSword = 1,
@@ -305,7 +313,7 @@ impl TryFrom<u8> for SwordFlags {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Copy, Clone, Serialize)]
 enum ShieldFlags {
     None           = 0,
     FightersShield = 1,
@@ -331,7 +339,7 @@ impl TryFrom<u8> for ShieldFlags {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Copy, Clone, Serialize)]
 enum ArmorFlags {
     GreenMail = 0,
     BlueMail  = 1,
@@ -355,7 +363,7 @@ impl TryFrom<u8> for ArmorFlags {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Copy, Clone, Serialize)]
 enum BottleFlags {
     NoBottle    = 0x00,
     Mushroom    = 0x01,
@@ -391,7 +399,7 @@ impl TryFrom<u8> for BottleFlags {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Copy, Clone, Serialize)]
 enum MagicFlags {
     Normal  = 0,
     Half    = 1,
@@ -415,7 +423,7 @@ impl TryFrom<u8> for MagicFlags {
     }
 }
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Copy, Clone, Serialize)]
 struct GameState {
     // Items
     pub bow:               BowFlags,
@@ -473,25 +481,6 @@ struct GameState {
 
 lazy_static! {
     static ref GAME_STATE: Mutex<GameState> = Mutex::new(GameState::default());
-}
-
-fn main() {
-    let matches = App::new("SD2SNES LttP Randomizer Tracker")
-                          .version(crate_version!())
-                          .author(crate_authors!())
-                          .about("Automatically track progress in a Link to the Past randomizer run using a USB2SNES modified SD2SNES.")
-                          .arg(Arg::with_name("SERIAL")
-                               .help("The SD2SNES serial port to use.")
-                               .required(true)
-                               .index(1))
-                          .get_matches();
-
-    let serial_port = matches.value_of("SERIAL").unwrap().to_string();
-    println!("Using serial port: {}", &serial_port);
-
-    thread::spawn(move || { update_tracker_data(&serial_port) });
-
-    loop {}
 }
 
 fn update_tracker_data(serial_port: &str) {
@@ -553,27 +542,7 @@ fn update_tracker_data(serial_port: &str) {
             }
         };
 
-        println!("Game State: {:#?}", &game_state);
-
-        // println!("Items: {:02X} {:02X} {:02X} {:02X} {:02X}", &game_state.bow, &game_state.boomerang, &game_state.hook_shot, &game_state.bomb, &game_state.shroom_powder);
-        // println!("       {:02X} {:02X} {:02X} {:02X} {:02X}", &game_state.fire_rod, &game_state.ice_rod, &game_state.bombos_medallion, &game_state.ether_medallion, &game_state.quake_medallion);
-        // println!("       {:02X} {:02X} {:02X} {:02X} {:02X}", &game_state.lantern, &game_state.hammer, &game_state.flute_shovel, &game_state.net, &game_state.book);
-        // println!("       {:02X} {:02X} {:02X} {:02X} {:02X}", &game_state.bottle, &game_state.cane_somaria, &game_state.cane_byrna, &game_state.cape, &game_state.mirror);
-        // println!("\nAbilities: {:02X} {:02X} {:02X} {:02X}", &game_state.boots, &game_state.gloves, &game_state.flippers, &game_state.moon_pearl);
-        // println!("\nProgression: {:02X} {:02X} {:02X}", &game_state.sword_level, &game_state.shield_level, &game_state.armor_level);
-        // println!("\nBottles: {:02X} {:02X} {:02X} {:02X}", &game_state.bottle_content1, &game_state.bottle_content2, &game_state.bottle_content3, &game_state.bottle_content4);
-        // println!("\nRupees: {}", &game_state.rupees);
-        // println!("Bombs: {}/{}", &game_state.bomb, &game_state.bomb_capacity);
-        // println!("Arrows: {}/{}", &game_state.arrows, &game_state.arrow_capacity);
-        // println!("Hearts: {:01.2}/{}", (game_state.hearts as f32) / (8 as f32), game_state.max_hearts / 8);
-        // println!("Heart quarters: {}", &game_state.heart_quarters);
-        // println!("Magic: {}", if game_state.magic_progression == 0 { "Normal" } else
-        //                       if game_state.magic_progression == 1 { "1/2"    } else
-        //                       if game_state.magic_progression == 2 { "1/4"    } else
-        //                                                            { "WTF"    });
-        // println!("\nKeys: small: {}", &game_state.small_keys);
-        // println!("");
-
+        // println!("Game State: {:#?}", &game_state);
         { *GAME_STATE.lock().unwrap() = game_state; }
     }
 }
@@ -744,4 +713,42 @@ fn parse_sd2snes_response(response: &Vec<u8>, item_start: u32) -> Result<GameSta
             seven: response[(item_start + 0x3A) as usize] & 0b01000000 > 0,
         },
     })
+}
+
+#[get("/")]
+fn index() -> &'static str {
+    "Hello, world!"
+}
+
+#[get("/game_state", format = "application/json")]
+fn get_game_state() -> Json<GameState> {
+    let game_state = GAME_STATE.lock().unwrap().clone();
+    Json(game_state)
+}
+
+#[get("/<file..>")]
+fn files(file: PathBuf) -> Option<NamedFile> {
+    NamedFile::open(Path::new("static/").join(file)).ok()
+}
+
+fn main() {
+    let matches = App::new("SD2SNES LttP Randomizer Tracker")
+                          .version(crate_version!())
+                          .author(crate_authors!())
+                          .about("Automatically track progress in a Link to the Past randomizer run using a USB2SNES modified SD2SNES.")
+                          .arg(Arg::with_name("SERIAL")
+                               .help("The SD2SNES serial port to use.")
+                               .required(true)
+                               .index(1))
+                          .get_matches();
+
+    let serial_port = matches.value_of("SERIAL").unwrap().to_string();
+    println!("Using serial port: {}", &serial_port);
+
+    thread::spawn(move || { update_tracker_data(&serial_port) });
+
+    rocket::ignite().mount(
+        "/",
+        routes![index,get_game_state,files]
+    ).launch();
 }
