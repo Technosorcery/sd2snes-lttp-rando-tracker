@@ -1,16 +1,18 @@
+#![feature(try_from)]
+
 #[macro_use]
 extern crate bitflags;
 #[macro_use]
 extern crate clap;
 #[macro_use]
+extern crate failure;
+#[macro_use]
 extern crate lazy_static;
 extern crate serial;
-#[macro_use]
-extern crate num_derive;
-extern crate num_traits;
 
 use clap::{Arg, App};
 
+use std::convert::TryFrom;
 use std::io;
 use std::fs::File;
 use std::sync::Mutex;
@@ -20,7 +22,6 @@ use std::{thread, time};
 use std::io::prelude::*;
 use serial::prelude::*;
 
-use num_traits::{FromPrimitive, ToPrimitive};
 use serial::PortSettings;
 
 #[derive(Debug, Copy, Clone)]
@@ -71,7 +72,7 @@ pub enum ServerFlag {
     DATA64B = 128,
 }
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone, Copy)]
 struct BigKey {
     // Light world
     eastern_palace: bool,
@@ -88,31 +89,77 @@ struct BigKey {
     gannons_tower: bool,
 }
 
-bitflags! {
-    struct BowFlags: u8 {
-        const NONE = 0;
-        const SILVER = 4;
-    }
+#[derive(Debug, Default, Clone, Copy)]
+struct Pendant {
+    red: bool,
+    blue: bool,
+    green: bool,
+}
+
+#[derive(Debug, Default, Clone, Copy)]
+struct Crystal {
+    one: bool,
+    two: bool,
+    three: bool,
+    four: bool,
+    five: bool,
+    six: bool,
+    seven: bool,
+}
+
+#[derive(Debug)]
+enum BowFlags {
+    None             = 0,
+    Wood             = 1,
+    WoodWithArrows   = 2,
+    Silver           = 3,
+    SilverWithArrows = 4,
 }
 
 impl Default for BowFlags {
-    fn default() -> BowFlags { BowFlags::NONE }
+    fn default() -> BowFlags { BowFlags::None }
 }
 
-bitflags! {
-    struct BoomerangFlags: u8 {
-        const NONE = 0;
-        const BLUE = 1;
-        const RED  = 2;
-        const BOTH = Self::BLUE.bits | Self::RED.bits;
+impl TryFrom<u8> for BowFlags {
+    type Error = failure::Error;
+
+    fn try_from(number: u8) -> Result<BowFlags, Self::Error> {
+        match number {
+            0 => Ok(BowFlags::None),
+            1 => Ok(BowFlags::Wood),
+            2 => Ok(BowFlags::WoodWithArrows),
+            3 => Ok(BowFlags::Silver),
+            4 => Ok(BowFlags::SilverWithArrows),
+            _ => Err(format_err!("Unknown item flag: 0x{:X}", number)),
+        }
     }
 }
 
-impl Default for BoomerangFlags {
-    fn default() -> BoomerangFlags { BoomerangFlags::NONE }
+#[derive(Debug)]
+enum BoomerangFlags {
+    None = 0,
+    Blue = 1,
+    Red  = 2,
 }
 
-#[derive(Debug, FromPrimitive, ToPrimitive)]
+impl Default for BoomerangFlags {
+    fn default() -> BoomerangFlags { BoomerangFlags::None }
+}
+
+impl TryFrom<u8> for BoomerangFlags {
+    type Error = failure::Error;
+
+    fn try_from(number: u8) -> Result<BoomerangFlags, Self::Error> {
+        match number {
+            0 => Ok(BoomerangFlags::None),
+            1 => Ok(BoomerangFlags::Blue),
+            2 => Ok(BoomerangFlags::Red),
+            _ => Err(format_err!("Unknown item flag: 0x{:X}", number)),
+        }
+    }
+}
+
+#[derive(Debug)]
 enum GenericItemFlags {
     None = 0,
     Have = 1,
@@ -122,33 +169,69 @@ impl Default for GenericItemFlags {
     fn default() -> GenericItemFlags { GenericItemFlags::None }
 }
 
-bitflags! {
-    struct ShroomPowderFlags: u8 {
-        const NONE   = 0;
-        const SHROOM = 1;
-        const POWDER = 2;
-        const BOTH   = Self::SHROOM.bits | Self::POWDER.bits;
+impl TryFrom<u8> for GenericItemFlags {
+    type Error = failure::Error;
+
+    fn try_from(number: u8) -> Result<GenericItemFlags, Self::Error> {
+        match number {
+            0 => Ok(GenericItemFlags::None),
+            1 => Ok(GenericItemFlags::Have),
+            _ => Err(format_err!("Unknown item flag: 0x{:X}", number)),
+        }
     }
+}
+
+#[derive(Debug)]
+enum ShroomPowderFlags {
+    None   = 0,
+    Shroom = 1,
+    Powder = 2,
 }
 
 impl Default for ShroomPowderFlags {
-    fn default() -> ShroomPowderFlags { ShroomPowderFlags::NONE }
+    fn default() -> ShroomPowderFlags { ShroomPowderFlags::None }
 }
 
-bitflags! {
-    struct FluteShovelFlags: u8 {
-        const NONE   = 0;
-        const SHOVEL = 1;
-        const FLUTE  = 2;
-        const BOTH   = Self::SHOVEL.bits | Self::FLUTE.bits;
+impl TryFrom<u8> for ShroomPowderFlags {
+    type Error = failure::Error;
+
+    fn try_from(number: u8) -> Result<ShroomPowderFlags, Self::Error> {
+        match number {
+            0 => Ok(ShroomPowderFlags::None),
+            1 => Ok(ShroomPowderFlags::Shroom),
+            2 => Ok(ShroomPowderFlags::Powder),
+            _ => Err(format_err!("Unknown item flag: 0x{:X}", number)),
+        }
     }
 }
 
-impl Default for FluteShovelFlags {
-    fn default() -> FluteShovelFlags { FluteShovelFlags::NONE }
+#[derive(Debug)]
+enum FluteShovelFlags {
+    None         = 0,
+    Shovel       = 1,
+    Flute        = 2,
+    FluteAndBird = 3,
 }
 
-#[derive(Debug, FromPrimitive, ToPrimitive)]
+impl Default for FluteShovelFlags {
+    fn default() -> FluteShovelFlags { FluteShovelFlags::None }
+}
+
+impl TryFrom<u8> for FluteShovelFlags {
+    type Error = failure::Error;
+
+    fn try_from(number: u8) -> Result<FluteShovelFlags, Self::Error> {
+        match number {
+            0 => Ok(FluteShovelFlags::None),
+            1 => Ok(FluteShovelFlags::Shovel),
+            2 => Ok(FluteShovelFlags::Flute),
+            3 => Ok(FluteShovelFlags::FluteAndBird),
+            _ => Err(format_err!("Unknown item flag: 0x{:X}", number)),
+        }
+    }
+}
+
+#[derive(Debug)]
 enum MirrorFlags {
     None = 0,
     Have = 2,
@@ -158,7 +241,19 @@ impl Default for MirrorFlags {
     fn default() -> MirrorFlags { MirrorFlags::None }
 }
 
-#[derive(Debug, FromPrimitive, ToPrimitive)]
+impl TryFrom<u8> for MirrorFlags {
+    type Error = failure::Error;
+
+    fn try_from(number: u8) -> Result<MirrorFlags, Self::Error> {
+        match number {
+            0 => Ok(MirrorFlags::None),
+            2 => Ok(MirrorFlags::Have),
+            _ => Err(format_err!("Unknown item flag: 0x{:X}", number)),
+        }
+    }
+}
+
+#[derive(Debug)]
 enum GlovesFlags {
     None       = 0,
     PowerGlove = 1,
@@ -169,7 +264,20 @@ impl Default for GlovesFlags {
     fn default() -> GlovesFlags { GlovesFlags::None }
 }
 
-#[derive(Debug, FromPrimitive, ToPrimitive)]
+impl TryFrom<u8> for GlovesFlags {
+    type Error = failure::Error;
+
+    fn try_from(number: u8) -> Result<GlovesFlags, Self::Error> {
+        match number {
+            0 => Ok(GlovesFlags::None),
+            1 => Ok(GlovesFlags::PowerGlove),
+            2 => Ok(GlovesFlags::TitansMitt),
+            _ => Err(format_err!("Unknown item flag: 0x{:X}", number)),
+        }
+    }
+}
+
+#[derive(Debug)]
 enum SwordFlags {
     None          = 0,
     FightersSword = 1,
@@ -182,7 +290,22 @@ impl Default for SwordFlags {
     fn default() -> SwordFlags { SwordFlags::None }
 }
 
-#[derive(Debug, FromPrimitive, ToPrimitive)]
+impl TryFrom<u8> for SwordFlags {
+    type Error = failure::Error;
+
+    fn try_from(number: u8) -> Result<SwordFlags, Self::Error> {
+        match number {
+            0 => Ok(SwordFlags::None),
+            1 => Ok(SwordFlags::FightersSword),
+            2 => Ok(SwordFlags::MasterSword),
+            3 => Ok(SwordFlags::TemperedSword),
+            4 => Ok(SwordFlags::GoldenSword),
+            _ => Err(format_err!("Unknown item flag: 0x{:X}", number)),
+        }
+    }
+}
+
+#[derive(Debug)]
 enum ShieldFlags {
     None           = 0,
     FightersShield = 1,
@@ -194,7 +317,21 @@ impl Default for ShieldFlags {
     fn default() -> ShieldFlags { ShieldFlags::None }
 }
 
-#[derive(Debug, FromPrimitive, ToPrimitive)]
+impl TryFrom<u8> for ShieldFlags {
+    type Error = failure::Error;
+
+    fn try_from(number: u8) -> Result<ShieldFlags, Self::Error> {
+        match number {
+            0 => Ok(ShieldFlags::None),
+            1 => Ok(ShieldFlags::FightersShield),
+            2 => Ok(ShieldFlags::RedShield),
+            3 => Ok(ShieldFlags::MirrorShield),
+            _ => Err(format_err!("Unknown item flag: 0x{:X}", number)),
+        }
+    }
+}
+
+#[derive(Debug)]
 enum ArmorFlags {
     GreenMail = 0,
     BlueMail  = 1,
@@ -205,22 +342,56 @@ impl Default for ArmorFlags {
     fn default() -> ArmorFlags { ArmorFlags::GreenMail }
 }
 
-#[derive(Debug, FromPrimitive, ToPrimitive)]
+impl TryFrom<u8> for ArmorFlags {
+    type Error = failure::Error;
+
+    fn try_from(number: u8) -> Result<ArmorFlags, Self::Error> {
+        match number {
+            0 => Ok(ArmorFlags::GreenMail),
+            1 => Ok(ArmorFlags::BlueMail),
+            2 => Ok(ArmorFlags::RedMail),
+            _ => Err(format_err!("Unknown item flag: 0x{:X}", number)),
+        }
+    }
+}
+
+#[derive(Debug)]
 enum BottleFlags {
-    NoBottle   = 0x00,
-    Empty      = 0x02,
-    BluePotion = 0x05,
-    // RedPotion
-    // GreenPotion
-    // Bee
-    // MagicBee
+    NoBottle    = 0x00,
+    Mushroom    = 0x01,
+    Empty       = 0x02,
+    RedPotion   = 0x03,
+    GreenPotion = 0x04,
+    BluePotion  = 0x05,
+    Fairy       = 0x06,
+    Bee         = 0x07,
+    MagicBee    = 0x08,
 }
 
 impl Default for BottleFlags {
     fn default() -> BottleFlags { BottleFlags::NoBottle }
 }
 
-#[derive(Debug, FromPrimitive, ToPrimitive)]
+impl TryFrom<u8> for BottleFlags {
+    type Error = failure::Error;
+
+    fn try_from(number: u8) -> Result<BottleFlags, Self::Error> {
+        match number {
+            0x00 => Ok(BottleFlags::NoBottle),
+            0x01 => Ok(BottleFlags::Mushroom),
+            0x02 => Ok(BottleFlags::Empty),
+            0x03 => Ok(BottleFlags::RedPotion),
+            0x04 => Ok(BottleFlags::GreenPotion),
+            0x05 => Ok(BottleFlags::BluePotion),
+            0x06 => Ok(BottleFlags::Fairy),
+            0x07 => Ok(BottleFlags::Bee),
+            0x08 => Ok(BottleFlags::MagicBee),
+            _    => Err(format_err!("Unknown item flag: 0x{:X}", number)),
+        }
+    }
+}
+
+#[derive(Debug)]
 enum MagicFlags {
     Normal  = 0,
     Half    = 1,
@@ -229,6 +400,19 @@ enum MagicFlags {
 
 impl Default for MagicFlags {
     fn default() -> MagicFlags { MagicFlags::Normal }
+}
+
+impl TryFrom<u8> for MagicFlags {
+    type Error = failure::Error;
+
+    fn try_from(number: u8) -> Result<MagicFlags, Self::Error> {
+        match number {
+            0 => Ok(MagicFlags::Normal),
+            1 => Ok(MagicFlags::Half),
+            2 => Ok(MagicFlags::Quarter),
+            _ => Err(format_err!("Unknown magic flag: 0x{:X}", number)),
+        }
+    }
 }
 
 #[derive(Debug, Default)]
@@ -278,11 +462,15 @@ struct GameState {
     pub arrows:            u8,
     pub arrow_capacity:    u8,
 
+    pub magic_progression: MagicFlags,
+
     pub small_keys:        u8,
     pub big_key:           BigKey,
 
-    pub magic_progression: MagicFlags,
+    pub pendant:           Pendant,
+    pub crystal:           Crystal,
 }
+
 lazy_static! {
     static ref GAME_STATE: Mutex<GameState> = Mutex::new(GameState::default());
 }
@@ -338,13 +526,13 @@ fn update_tracker_data(serial_port: &str) {
                         // 0xF50000 <-- WRAM start on SD2SNES
                         // 0x00F340 <-- Offset in WRAM to the items & other
                         //              things we're interested in tracking.
-        let mem_offset: u32 = 0xF5F340;
-        let mem_size:   u32 = 0x000040;
+        let mem_offset: u32 = 0xF50000;
+        let mem_size:   u32 = 0x040000;
         // Handy if we want to look at more of the WRAM, so we don't need to
         // manually update the offset into our WRAM chunk of every item.
-        let item_start = 0x00;
+        let item_start = 0xF340;
 
-        println!("Querying SD2SNES...");
+        // println!("Querying SD2SNES...");
         let response = match read_wram(&mut port, mem_offset, mem_size) {
             Ok(r) => r,
             Err(e) => {
@@ -357,59 +545,12 @@ fn update_tracker_data(serial_port: &str) {
         let mut buffer = File::create("raw_response.txt").unwrap();
         buffer.write(&response[..]).unwrap();
 
-        let game_state = GameState {
-            bow:               BowFlags::from_bits(response[item_start + 0x00]).unwrap(),
-            boomerang:         BoomerangFlags::from_bits(response[item_start + 0x01]).unwrap(),
-            hook_shot:         num_traits::FromPrimitive::from_u8(response[item_start + 0x02]).unwrap(),
-            bomb:              response[item_start + 0x03],
-            shroom_powder:     ShroomPowderFlags::from_bits(response[item_start + 0x04]).unwrap(),
-            fire_rod:          num_traits::FromPrimitive::from_u8(response[item_start + 0x05]).unwrap(),
-            ice_rod:           num_traits::FromPrimitive::from_u8(response[item_start + 0x06]).unwrap(),
-            bombos_medallion:  num_traits::FromPrimitive::from_u8(response[item_start + 0x07]).unwrap(),
-            ether_medallion:   num_traits::FromPrimitive::from_u8(response[item_start + 0x08]).unwrap(),
-            quake_medallion:   num_traits::FromPrimitive::from_u8(response[item_start + 0x09]).unwrap(),
-            lantern:           num_traits::FromPrimitive::from_u8(response[item_start + 0x0A]).unwrap(),
-            hammer:            num_traits::FromPrimitive::from_u8(response[item_start + 0x0B]).unwrap(),
-            flute_shovel:      FluteShovelFlags::from_bits(response[item_start + 0x0C]).unwrap(),
-            net:               num_traits::FromPrimitive::from_u8(response[item_start + 0x0D]).unwrap(),
-            book:              num_traits::FromPrimitive::from_u8(response[item_start + 0x0E]).unwrap(),
-            bottle:            response[item_start + 0x0F],
-            cane_somaria:      num_traits::FromPrimitive::from_u8(response[item_start + 0x10]).unwrap(),
-            cane_byrna:        num_traits::FromPrimitive::from_u8(response[item_start + 0x11]).unwrap(),
-            cape:              num_traits::FromPrimitive::from_u8(response[item_start + 0x12]).unwrap(),
-            mirror:            num_traits::FromPrimitive::from_u8(response[item_start + 0x13]).unwrap(),
-
-            gloves:            num_traits::FromPrimitive::from_u8(response[item_start + 0x14]).unwrap(),
-            boots:             num_traits::FromPrimitive::from_u8(response[item_start + 0x15]).unwrap(),
-            flippers:          num_traits::FromPrimitive::from_u8(response[item_start + 0x16]).unwrap(),
-            moon_pearl:        num_traits::FromPrimitive::from_u8(response[item_start + 0x17]).unwrap(),
-
-            sword_level:       num_traits::FromPrimitive::from_u8(response[item_start + 0x19]).unwrap(),
-            shield_level:      num_traits::FromPrimitive::from_u8(response[item_start + 0x1A]).unwrap(),
-            armor_level:       num_traits::FromPrimitive::from_u8(response[item_start + 0x1B]).unwrap(),
-
-            bottle_content1:   num_traits::FromPrimitive::from_u8(response[item_start + 0x1C]).unwrap(),
-            bottle_content2:   num_traits::FromPrimitive::from_u8(response[item_start + 0x1D]).unwrap(),
-            bottle_content3:   num_traits::FromPrimitive::from_u8(response[item_start + 0x1E]).unwrap(),
-            bottle_content4:   num_traits::FromPrimitive::from_u8(response[item_start + 0x1F]).unwrap(),
-
-            // Rupees are spread across two bytes, as the randomizer lifted the
-            // 255 Rupee limit, and it's stored little-endian.
-            rupees:            ((response[item_start + 0x21] as u16) << 8) + response[item_start + 0x20] as u16,
-            heart_quarters:    response[item_start + 0x2B],
-            bomb_capacity:     response[item_start + 0x30] + 10,
-            hearts:            response[item_start + 0x2D],
-            max_hearts:        response[item_start + 0x2C],
-
-            arrows:            response[item_start + 0x37],
-            arrow_capacity:    response[item_start + 0x31] + 30,
-
-            small_keys:        if response[item_start + 0x2F] == 0xFF {     0 } else { response[item_start + 0x2F] },
-            big_key:           BigKey::default(),
-            //if response[item_start + 0x2F] == 0xFF { false } else { response[item_start + 0x26] > 0 };
-            // 0x27 -> PoD Big Key
-
-            magic_progression: num_traits::FromPrimitive::from_u8(response[item_start + 0x3B]).unwrap(),
+        let game_state = match parse_sd2snes_response(&response, item_start) {
+            Ok(gs) => gs,
+            Err(e) => {
+                println!("Unable to parse game state: {}", e);
+                continue;
+            }
         };
 
         println!("Game State: {:#?}", &game_state);
@@ -483,4 +624,124 @@ fn read_wram<T: SerialPort>(port: &mut T, mem_offset: u32, mem_size: u32) -> io:
 
     // Drop the first "block" as it's just the header.
     Ok(result[512..].to_vec())
+}
+
+fn parse_sd2snes_response(response: &Vec<u8>, item_start: u32) -> Result<GameState, failure::Error> {
+    Ok(GameState {
+        bow:               BowFlags::try_from(response[(item_start + 0x00) as usize])?,
+        boomerang:         BoomerangFlags::try_from(response[(item_start + 0x01) as usize])?,
+        hook_shot:         GenericItemFlags::try_from(response[(item_start + 0x02) as usize])?,
+        bomb:              response[(item_start + 0x03) as usize],
+        shroom_powder:     ShroomPowderFlags::try_from(response[(item_start + 0x04) as usize])?,
+        fire_rod:          GenericItemFlags::try_from(response[(item_start + 0x05) as usize])?,
+        ice_rod:           GenericItemFlags::try_from(response[(item_start + 0x06) as usize])?,
+        bombos_medallion:  GenericItemFlags::try_from(response[(item_start + 0x07) as usize])?,
+        ether_medallion:   GenericItemFlags::try_from(response[(item_start + 0x08) as usize])?,
+        quake_medallion:   GenericItemFlags::try_from(response[(item_start + 0x09) as usize])?,
+        lantern:           GenericItemFlags::try_from(response[(item_start + 0x0A) as usize])?,
+        hammer:            GenericItemFlags::try_from(response[(item_start + 0x0B) as usize])?,
+        flute_shovel:      FluteShovelFlags::try_from(response[(item_start + 0x0C) as usize])?,
+        net:               GenericItemFlags::try_from(response[(item_start + 0x0D) as usize])?,
+        book:              GenericItemFlags::try_from(response[(item_start + 0x0E) as usize])?,
+        bottle:            response[(item_start + 0x0F) as usize],
+        cane_somaria:      GenericItemFlags::try_from(response[(item_start + 0x10) as usize])?,
+        cane_byrna:        GenericItemFlags::try_from(response[(item_start + 0x11) as usize])?,
+        cape:              GenericItemFlags::try_from(response[(item_start + 0x12) as usize])?,
+        mirror:            MirrorFlags::try_from(response[(item_start + 0x13) as usize])?,
+
+        gloves:            GlovesFlags::try_from(response[(item_start + 0x14) as usize])?,
+        boots:             GenericItemFlags::try_from(response[(item_start + 0x15) as usize])?,
+        flippers:          GenericItemFlags::try_from(response[(item_start + 0x16) as usize])?,
+        moon_pearl:        GenericItemFlags::try_from(response[(item_start + 0x17) as usize])?,
+
+        sword_level:       SwordFlags::try_from(response[(item_start + 0x19) as usize])?,
+        shield_level:      ShieldFlags::try_from(response[(item_start + 0x1A) as usize])?,
+        armor_level:       ArmorFlags::try_from(response[(item_start + 0x1B) as usize])?,
+
+        bottle_content1:   BottleFlags::try_from(response[(item_start + 0x1C) as usize])?,
+        bottle_content2:   BottleFlags::try_from(response[(item_start + 0x1D) as usize])?,
+        bottle_content3:   BottleFlags::try_from(response[(item_start + 0x1E) as usize])?,
+        bottle_content4:   BottleFlags::try_from(response[(item_start + 0x1F) as usize])?,
+
+        // Rupees are spread across two bytes, as the randomizer lifted the
+        // 255 Rupee limit, and it's stored little-endian.
+        rupees:            ((response[(item_start + 0x23) as usize] as u16) << 8) + response[(item_start + 0x22) as usize] as u16,
+        heart_quarters:    response[(item_start + 0x2B) as usize],
+        bomb_capacity:     response[(item_start + 0x30) as usize] + 10,
+        hearts:            response[(item_start + 0x2D) as usize],
+        max_hearts:        response[(item_start + 0x2C) as usize],
+
+        arrows:            response[(item_start + 0x37) as usize],
+        arrow_capacity:    response[(item_start + 0x31) as usize] + 30,
+
+        magic_progression: MagicFlags::try_from(response[(item_start + 0x3B) as usize])?,
+
+        small_keys:        if response[(item_start + 0x2F) as usize] == 0xFF {     0 } else { response[(item_start + 0x2F) as usize] },
+        big_key: BigKey {
+            // BigKey1: 0x366
+            //       Skull Woods
+            //       |Ice Palace
+            //       ||Tower of Hera
+            //       |||Gargoyle's Domain
+            //       ||||Turtle Rock
+            //       |||||Gannon's Tower
+            //       ||||||x
+            //       |||||||x
+            //       vvvvvvvv
+            //      |--------|
+            // Bit:  7      0
+            gannons_tower: response[(item_start + 0x26) as usize] & 0b00000100 > 0,
+            turtle_rock:   response[(item_start + 0x26) as usize] & 0b00001000 > 0,
+            thieves_town:  response[(item_start + 0x26) as usize] & 0b00010000 > 0,
+            tower_of_hera: response[(item_start + 0x26) as usize] & 0b00100000 > 0,
+            ice_palace:    response[(item_start + 0x26) as usize] & 0b01000000 > 0,
+            skull_woods:   response[(item_start + 0x26) as usize] & 0b10000000 > 0,
+
+            // BigKey2: 0x367
+            //       X
+            //       |X
+            //       ||Eastern Palace
+            //       |||Desert Palace
+            //       ||||X
+            //       |||||Swamp Palace
+            //       ||||||Dark Palace
+            //       |||||||Misery Mire
+            //       vvvvvvvv
+            //      |--------|
+            // Bit:  7      0
+            misery_mire:        response[(item_start + 0x27) as usize] & 0b00000001 > 0,
+            desert_palace:      response[(item_start + 0x27) as usize] & 0b00000010 > 0,
+            swamp_palace:       response[(item_start + 0x27) as usize] & 0b00000100 > 0,
+            palace_of_darkness: response[(item_start + 0x27) as usize] & 0b00010000 > 0,
+            eastern_palace:     response[(item_start + 0x27) as usize] & 0b00100000 > 0,
+        },
+
+        // 0x374 -> Pendants (Bitmask)
+        // 1 - Red
+        // 2 - Blue
+        // 4 - Green
+        pendant: Pendant {
+            red:   response[(item_start + 0x34) as usize] & 0b0001 > 0,
+            blue:  response[(item_start + 0x34) as usize] & 0b0010 > 0,
+            green: response[(item_start + 0x34) as usize] & 0b0100 > 0,
+        },
+
+        // 0x37A -> Crystals (Bitmask)
+        // 1 - Misery Mire
+        // 2 - Dark Palace
+        // 4 - Ice Palace
+        // 8 - Turtle Rock
+        // 16 - Swamp Palace
+        // 32 - Gargoyle's Domain
+        // 64 - Skull Woods
+        crystal: Crystal {
+            one:   response[(item_start + 0x3A) as usize] & 0b00000001 > 0,
+            three: response[(item_start + 0x3A) as usize] & 0b00000010 > 0,
+            five:  response[(item_start + 0x3A) as usize] & 0b00000100 > 0,
+            four:  response[(item_start + 0x3A) as usize] & 0b00001000 > 0,
+            two:   response[(item_start + 0x3A) as usize] & 0b00010000 > 0,
+            six:   response[(item_start + 0x3A) as usize] & 0b00100000 > 0,
+            seven: response[(item_start + 0x3A) as usize] & 0b01000000 > 0,
+        },
+    })
 }

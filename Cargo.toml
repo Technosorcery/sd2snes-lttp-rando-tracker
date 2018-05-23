@@ -6,7 +6,6 @@ authors = ["Jacob Helwig <jacob@technosorcery.net>"]
 [dependencies]
 bitflags = "1.0.3"
 clap = "2.31.2"
+failure = "0.1.1"
 lazy_static = "1.0"
-num-traits = "0.2"
-num-derive = "0.2"
 serial = "0.4"
