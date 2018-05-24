@@ -34,10 +34,10 @@ use serial::PortSettings;
 #[derive(Debug, Copy, Clone)]
 pub enum ServerOpcode {
         // address space operations
-        GET = 0,
-        PUT,
-        VGET,
-        VPUT,
+        Get = 0,
+        Put,
+        VGet,
+        VPut,
 
         // file system operations
         LS,
@@ -46,37 +46,37 @@ pub enum ServerOpcode {
         MV,
 
         // special operations
-        RESET,
-        BOOT,
-        POWER_CYCLE,
-        INFO,
-        MENU_RESET,
-        STREAM,
-        TIME,
+        Reset,
+        Boot,
+        PowerCycle,
+        Info,
+        MenuReset,
+        Stream,
+        Time,
 
         // response
-        RESPONSE,
+        Response,
 }
 
 #[derive(Debug, Copy, Clone)]
 pub enum ServerSpace {
-    FILE = 0,
+    File = 0,
     SNES,
     MSU,
-    CMD,
-    CONFIG,
+    Cmd,
+    Config,
 }
 
 #[derive(Debug, Copy, Clone)]
 pub enum ServerFlag {
-    NONE = 0,
-    SKIPRESET = 1,
-    ONLYRESET = 2,
-    CLRX = 4,
-    SETX = 8,
-    STREAM_BURST = 16,
-    NORESP = 64,
-    DATA64B = 128,
+    None = 0,
+    SkipReset = 1,
+    OnlyReset = 2,
+    ClrX = 4,
+    SetX = 8,
+    StreamBurst = 16,
+    NoResp = 64,
+    Data64B = 128,
 }
 
 #[derive(Debug, Default, Clone, Copy, Serialize)]
@@ -506,9 +506,9 @@ fn read_wram<T: SerialPort>(port: &mut T, mem_offset: u32, mem_size: u32) -> io:
     let mut buf: Vec<u8> = Vec::with_capacity(512);
     buf.extend_from_slice("USBA".as_bytes());
     buf.resize(512, 0);
-    buf[4] = ServerOpcode::GET as u8; // opcode
+    buf[4] = ServerOpcode::Get as u8; // opcode
     buf[5] = ServerSpace::SNES as u8; // space
-    buf[6] = ServerFlag::NONE  as u8; // flags
+    buf[6] = ServerFlag::None  as u8; // flags
     // offset is big endian, and starts at index 256
     buf[256] = ((mem_offset >> 24) & 0xFF) as u8;
     buf[257] = ((mem_offset >> 16) & 0xFF) as u8;
@@ -536,7 +536,7 @@ fn read_wram<T: SerialPort>(port: &mut T, mem_offset: u32, mem_size: u32) -> io:
        result[1] != "S".as_bytes()[0] ||
        result[2] != "B".as_bytes()[0] ||
        result[3] != "A".as_bytes()[0] ||
-       result[4] != ServerOpcode::RESPONSE as u8 {
+       result[4] != ServerOpcode::Response as u8 {
 
         let timeout = port.timeout();
         port.set_timeout(Duration::from_millis(50))?;
