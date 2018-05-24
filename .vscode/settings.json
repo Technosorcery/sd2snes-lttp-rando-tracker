@@ -1,7 +1,10 @@
 {
     "cSpell.words": [
+        "Bitmask",
         "CLRX",
+        "Gannon's",
         "MKDIR",
+        "Mutex",
         "NORESP",
         "ONLYRESET",
         "Randomizer",
@@ -13,7 +16,11 @@
         "VPUT",
         "bombos",
         "byrna",
+        "codegen",
+        "contrib",
+        "gannons",
         "millis",
+        "serde",
         "shroom",
         "somaria",
         "sram",
