@@ -8,7 +8,6 @@ extern crate failure;
 #[macro_use]
 extern crate lazy_static;
 extern crate rocket;
-#[macro_use]
 extern crate rocket_contrib;
 #[macro_use]
 extern crate serde_derive;
