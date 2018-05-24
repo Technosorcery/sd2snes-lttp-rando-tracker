@@ -168,28 +168,6 @@ impl TryFrom<u8> for BoomerangFlags {
 }
 
 #[derive(Debug, Copy, Clone, Serialize)]
-enum GenericItemFlags {
-    None = 0,
-    Have = 1,
-}
-
-impl Default for GenericItemFlags {
-    fn default() -> GenericItemFlags { GenericItemFlags::None }
-}
-
-impl TryFrom<u8> for GenericItemFlags {
-    type Error = failure::Error;
-
-    fn try_from(number: u8) -> Result<GenericItemFlags, Self::Error> {
-        match number {
-            0 => Ok(GenericItemFlags::None),
-            1 => Ok(GenericItemFlags::Have),
-            _ => Err(format_err!("Unknown item flag: 0x{:X}", number)),
-        }
-    }
-}
-
-#[derive(Debug, Copy, Clone, Serialize)]
 enum ShroomPowderFlags {
     None   = 0,
     Shroom = 1,
@@ -234,28 +212,6 @@ impl TryFrom<u8> for FluteShovelFlags {
             1 => Ok(FluteShovelFlags::Shovel),
             2 => Ok(FluteShovelFlags::Flute),
             3 => Ok(FluteShovelFlags::FluteAndBird),
-            _ => Err(format_err!("Unknown item flag: 0x{:X}", number)),
-        }
-    }
-}
-
-#[derive(Debug, Copy, Clone, Serialize)]
-enum MirrorFlags {
-    None = 0,
-    Have = 2,
-}
-
-impl Default for MirrorFlags {
-    fn default() -> MirrorFlags { MirrorFlags::None }
-}
-
-impl TryFrom<u8> for MirrorFlags {
-    type Error = failure::Error;
-
-    fn try_from(number: u8) -> Result<MirrorFlags, Self::Error> {
-        match number {
-            0 => Ok(MirrorFlags::None),
-            2 => Ok(MirrorFlags::Have),
             _ => Err(format_err!("Unknown item flag: 0x{:X}", number)),
         }
     }
@@ -428,29 +384,29 @@ struct GameState {
     // Items
     pub bow:               BowFlags,
     pub boomerang:         BoomerangFlags,
-    pub hook_shot:         GenericItemFlags,
+    pub hook_shot:         bool,
     pub bomb:              u8,
     pub shroom_powder:     ShroomPowderFlags,
-    pub fire_rod:          GenericItemFlags,
-    pub ice_rod:           GenericItemFlags,
-    pub bombos_medallion:  GenericItemFlags,
-    pub ether_medallion:   GenericItemFlags,
-    pub quake_medallion:   GenericItemFlags,
-    pub lantern:           GenericItemFlags,
-    pub hammer:            GenericItemFlags,
+    pub fire_rod:          bool,
+    pub ice_rod:           bool,
+    pub bombos_medallion:  bool,
+    pub ether_medallion:   bool,
+    pub quake_medallion:   bool,
+    pub lantern:           bool,
+    pub hammer:            bool,
     pub flute_shovel:      FluteShovelFlags,
-    pub net:               GenericItemFlags,
-    pub book:              GenericItemFlags,
+    pub net:               bool,
+    pub book:              bool,
     pub bottle:            u8,
-    pub cane_somaria:      GenericItemFlags,
-    pub cane_byrna:        GenericItemFlags,
-    pub cape:              GenericItemFlags,
-    pub mirror:            MirrorFlags,
+    pub cane_somaria:      bool,
+    pub cane_byrna:        bool,
+    pub cape:              bool,
+    pub mirror:            bool,
     // Abilities
     pub gloves:            GlovesFlags,
-    pub boots:             GenericItemFlags,
-    pub flippers:          GenericItemFlags,
-    pub moon_pearl:        GenericItemFlags,
+    pub boots:             bool,
+    pub flippers:          bool,
+    pub moon_pearl:        bool,
     // Weapon & Armor Progression
     pub sword_level:       SwordFlags,
     pub shield_level:      ShieldFlags,
@@ -599,29 +555,29 @@ fn parse_sd2snes_response(response: &Vec<u8>, item_start: u32) -> Result<GameSta
     Ok(GameState {
         bow:               BowFlags::try_from(response[(item_start + 0x00) as usize])?,
         boomerang:         BoomerangFlags::try_from(response[(item_start + 0x01) as usize])?,
-        hook_shot:         GenericItemFlags::try_from(response[(item_start + 0x02) as usize])?,
+        hook_shot:         response[(item_start + 0x02) as usize] > 0,
         bomb:              response[(item_start + 0x03) as usize],
         shroom_powder:     ShroomPowderFlags::try_from(response[(item_start + 0x04) as usize])?,
-        fire_rod:          GenericItemFlags::try_from(response[(item_start + 0x05) as usize])?,
-        ice_rod:           GenericItemFlags::try_from(response[(item_start + 0x06) as usize])?,
-        bombos_medallion:  GenericItemFlags::try_from(response[(item_start + 0x07) as usize])?,
-        ether_medallion:   GenericItemFlags::try_from(response[(item_start + 0x08) as usize])?,
-        quake_medallion:   GenericItemFlags::try_from(response[(item_start + 0x09) as usize])?,
-        lantern:           GenericItemFlags::try_from(response[(item_start + 0x0A) as usize])?,
-        hammer:            GenericItemFlags::try_from(response[(item_start + 0x0B) as usize])?,
+        fire_rod:          response[(item_start + 0x05) as usize] > 0,
+        ice_rod:           response[(item_start + 0x06) as usize] > 0,
+        bombos_medallion:  response[(item_start + 0x07) as usize] > 0,
+        ether_medallion:   response[(item_start + 0x08) as usize] > 0,
+        quake_medallion:   response[(item_start + 0x09) as usize] > 0,
+        lantern:           response[(item_start + 0x0A) as usize] > 0,
+        hammer:            response[(item_start + 0x0B) as usize] > 0,
         flute_shovel:      FluteShovelFlags::try_from(response[(item_start + 0x0C) as usize])?,
-        net:               GenericItemFlags::try_from(response[(item_start + 0x0D) as usize])?,
-        book:              GenericItemFlags::try_from(response[(item_start + 0x0E) as usize])?,
+        net:               response[(item_start + 0x0D) as usize] > 0,
+        book:              response[(item_start + 0x0E) as usize] > 0,
         bottle:            response[(item_start + 0x0F) as usize],
-        cane_somaria:      GenericItemFlags::try_from(response[(item_start + 0x10) as usize])?,
-        cane_byrna:        GenericItemFlags::try_from(response[(item_start + 0x11) as usize])?,
-        cape:              GenericItemFlags::try_from(response[(item_start + 0x12) as usize])?,
-        mirror:            MirrorFlags::try_from(response[(item_start + 0x13) as usize])?,
+        cane_somaria:      response[(item_start + 0x10) as usize] > 0,
+        cane_byrna:        response[(item_start + 0x11) as usize] > 0,
+        cape:              response[(item_start + 0x12) as usize] > 0,
+        mirror:            response[(item_start + 0x13) as usize] > 0,
 
         gloves:            GlovesFlags::try_from(response[(item_start + 0x14) as usize])?,
-        boots:             GenericItemFlags::try_from(response[(item_start + 0x15) as usize])?,
-        flippers:          GenericItemFlags::try_from(response[(item_start + 0x16) as usize])?,
-        moon_pearl:        GenericItemFlags::try_from(response[(item_start + 0x17) as usize])?,
+        boots:             response[(item_start + 0x15) as usize] > 0,
+        flippers:          response[(item_start + 0x16) as usize] > 0,
+        moon_pearl:        response[(item_start + 0x17) as usize] > 0,
 
         sword_level:       SwordFlags::try_from(response[(item_start + 0x19) as usize])?,
         shield_level:      ShieldFlags::try_from(response[(item_start + 0x1A) as usize])?,
