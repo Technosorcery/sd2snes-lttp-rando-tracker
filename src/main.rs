@@ -515,11 +515,11 @@ fn update_tracker_data(serial_port: &str) {
                         // 0xF50000 <-- WRAM start on SD2SNES
                         // 0x00F340 <-- Offset in WRAM to the items & other
                         //              things we're interested in tracking.
-        let mem_offset: u32 = 0xF50000;
-        let mem_size:   u32 = 0x040000;
+        let mem_offset: u32 = 0xF5F340;
+        let mem_size:   u32 = 0x000200;
         // Handy if we want to look at more of the WRAM, so we don't need to
         // manually update the offset into our WRAM chunk of every item.
-        let item_start = 0xF340;
+        let item_start = 0x0000;
 
         // println!("Querying SD2SNES...");
         let response = match read_wram(&mut port, mem_offset, mem_size) {
