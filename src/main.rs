@@ -715,11 +715,6 @@ fn parse_sd2snes_response(response: &Vec<u8>, item_start: u32) -> Result<GameSta
     })
 }
 
-#[get("/")]
-fn index() -> &'static str {
-    "Hello, world!"
-}
-
 #[get("/game_state", format = "application/json")]
 fn get_game_state() -> Json<GameState> {
     let game_state = GAME_STATE.lock().unwrap().clone();
@@ -728,8 +723,16 @@ fn get_game_state() -> Json<GameState> {
 
 #[get("/<file..>")]
 fn files(file: PathBuf) -> Option<NamedFile> {
-    NamedFile::open(Path::new("static/").join(file)).ok()
+    let mut path = Path::new("static/").join(file);
+    if path.is_dir() { path = path.join("index.html") }
+
+    println!("Attempting to find static file at: {:?}", &path);
+
+    NamedFile::open(path).ok()
 }
+
+#[get("/")]
+fn root() -> Option<NamedFile> { files(PathBuf::from("")) }
 
 fn main() {
     let matches = App::new("SD2SNES LttP Randomizer Tracker")
@@ -749,6 +752,6 @@ fn main() {
 
     rocket::ignite().mount(
         "/",
-        routes![index,get_game_state,files]
+        routes![get_game_state,files,root]
     ).launch();
 }
