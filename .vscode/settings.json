@@ -25,5 +25,7 @@
         "somaria",
         "sram",
         "wram"
-    ]
+    ],
+    "rust.unstable_features": true,
+    "rust-client.channel": "nightly"
 }
