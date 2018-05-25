@@ -1,7 +1,11 @@
 {
     "cSpell.words": [
+        "Bitmask",
         "CLRX",
+        "Deserialize",
+        "Gannon's",
         "MKDIR",
+        "Mutex",
         "NORESP",
         "ONLYRESET",
         "Randomizer",
@@ -13,10 +17,16 @@
         "VPUT",
         "bombos",
         "byrna",
+        "codegen",
+        "contrib",
+        "gannons",
         "millis",
+        "serde",
         "shroom",
         "somaria",
         "sram",
         "wram"
-    ]
+    ],
+    "rust.unstable_features": true,
+    "rust-client.channel": "nightly"
 }

@@ -8,13 +8,13 @@ extern crate failure;
 #[macro_use]
 extern crate lazy_static;
 extern crate rocket;
-#[macro_use]
 extern crate rocket_contrib;
 #[macro_use]
 extern crate serde_derive;
+extern crate serde_json;
 extern crate serial;
 
-use clap::{Arg, App};
+use clap::{App, Arg, ArgGroup};
 
 use rocket::response::NamedFile;
 use rocket_contrib::Json;
@@ -35,10 +35,10 @@ use serial::PortSettings;
 #[derive(Debug, Copy, Clone)]
 pub enum ServerOpcode {
         // address space operations
-        GET = 0,
-        PUT,
-        VGET,
-        VPUT,
+        Get = 0,
+        Put,
+        VGet,
+        VPut,
 
         // file system operations
         LS,
@@ -47,40 +47,40 @@ pub enum ServerOpcode {
         MV,
 
         // special operations
-        RESET,
-        BOOT,
-        POWER_CYCLE,
-        INFO,
-        MENU_RESET,
-        STREAM,
-        TIME,
+        Reset,
+        Boot,
+        PowerCycle,
+        Info,
+        MenuReset,
+        Stream,
+        Time,
 
         // response
-        RESPONSE,
+        Response,
 }
 
 #[derive(Debug, Copy, Clone)]
 pub enum ServerSpace {
-    FILE = 0,
+    File = 0,
     SNES,
     MSU,
-    CMD,
-    CONFIG,
+    Cmd,
+    Config,
 }
 
 #[derive(Debug, Copy, Clone)]
 pub enum ServerFlag {
-    NONE = 0,
-    SKIPRESET = 1,
-    ONLYRESET = 2,
-    CLRX = 4,
-    SETX = 8,
-    STREAM_BURST = 16,
-    NORESP = 64,
-    DATA64B = 128,
+    None = 0,
+    SkipReset = 1,
+    OnlyReset = 2,
+    ClrX = 4,
+    SetX = 8,
+    StreamBurst = 16,
+    NoResp = 64,
+    Data64B = 128,
 }
 
-#[derive(Debug, Default, Clone, Copy, Serialize)]
+#[derive(Debug, Default, Clone, Copy, Serialize, Deserialize)]
 struct BigKey {
     // Light world
     eastern_palace: bool,
@@ -97,14 +97,14 @@ struct BigKey {
     gannons_tower: bool,
 }
 
-#[derive(Debug, Default, Clone, Copy, Serialize)]
+#[derive(Debug, Default, Clone, Copy, Serialize, Deserialize)]
 struct Pendant {
     red: bool,
     blue: bool,
     green: bool,
 }
 
-#[derive(Debug, Default, Clone, Copy, Serialize)]
+#[derive(Debug, Default, Clone, Copy, Serialize, Deserialize)]
 struct Crystal {
     one: bool,
     two: bool,
@@ -115,7 +115,7 @@ struct Crystal {
     seven: bool,
 }
 
-#[derive(Debug, Copy, Clone, Serialize)]
+#[derive(Debug, Copy, Clone, Serialize, Deserialize)]
 enum BowFlags {
     None             = 0,
     Wood             = 1,
@@ -143,7 +143,7 @@ impl TryFrom<u8> for BowFlags {
     }
 }
 
-#[derive(Debug, Copy, Clone, Serialize)]
+#[derive(Debug, Copy, Clone, Serialize, Deserialize)]
 enum BoomerangFlags {
     None = 0,
     Blue = 1,
@@ -167,29 +167,7 @@ impl TryFrom<u8> for BoomerangFlags {
     }
 }
 
-#[derive(Debug, Copy, Clone, Serialize)]
-enum GenericItemFlags {
-    None = 0,
-    Have = 1,
-}
-
-impl Default for GenericItemFlags {
-    fn default() -> GenericItemFlags { GenericItemFlags::None }
-}
-
-impl TryFrom<u8> for GenericItemFlags {
-    type Error = failure::Error;
-
-    fn try_from(number: u8) -> Result<GenericItemFlags, Self::Error> {
-        match number {
-            0 => Ok(GenericItemFlags::None),
-            1 => Ok(GenericItemFlags::Have),
-            _ => Err(format_err!("Unknown item flag: 0x{:X}", number)),
-        }
-    }
-}
-
-#[derive(Debug, Copy, Clone, Serialize)]
+#[derive(Debug, Copy, Clone, Serialize, Deserialize)]
 enum ShroomPowderFlags {
     None   = 0,
     Shroom = 1,
@@ -213,7 +191,7 @@ impl TryFrom<u8> for ShroomPowderFlags {
     }
 }
 
-#[derive(Debug, Copy, Clone, Serialize)]
+#[derive(Debug, Copy, Clone, Serialize, Deserialize)]
 enum FluteShovelFlags {
     None         = 0,
     Shovel       = 1,
@@ -239,29 +217,7 @@ impl TryFrom<u8> for FluteShovelFlags {
     }
 }
 
-#[derive(Debug, Copy, Clone, Serialize)]
-enum MirrorFlags {
-    None = 0,
-    Have = 2,
-}
-
-impl Default for MirrorFlags {
-    fn default() -> MirrorFlags { MirrorFlags::None }
-}
-
-impl TryFrom<u8> for MirrorFlags {
-    type Error = failure::Error;
-
-    fn try_from(number: u8) -> Result<MirrorFlags, Self::Error> {
-        match number {
-            0 => Ok(MirrorFlags::None),
-            2 => Ok(MirrorFlags::Have),
-            _ => Err(format_err!("Unknown item flag: 0x{:X}", number)),
-        }
-    }
-}
-
-#[derive(Debug, Copy, Clone, Serialize)]
+#[derive(Debug, Copy, Clone, Serialize, Deserialize)]
 enum GlovesFlags {
     None       = 0,
     PowerGlove = 1,
@@ -285,7 +241,7 @@ impl TryFrom<u8> for GlovesFlags {
     }
 }
 
-#[derive(Debug, Copy, Clone, Serialize)]
+#[derive(Debug, Copy, Clone, Serialize, Deserialize)]
 enum SwordFlags {
     None          = 0,
     FightersSword = 1,
@@ -313,7 +269,7 @@ impl TryFrom<u8> for SwordFlags {
     }
 }
 
-#[derive(Debug, Copy, Clone, Serialize)]
+#[derive(Debug, Copy, Clone, Serialize, Deserialize)]
 enum ShieldFlags {
     None           = 0,
     FightersShield = 1,
@@ -339,7 +295,7 @@ impl TryFrom<u8> for ShieldFlags {
     }
 }
 
-#[derive(Debug, Copy, Clone, Serialize)]
+#[derive(Debug, Copy, Clone, Serialize, Deserialize)]
 enum ArmorFlags {
     GreenMail = 0,
     BlueMail  = 1,
@@ -363,7 +319,7 @@ impl TryFrom<u8> for ArmorFlags {
     }
 }
 
-#[derive(Debug, Copy, Clone, Serialize)]
+#[derive(Debug, Copy, Clone, Serialize, Deserialize)]
 enum BottleFlags {
     NoBottle    = 0x00,
     Mushroom    = 0x01,
@@ -399,7 +355,7 @@ impl TryFrom<u8> for BottleFlags {
     }
 }
 
-#[derive(Debug, Copy, Clone, Serialize)]
+#[derive(Debug, Copy, Clone, Serialize, Deserialize)]
 enum MagicFlags {
     Normal  = 0,
     Half    = 1,
@@ -423,34 +379,34 @@ impl TryFrom<u8> for MagicFlags {
     }
 }
 
-#[derive(Debug, Default, Copy, Clone, Serialize)]
+#[derive(Debug, Default, Copy, Clone, Serialize, Deserialize)]
 struct GameState {
     // Items
     pub bow:               BowFlags,
     pub boomerang:         BoomerangFlags,
-    pub hook_shot:         GenericItemFlags,
+    pub hook_shot:         bool,
     pub bomb:              u8,
     pub shroom_powder:     ShroomPowderFlags,
-    pub fire_rod:          GenericItemFlags,
-    pub ice_rod:           GenericItemFlags,
-    pub bombos_medallion:  GenericItemFlags,
-    pub ether_medallion:   GenericItemFlags,
-    pub quake_medallion:   GenericItemFlags,
-    pub lantern:           GenericItemFlags,
-    pub hammer:            GenericItemFlags,
+    pub fire_rod:          bool,
+    pub ice_rod:           bool,
+    pub bombos_medallion:  bool,
+    pub ether_medallion:   bool,
+    pub quake_medallion:   bool,
+    pub lantern:           bool,
+    pub hammer:            bool,
     pub flute_shovel:      FluteShovelFlags,
-    pub net:               GenericItemFlags,
-    pub book:              GenericItemFlags,
-    pub bottle:            u8,
-    pub cane_somaria:      GenericItemFlags,
-    pub cane_byrna:        GenericItemFlags,
-    pub cape:              GenericItemFlags,
-    pub mirror:            MirrorFlags,
+    pub net:               bool,
+    pub book:              bool,
+    pub bottle:            bool,
+    pub cane_somaria:      bool,
+    pub cane_byrna:        bool,
+    pub cape:              bool,
+    pub mirror:            bool,
     // Abilities
     pub gloves:            GlovesFlags,
-    pub boots:             GenericItemFlags,
-    pub flippers:          GenericItemFlags,
-    pub moon_pearl:        GenericItemFlags,
+    pub boots:             bool,
+    pub flippers:          bool,
+    pub moon_pearl:        bool,
     // Weapon & Armor Progression
     pub sword_level:       SwordFlags,
     pub shield_level:      ShieldFlags,
@@ -479,11 +435,135 @@ struct GameState {
     pub crystal:           Crystal,
 }
 
+impl TryFrom<Vec<u8>> for GameState {
+    type Error = failure::Error;
+
+    fn try_from(response: Vec<u8>) -> Result<GameState, Self::Error> {
+        Ok(GameState {
+            bow:               BowFlags::try_from(response[0x00])?,
+            boomerang:         BoomerangFlags::try_from(response[0x01])?,
+            hook_shot:         response[0x02] > 0,
+            bomb:              response[0x03],
+            shroom_powder:     ShroomPowderFlags::try_from(response[0x04])?,
+            fire_rod:          response[0x05] > 0,
+            ice_rod:           response[0x06] > 0,
+            bombos_medallion:  response[0x07] > 0,
+            ether_medallion:   response[0x08] > 0,
+            quake_medallion:   response[0x09] > 0,
+            lantern:           response[0x0A] > 0,
+            hammer:            response[0x0B] > 0,
+            flute_shovel:      FluteShovelFlags::try_from(response[0x0C])?,
+            net:               response[0x0D] > 0,
+            book:              response[0x0E] > 0,
+            bottle:            response[0x0F] > 0,
+            cane_somaria:      response[0x10] > 0,
+            cane_byrna:        response[0x11] > 0,
+            cape:              response[0x12] > 0,
+            mirror:            response[0x13] > 0,
+
+            gloves:            GlovesFlags::try_from(response[0x14])?,
+            boots:             response[0x15] > 0,
+            flippers:          response[0x16] > 0,
+            moon_pearl:        response[0x17] > 0,
+
+            sword_level:       SwordFlags::try_from(response[0x19])?,
+            shield_level:      ShieldFlags::try_from(response[0x1A])?,
+            armor_level:       ArmorFlags::try_from(response[0x1B])?,
+
+            bottle_content1:   BottleFlags::try_from(response[0x1C])?,
+            bottle_content2:   BottleFlags::try_from(response[0x1D])?,
+            bottle_content3:   BottleFlags::try_from(response[0x1E])?,
+            bottle_content4:   BottleFlags::try_from(response[0x1F])?,
+
+            // Rupees are spread across two bytes, as the randomizer lifted the
+            // 255 Rupee limit, and it's stored little-endian.
+            rupees:            ((response[0x23] as u16) << 8) + response[0x22] as u16,
+            heart_quarters:    response[0x2B],
+            bomb_capacity:     response[0x30] + 10,
+            hearts:            response[0x2D],
+            max_hearts:        response[0x2C],
+
+            arrows:            response[0x37],
+            arrow_capacity:    response[0x31] + 30,
+
+            magic_progression: MagicFlags::try_from(response[0x3B])?,
+
+            small_keys:        if response[0x2F] == 0xFF { 0 } else { response[0x2F] },
+            big_key: BigKey {
+                // BigKey1: 0x366
+                //       Skull Woods
+                //       |Ice Palace
+                //       ||Tower of Hera
+                //       |||Gargoyle's Domain
+                //       ||||Turtle Rock
+                //       |||||Gannon's Tower
+                //       ||||||x
+                //       |||||||x
+                //       vvvvvvvv
+                //      |--------|
+                // Bit:  7      0
+                gannons_tower: response[0x26] & 0b00000100 > 0,
+                turtle_rock:   response[0x26] & 0b00001000 > 0,
+                thieves_town:  response[0x26] & 0b00010000 > 0,
+                tower_of_hera: response[0x26] & 0b00100000 > 0,
+                ice_palace:    response[0x26] & 0b01000000 > 0,
+                skull_woods:   response[0x26] & 0b10000000 > 0,
+
+                // BigKey2: 0x367
+                //       X
+                //       |X
+                //       ||Eastern Palace
+                //       |||Desert Palace
+                //       ||||X
+                //       |||||Swamp Palace
+                //       ||||||Dark Palace
+                //       |||||||Misery Mire
+                //       vvvvvvvv
+                //      |--------|
+                // Bit:  7      0
+                misery_mire:        response[0x27] & 0b00000001 > 0,
+                desert_palace:      response[0x27] & 0b00000010 > 0,
+                swamp_palace:       response[0x27] & 0b00000100 > 0,
+                palace_of_darkness: response[0x27] & 0b00010000 > 0,
+                eastern_palace:     response[0x27] & 0b00100000 > 0,
+            },
+
+            // 0x374 -> Pendants (Bitmask)
+            // 1 - Red
+            // 2 - Blue
+            // 4 - Green
+            pendant: Pendant {
+                red:   response[0x34] & 0b0001 > 0,
+                blue:  response[0x34] & 0b0010 > 0,
+                green: response[0x34] & 0b0100 > 0,
+            },
+
+            // 0x37A -> Crystals (Bitmask)
+            // 1 - Misery Mire
+            // 2 - Dark Palace
+            // 4 - Ice Palace
+            // 8 - Turtle Rock
+            // 16 - Swamp Palace
+            // 32 - Gargoyle's Domain
+            // 64 - Skull Woods
+            crystal: Crystal {
+                one:   response[0x3A] & 0b00000001 > 0,
+                three: response[0x3A] & 0b00000010 > 0,
+                five:  response[0x3A] & 0b00000100 > 0,
+                four:  response[0x3A] & 0b00001000 > 0,
+                two:   response[0x3A] & 0b00010000 > 0,
+                six:   response[0x3A] & 0b00100000 > 0,
+                seven: response[0x3A] & 0b01000000 > 0,
+            },
+        })
+    }
+}
+
 lazy_static! {
     static ref GAME_STATE: Mutex<GameState> = Mutex::new(GameState::default());
 }
 
-fn update_tracker_data(serial_port: &str) {
+fn update_tracker_serial_data(serial_port: &str) {
     let mut port = match serial::open(&serial_port) {
         Ok(p) => p,
         Err(e) => {
@@ -515,11 +595,11 @@ fn update_tracker_data(serial_port: &str) {
                         // 0xF50000 <-- WRAM start on SD2SNES
                         // 0x00F340 <-- Offset in WRAM to the items & other
                         //              things we're interested in tracking.
-        let mem_offset: u32 = 0xF50000;
-        let mem_size:   u32 = 0x040000;
+        let mem_offset: u32 = 0xF5F340;
+        let mem_size:   u32 = 0x000200;
         // Handy if we want to look at more of the WRAM, so we don't need to
         // manually update the offset into our WRAM chunk of every item.
-        let item_start = 0xF340;
+        let item_start = 0x0000;
 
         // println!("Querying SD2SNES...");
         let response = match read_wram(&mut port, mem_offset, mem_size) {
@@ -534,7 +614,7 @@ fn update_tracker_data(serial_port: &str) {
         let mut buffer = File::create("raw_response.txt").unwrap();
         buffer.write(&response[..]).unwrap();
 
-        let game_state = match parse_sd2snes_response(&response, item_start) {
+        let game_state = match GameState::try_from(response[(item_start as usize)..(mem_size as usize)].to_vec()) {
             Ok(gs) => gs,
             Err(e) => {
                 println!("Unable to parse game state: {}", e);
@@ -547,13 +627,43 @@ fn update_tracker_data(serial_port: &str) {
     }
 }
 
+fn update_tracker_file_data(file_path: &str) {
+    let one_second = time::Duration::from_millis(1_000);
+    loop {
+        thread::sleep(one_second);
+
+        let mut f = match File::open(&file_path) {
+            Ok(f) => f,
+            Err(e) => {
+                println!("Unable to open file ({:?}): {}", &file_path, e);
+                continue;
+            }
+        };
+        let mut state_json = String::new();
+        if let Err(e) = f.read_to_string(&mut state_json) {
+            println!("Unable to read file({:?}): {}", &file_path, e);
+            continue;
+        };
+
+        let game_state: GameState = match serde_json::from_str(&state_json) {
+            Ok(gs) => gs,
+            Err(e) => {
+                println!("Unable to parse game state: {}", e);
+                continue;
+            }
+        };
+
+        { *GAME_STATE.lock().unwrap() = game_state; }
+    }
+}
+
 fn read_wram<T: SerialPort>(port: &mut T, mem_offset: u32, mem_size: u32) -> io::Result<Vec<u8>> {
     let mut buf: Vec<u8> = Vec::with_capacity(512);
     buf.extend_from_slice("USBA".as_bytes());
     buf.resize(512, 0);
-    buf[4] = ServerOpcode::GET as u8; // opcode
+    buf[4] = ServerOpcode::Get as u8; // opcode
     buf[5] = ServerSpace::SNES as u8; // space
-    buf[6] = ServerFlag::NONE  as u8; // flags
+    buf[6] = ServerFlag::None  as u8; // flags
     // offset is big endian, and starts at index 256
     buf[256] = ((mem_offset >> 24) & 0xFF) as u8;
     buf[257] = ((mem_offset >> 16) & 0xFF) as u8;
@@ -581,7 +691,7 @@ fn read_wram<T: SerialPort>(port: &mut T, mem_offset: u32, mem_size: u32) -> io:
        result[1] != "S".as_bytes()[0] ||
        result[2] != "B".as_bytes()[0] ||
        result[3] != "A".as_bytes()[0] ||
-       result[4] != ServerOpcode::RESPONSE as u8 {
+       result[4] != ServerOpcode::Response as u8 {
 
         let timeout = port.timeout();
         port.set_timeout(Duration::from_millis(50))?;
@@ -595,131 +705,6 @@ fn read_wram<T: SerialPort>(port: &mut T, mem_offset: u32, mem_size: u32) -> io:
     Ok(result[512..].to_vec())
 }
 
-fn parse_sd2snes_response(response: &Vec<u8>, item_start: u32) -> Result<GameState, failure::Error> {
-    Ok(GameState {
-        bow:               BowFlags::try_from(response[(item_start + 0x00) as usize])?,
-        boomerang:         BoomerangFlags::try_from(response[(item_start + 0x01) as usize])?,
-        hook_shot:         GenericItemFlags::try_from(response[(item_start + 0x02) as usize])?,
-        bomb:              response[(item_start + 0x03) as usize],
-        shroom_powder:     ShroomPowderFlags::try_from(response[(item_start + 0x04) as usize])?,
-        fire_rod:          GenericItemFlags::try_from(response[(item_start + 0x05) as usize])?,
-        ice_rod:           GenericItemFlags::try_from(response[(item_start + 0x06) as usize])?,
-        bombos_medallion:  GenericItemFlags::try_from(response[(item_start + 0x07) as usize])?,
-        ether_medallion:   GenericItemFlags::try_from(response[(item_start + 0x08) as usize])?,
-        quake_medallion:   GenericItemFlags::try_from(response[(item_start + 0x09) as usize])?,
-        lantern:           GenericItemFlags::try_from(response[(item_start + 0x0A) as usize])?,
-        hammer:            GenericItemFlags::try_from(response[(item_start + 0x0B) as usize])?,
-        flute_shovel:      FluteShovelFlags::try_from(response[(item_start + 0x0C) as usize])?,
-        net:               GenericItemFlags::try_from(response[(item_start + 0x0D) as usize])?,
-        book:              GenericItemFlags::try_from(response[(item_start + 0x0E) as usize])?,
-        bottle:            response[(item_start + 0x0F) as usize],
-        cane_somaria:      GenericItemFlags::try_from(response[(item_start + 0x10) as usize])?,
-        cane_byrna:        GenericItemFlags::try_from(response[(item_start + 0x11) as usize])?,
-        cape:              GenericItemFlags::try_from(response[(item_start + 0x12) as usize])?,
-        mirror:            MirrorFlags::try_from(response[(item_start + 0x13) as usize])?,
-
-        gloves:            GlovesFlags::try_from(response[(item_start + 0x14) as usize])?,
-        boots:             GenericItemFlags::try_from(response[(item_start + 0x15) as usize])?,
-        flippers:          GenericItemFlags::try_from(response[(item_start + 0x16) as usize])?,
-        moon_pearl:        GenericItemFlags::try_from(response[(item_start + 0x17) as usize])?,
-
-        sword_level:       SwordFlags::try_from(response[(item_start + 0x19) as usize])?,
-        shield_level:      ShieldFlags::try_from(response[(item_start + 0x1A) as usize])?,
-        armor_level:       ArmorFlags::try_from(response[(item_start + 0x1B) as usize])?,
-
-        bottle_content1:   BottleFlags::try_from(response[(item_start + 0x1C) as usize])?,
-        bottle_content2:   BottleFlags::try_from(response[(item_start + 0x1D) as usize])?,
-        bottle_content3:   BottleFlags::try_from(response[(item_start + 0x1E) as usize])?,
-        bottle_content4:   BottleFlags::try_from(response[(item_start + 0x1F) as usize])?,
-
-        // Rupees are spread across two bytes, as the randomizer lifted the
-        // 255 Rupee limit, and it's stored little-endian.
-        rupees:            ((response[(item_start + 0x23) as usize] as u16) << 8) + response[(item_start + 0x22) as usize] as u16,
-        heart_quarters:    response[(item_start + 0x2B) as usize],
-        bomb_capacity:     response[(item_start + 0x30) as usize] + 10,
-        hearts:            response[(item_start + 0x2D) as usize],
-        max_hearts:        response[(item_start + 0x2C) as usize],
-
-        arrows:            response[(item_start + 0x37) as usize],
-        arrow_capacity:    response[(item_start + 0x31) as usize] + 30,
-
-        magic_progression: MagicFlags::try_from(response[(item_start + 0x3B) as usize])?,
-
-        small_keys:        if response[(item_start + 0x2F) as usize] == 0xFF {     0 } else { response[(item_start + 0x2F) as usize] },
-        big_key: BigKey {
-            // BigKey1: 0x366
-            //       Skull Woods
-            //       |Ice Palace
-            //       ||Tower of Hera
-            //       |||Gargoyle's Domain
-            //       ||||Turtle Rock
-            //       |||||Gannon's Tower
-            //       ||||||x
-            //       |||||||x
-            //       vvvvvvvv
-            //      |--------|
-            // Bit:  7      0
-            gannons_tower: response[(item_start + 0x26) as usize] & 0b00000100 > 0,
-            turtle_rock:   response[(item_start + 0x26) as usize] & 0b00001000 > 0,
-            thieves_town:  response[(item_start + 0x26) as usize] & 0b00010000 > 0,
-            tower_of_hera: response[(item_start + 0x26) as usize] & 0b00100000 > 0,
-            ice_palace:    response[(item_start + 0x26) as usize] & 0b01000000 > 0,
-            skull_woods:   response[(item_start + 0x26) as usize] & 0b10000000 > 0,
-
-            // BigKey2: 0x367
-            //       X
-            //       |X
-            //       ||Eastern Palace
-            //       |||Desert Palace
-            //       ||||X
-            //       |||||Swamp Palace
-            //       ||||||Dark Palace
-            //       |||||||Misery Mire
-            //       vvvvvvvv
-            //      |--------|
-            // Bit:  7      0
-            misery_mire:        response[(item_start + 0x27) as usize] & 0b00000001 > 0,
-            desert_palace:      response[(item_start + 0x27) as usize] & 0b00000010 > 0,
-            swamp_palace:       response[(item_start + 0x27) as usize] & 0b00000100 > 0,
-            palace_of_darkness: response[(item_start + 0x27) as usize] & 0b00010000 > 0,
-            eastern_palace:     response[(item_start + 0x27) as usize] & 0b00100000 > 0,
-        },
-
-        // 0x374 -> Pendants (Bitmask)
-        // 1 - Red
-        // 2 - Blue
-        // 4 - Green
-        pendant: Pendant {
-            red:   response[(item_start + 0x34) as usize] & 0b0001 > 0,
-            blue:  response[(item_start + 0x34) as usize] & 0b0010 > 0,
-            green: response[(item_start + 0x34) as usize] & 0b0100 > 0,
-        },
-
-        // 0x37A -> Crystals (Bitmask)
-        // 1 - Misery Mire
-        // 2 - Dark Palace
-        // 4 - Ice Palace
-        // 8 - Turtle Rock
-        // 16 - Swamp Palace
-        // 32 - Gargoyle's Domain
-        // 64 - Skull Woods
-        crystal: Crystal {
-            one:   response[(item_start + 0x3A) as usize] & 0b00000001 > 0,
-            three: response[(item_start + 0x3A) as usize] & 0b00000010 > 0,
-            five:  response[(item_start + 0x3A) as usize] & 0b00000100 > 0,
-            four:  response[(item_start + 0x3A) as usize] & 0b00001000 > 0,
-            two:   response[(item_start + 0x3A) as usize] & 0b00010000 > 0,
-            six:   response[(item_start + 0x3A) as usize] & 0b00100000 > 0,
-            seven: response[(item_start + 0x3A) as usize] & 0b01000000 > 0,
-        },
-    })
-}
-
-#[get("/")]
-fn index() -> &'static str {
-    "Hello, world!"
-}
-
 #[get("/game_state", format = "application/json")]
 fn get_game_state() -> Json<GameState> {
     let game_state = GAME_STATE.lock().unwrap().clone();
@@ -728,27 +713,51 @@ fn get_game_state() -> Json<GameState> {
 
 #[get("/<file..>")]
 fn files(file: PathBuf) -> Option<NamedFile> {
-    NamedFile::open(Path::new("static/").join(file)).ok()
+    let mut path = Path::new("static/").join(file);
+    if path.is_dir() { path = path.join("index.html") }
+
+    println!("Attempting to find static file at: {:?}", &path);
+
+    NamedFile::open(path).ok()
 }
+
+#[get("/")]
+fn root() -> Option<NamedFile> { files(PathBuf::from("")) }
 
 fn main() {
     let matches = App::new("SD2SNES LttP Randomizer Tracker")
                           .version(crate_version!())
                           .author(crate_authors!())
                           .about("Automatically track progress in a Link to the Past randomizer run using a USB2SNES modified SD2SNES.")
-                          .arg(Arg::with_name("SERIAL")
+                          .arg(Arg::with_name("serial")
                                .help("The SD2SNES serial port to use.")
-                               .required(true)
-                               .index(1))
+                               .short("s")
+                               .long("serial")
+                               .takes_value(true))
+                          .arg(Arg::with_name("file")
+                               .help("JSON file to read game state from")
+                               .short("f")
+                               .long("file")
+                               .takes_value(true))
+                          .group(ArgGroup::with_name("source")
+                                 .required(true)
+                                 .args(&["serial", "file"]))
                           .get_matches();
 
-    let serial_port = matches.value_of("SERIAL").unwrap().to_string();
-    println!("Using serial port: {}", &serial_port);
-
-    thread::spawn(move || { update_tracker_data(&serial_port) });
+    thread::spawn(move || {
+        if let Some(serial) = matches.value_of("serial") {
+            let serial_port = serial.to_string();
+            println!("Using serial port: {}", &serial_port);
+            update_tracker_serial_data(&serial_port);
+        } else if let Some(file) = matches.value_of("file") {
+            let file_source = file.to_string();
+            println!("Using file: {}", &file_source);
+            update_tracker_file_data(&file_source);
+        }
+    });
 
     rocket::ignite().mount(
         "/",
-        routes![index,get_game_state,files]
+        routes![get_game_state,files,root]
     ).launch();
 }
