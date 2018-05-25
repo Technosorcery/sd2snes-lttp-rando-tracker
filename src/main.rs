@@ -11,9 +11,10 @@ extern crate rocket;
 extern crate rocket_contrib;
 #[macro_use]
 extern crate serde_derive;
+extern crate serde_json;
 extern crate serial;
 
-use clap::{Arg, App};
+use clap::{App, Arg, ArgGroup};
 
 use rocket::response::NamedFile;
 use rocket_contrib::Json;
@@ -558,12 +559,11 @@ impl TryFrom<Vec<u8>> for GameState {
     }
 }
 
-
 lazy_static! {
     static ref GAME_STATE: Mutex<GameState> = Mutex::new(GameState::default());
 }
 
-fn update_tracker_data(serial_port: &str) {
+fn update_tracker_serial_data(serial_port: &str) {
     let mut port = match serial::open(&serial_port) {
         Ok(p) => p,
         Err(e) => {
@@ -623,6 +623,36 @@ fn update_tracker_data(serial_port: &str) {
         };
 
         // println!("Game State: {:#?}", &game_state);
+        { *GAME_STATE.lock().unwrap() = game_state; }
+    }
+}
+
+fn update_tracker_file_data(file_path: &str) {
+    let one_second = time::Duration::from_millis(1_000);
+    loop {
+        thread::sleep(one_second);
+
+        let mut f = match File::open(&file_path) {
+            Ok(f) => f,
+            Err(e) => {
+                println!("Unable to open file ({:?}): {}", &file_path, e);
+                continue;
+            }
+        };
+        let mut state_json = String::new();
+        if let Err(e) = f.read_to_string(&mut state_json) {
+            println!("Unable to read file({:?}): {}", &file_path, e);
+            continue;
+        };
+
+        let game_state: GameState = match serde_json::from_str(&state_json) {
+            Ok(gs) => gs,
+            Err(e) => {
+                println!("Unable to parse game state: {}", e);
+                continue;
+            }
+        };
+
         { *GAME_STATE.lock().unwrap() = game_state; }
     }
 }
@@ -699,16 +729,32 @@ fn main() {
                           .version(crate_version!())
                           .author(crate_authors!())
                           .about("Automatically track progress in a Link to the Past randomizer run using a USB2SNES modified SD2SNES.")
-                          .arg(Arg::with_name("SERIAL")
+                          .arg(Arg::with_name("serial")
                                .help("The SD2SNES serial port to use.")
-                               .required(true)
-                               .index(1))
+                               .short("s")
+                               .long("serial")
+                               .takes_value(true))
+                          .arg(Arg::with_name("file")
+                               .help("JSON file to read game state from")
+                               .short("f")
+                               .long("file")
+                               .takes_value(true))
+                          .group(ArgGroup::with_name("source")
+                                 .required(true)
+                                 .args(&["serial", "file"]))
                           .get_matches();
 
-    let serial_port = matches.value_of("SERIAL").unwrap().to_string();
-    println!("Using serial port: {}", &serial_port);
-
-    thread::spawn(move || { update_tracker_data(&serial_port) });
+    thread::spawn(move || {
+        if let Some(serial) = matches.value_of("serial") {
+            let serial_port = serial.to_string();
+            println!("Using serial port: {}", &serial_port);
+            update_tracker_serial_data(&serial_port);
+        } else if let Some(file) = matches.value_of("file") {
+            let file_source = file.to_string();
+            println!("Using file: {}", &file_source);
+            update_tracker_file_data(&file_source);
+        }
+    });
 
     rocket::ignite().mount(
         "/",
