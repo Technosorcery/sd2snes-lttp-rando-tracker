@@ -79,7 +79,7 @@ pub enum ServerFlag {
     Data64B = 128,
 }
 
-#[derive(Debug, Default, Clone, Copy, Serialize)]
+#[derive(Debug, Default, Clone, Copy, Serialize, Deserialize)]
 struct BigKey {
     // Light world
     eastern_palace: bool,
@@ -96,14 +96,14 @@ struct BigKey {
     gannons_tower: bool,
 }
 
-#[derive(Debug, Default, Clone, Copy, Serialize)]
+#[derive(Debug, Default, Clone, Copy, Serialize, Deserialize)]
 struct Pendant {
     red: bool,
     blue: bool,
     green: bool,
 }
 
-#[derive(Debug, Default, Clone, Copy, Serialize)]
+#[derive(Debug, Default, Clone, Copy, Serialize, Deserialize)]
 struct Crystal {
     one: bool,
     two: bool,
@@ -114,7 +114,7 @@ struct Crystal {
     seven: bool,
 }
 
-#[derive(Debug, Copy, Clone, Serialize)]
+#[derive(Debug, Copy, Clone, Serialize, Deserialize)]
 enum BowFlags {
     None             = 0,
     Wood             = 1,
@@ -142,7 +142,7 @@ impl TryFrom<u8> for BowFlags {
     }
 }
 
-#[derive(Debug, Copy, Clone, Serialize)]
+#[derive(Debug, Copy, Clone, Serialize, Deserialize)]
 enum BoomerangFlags {
     None = 0,
     Blue = 1,
@@ -166,7 +166,7 @@ impl TryFrom<u8> for BoomerangFlags {
     }
 }
 
-#[derive(Debug, Copy, Clone, Serialize)]
+#[derive(Debug, Copy, Clone, Serialize, Deserialize)]
 enum ShroomPowderFlags {
     None   = 0,
     Shroom = 1,
@@ -190,7 +190,7 @@ impl TryFrom<u8> for ShroomPowderFlags {
     }
 }
 
-#[derive(Debug, Copy, Clone, Serialize)]
+#[derive(Debug, Copy, Clone, Serialize, Deserialize)]
 enum FluteShovelFlags {
     None         = 0,
     Shovel       = 1,
@@ -216,7 +216,7 @@ impl TryFrom<u8> for FluteShovelFlags {
     }
 }
 
-#[derive(Debug, Copy, Clone, Serialize)]
+#[derive(Debug, Copy, Clone, Serialize, Deserialize)]
 enum GlovesFlags {
     None       = 0,
     PowerGlove = 1,
@@ -240,7 +240,7 @@ impl TryFrom<u8> for GlovesFlags {
     }
 }
 
-#[derive(Debug, Copy, Clone, Serialize)]
+#[derive(Debug, Copy, Clone, Serialize, Deserialize)]
 enum SwordFlags {
     None          = 0,
     FightersSword = 1,
@@ -268,7 +268,7 @@ impl TryFrom<u8> for SwordFlags {
     }
 }
 
-#[derive(Debug, Copy, Clone, Serialize)]
+#[derive(Debug, Copy, Clone, Serialize, Deserialize)]
 enum ShieldFlags {
     None           = 0,
     FightersShield = 1,
@@ -294,7 +294,7 @@ impl TryFrom<u8> for ShieldFlags {
     }
 }
 
-#[derive(Debug, Copy, Clone, Serialize)]
+#[derive(Debug, Copy, Clone, Serialize, Deserialize)]
 enum ArmorFlags {
     GreenMail = 0,
     BlueMail  = 1,
@@ -318,7 +318,7 @@ impl TryFrom<u8> for ArmorFlags {
     }
 }
 
-#[derive(Debug, Copy, Clone, Serialize)]
+#[derive(Debug, Copy, Clone, Serialize, Deserialize)]
 enum BottleFlags {
     NoBottle    = 0x00,
     Mushroom    = 0x01,
@@ -354,7 +354,7 @@ impl TryFrom<u8> for BottleFlags {
     }
 }
 
-#[derive(Debug, Copy, Clone, Serialize)]
+#[derive(Debug, Copy, Clone, Serialize, Deserialize)]
 enum MagicFlags {
     Normal  = 0,
     Half    = 1,
@@ -378,7 +378,7 @@ impl TryFrom<u8> for MagicFlags {
     }
 }
 
-#[derive(Debug, Default, Copy, Clone, Serialize)]
+#[derive(Debug, Default, Copy, Clone, Serialize, Deserialize)]
 struct GameState {
     // Items
     pub bow:               BowFlags,
