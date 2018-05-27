@@ -160,20 +160,20 @@ fn update_tracker_file_data(file_path: &str) {
         let mut f = match File::open(&file_path) {
             Ok(f) => f,
             Err(e) => {
-                println!("Unable to open file ({:?}): {}", &file_path, e);
+                println!("Unable to open file {:?}: {}", &file_path, e);
                 continue;
             }
         };
         let mut state_json = String::new();
         if let Err(e) = f.read_to_string(&mut state_json) {
-            println!("Unable to read file({:?}): {}", &file_path, e);
+            println!("Unable to read file {:?}: {}", &file_path, e);
             continue;
         };
 
         let game_state: GameState = match serde_json::from_str(&state_json) {
             Ok(gs) => gs,
             Err(e) => {
-                println!("Unable to parse game state: {}", e);
+                println!("Unable to parse game state {:?}: {}", &file_path, e);
                 continue;
             }
         };
