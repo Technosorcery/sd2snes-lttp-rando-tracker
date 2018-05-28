@@ -1,6 +1,12 @@
 language: rust
 rust:
   - nightly
-cache: cargo
+node_js:
+  - node
+cache:
+  cargo: true
+  yarn: true
 script:
+  - (cd ui && yarn install && yarn run build)
   - cargo build --verbose --all
+  - cargo test --verbose --all
