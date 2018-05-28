@@ -5,8 +5,10 @@
 extern crate clap;
 #[macro_use]
 extern crate failure;
+extern crate includedir;
 #[macro_use]
 extern crate lazy_static;
+extern crate phf;
 extern crate rocket;
 extern crate rocket_contrib;
 #[macro_use]
@@ -16,13 +18,22 @@ extern crate serial;
 
 mod lttp;
 
-use clap::{App, Arg, ArgGroup};
+use clap::{
+    App,
+    Arg,
+    ArgGroup,
+};
 
-use rocket::response::NamedFile;
+use rocket::http::{
+    ContentType,
+    Status,
+};
+use rocket::Response;
 use rocket_contrib::Json;
 
 use std::convert::TryFrom;
-use std::io;
+use std::env;
+use std::io::{self, Cursor};
 use std::fs::File;
 use std::path::{Path, PathBuf};
 use std::sync::Mutex;
@@ -35,6 +46,8 @@ use serial::prelude::*;
 use serial::PortSettings;
 
 use lttp::GameState;
+
+include!(concat!(env!("OUT_DIR"), "/ui_files.rs"));
 
 #[derive(Debug, Copy, Clone)]
 pub enum ServerOpcode {
@@ -237,17 +250,49 @@ fn get_game_state() -> Json<GameState> {
 }
 
 #[get("/<file..>")]
-fn files(file: PathBuf) -> Option<NamedFile> {
-    let mut path = Path::new("static/").join(file);
-    if path.is_dir() { path = path.join("index.html") }
+fn files<'r>(file: PathBuf) -> Option<Response<'r>> {
+    let mut path = Path::new("ui/dist/").join(file);
+    // If the path somehow isn't representable as a str, it's not one we want to
+    // attempt to serve.
+    let mut path_str = match path.to_str() {
+        Some(s) => s.to_string(),
+        None    => return None,
+    };
 
-    println!("Attempting to find static file at: {:?}", &path);
+    let file = match UI_FILES.get(&path_str) {
+        // Check if we were given a file path, or a directory. If the file can't
+        // be found, assume it was supposed to be a directory, and try grabbing
+        // the index.html from it.
+        Err(_) => {
+            path = path.join("index.html");
+            path_str = match path.to_str() {
+                Some(s) => s.to_string(),
+                None    => return None,
+            };
+            // If we still can't find the file, there isn't one to find.
+            match UI_FILES.get(&path_str) {
+                Err(_) => return None,
+                Ok(f)  => f,
+            }
+        },
+        Ok(f) => f,
+    };
 
-    NamedFile::open(path).ok()
+    let mut response = Response::new();
+
+    if let Some(ext) = path.extension() {
+        if let Some(ct) = ContentType::from_extension(&ext.to_string_lossy()) {
+            response.set_header(ct);
+        }
+    }
+    response.set_status(Status::Ok);
+    response.set_sized_body(Cursor::new(file));
+
+    Some(response)
 }
 
 #[get("/")]
-fn root() -> Option<NamedFile> { files(PathBuf::from("")) }
+fn root<'r>() -> Option<Response<'r>> { files(PathBuf::from("")) }
 
 fn main() {
     let matches = App::new("SD2SNES LttP Randomizer Tracker")
@@ -280,6 +325,8 @@ fn main() {
             update_tracker_file_data(&file_source);
         }
     });
+
+    UI_FILES.set_passthrough(env::var_os("UI_FILES_PASSTHROUGH").is_some());
 
     rocket::ignite().mount(
         "/",
