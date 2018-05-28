@@ -253,7 +253,7 @@ fn main() {
     let matches = App::new("SD2SNES LttP Randomizer Tracker")
                           .version(crate_version!())
                           .author(crate_authors!())
-                          .about("Automatically track progress in a Link to the Past randomizer run using a USB2SNES modified SD2SNES.")
+                          .about(crate_description!())
                           .arg(Arg::with_name("serial")
                                .help("The SD2SNES serial port to use.")
                                .short("s")

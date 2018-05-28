@@ -1,5 +1,6 @@
 [package]
 name = "sd2snes-lttp-rando-tracker"
+description = "Automatically track progress in a Link to the Past randomizer run using a USB2SNES modified SD2SNES."
 version = "0.1.0"
 authors = ["Jacob Helwig <jacob@technosorcery.net>"]
 
