@@ -1,5 +1,6 @@
 <template>
   <div class="dashboard">
+    <h1>{{ msg }}</h1>
     <item-tracker></item-tracker>
     <map-tracker></map-tracker>
   </div>
@@ -17,7 +18,7 @@ export default {
   },
   data () {
     return {
-      msg: 'Welcome to Your Vue.js App'
+      msg: 'The Dasboard'
     }
   }
 }

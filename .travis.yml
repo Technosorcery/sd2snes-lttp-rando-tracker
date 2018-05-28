@@ -7,6 +7,6 @@ cache:
   cargo: true
   yarn: true
 script:
-  - (cd ui && yarn install && yarn run build)
+  - (cd ui && yarn install && yarn run unit && yarn run build)
   - cargo build --verbose --all
   - cargo test --verbose --all
