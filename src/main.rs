@@ -90,7 +90,7 @@ lazy_static! {
 
 fn update_tracker_serial_data(serial_port: &str) {
     let mut port = match serial::open(&serial_port) {
-        Ok(p) => p,
+        Ok(p)  => p,
         Err(e) => {
             println!("Unable to open '{}': {}", &serial_port, &e);
             ::std::process::exit(1);
@@ -128,7 +128,7 @@ fn update_tracker_serial_data(serial_port: &str) {
 
         // println!("Querying SD2SNES...");
         let response = match read_wram(&mut port, mem_offset, mem_size) {
-            Ok(r) => r,
+            Ok(r)  => r,
             Err(e) => {
                 println!("Error reading response: {}", e);
                 continue;
@@ -158,7 +158,7 @@ fn update_tracker_file_data(file_path: &str) {
         thread::sleep(one_second);
 
         let mut f = match File::open(&file_path) {
-            Ok(f) => f,
+            Ok(f)  => f,
             Err(e) => {
                 println!("Unable to open file {:?}: {}", &file_path, e);
                 continue;
