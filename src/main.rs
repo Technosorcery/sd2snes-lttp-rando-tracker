@@ -1,10 +1,11 @@
-#![feature(try_from,plugin)]
+#![feature(try_from, plugin)]
 #![plugin(rocket_codegen)]
 
 #[macro_use]
 extern crate clap;
 #[macro_use]
 extern crate failure;
+extern crate hyper;
 extern crate includedir;
 #[macro_use]
 extern crate lazy_static;
@@ -15,6 +16,7 @@ extern crate rocket_contrib;
 extern crate serde_derive;
 extern crate serde_json;
 extern crate serial;
+extern crate unicase;
 
 mod lttp;
 
@@ -28,8 +30,13 @@ use rocket::http::{
     ContentType,
     Status,
 };
+use rocket::http::hyper::header::{
+    AccessControlAllowHeaders,
+    AccessControlAllowMethods,
+    AccessControlAllowOrigin,
+};
+use hyper::method::Method as hMethod;
 use rocket::Response;
-use rocket_contrib::Json;
 
 use std::convert::TryFrom;
 use std::env;
@@ -44,6 +51,8 @@ use std::io::prelude::*;
 use serial::prelude::*;
 
 use serial::PortSettings;
+
+use unicase::UniCase;
 
 use lttp::GameState;
 
@@ -243,10 +252,37 @@ fn read_wram<T: SerialPort>(port: &mut T, mem_offset: u32, mem_size: u32) -> io:
     Ok(result[512..].to_vec())
 }
 
+fn game_state_response<'r>() -> Response<'r> {
+    let mut response = Response::new();
+    response.set_header(ContentType::JSON);
+    response.set_status(Status::Ok);
+    response.set_header(AccessControlAllowOrigin::Any);
+    response.set_header(AccessControlAllowMethods(vec![hMethod::Get]));
+    response.set_header(AccessControlAllowHeaders(vec![
+        UniCase("content-type".to_owned()),
+        UniCase("accept".to_owned()),
+    ]));
+
+    response
+}
+
+#[options("/game_state", format = "application/json")]
+fn get_game_state_options<'r>() -> Response<'r> { game_state_response() }
+
 #[get("/game_state", format = "application/json")]
-fn get_game_state() -> Json<GameState> {
+fn get_game_state<'r>() -> Option<Response<'r>> {
     let game_state = GAME_STATE.lock().unwrap().clone();
-    Json(game_state)
+    let mut response = game_state_response();
+    let json = match serde_json::to_string(&game_state) {
+        Ok(j) => j,
+        Err(e) => {
+            println!("Could not serialize game state: {:?}", e);
+            return None;
+        }
+    };
+    response.set_sized_body(Cursor::new(json));
+
+    Some(response)
 }
 
 #[get("/<file..>")]
@@ -328,8 +364,15 @@ fn main() {
 
     UI_FILES.set_passthrough(env::var_os("UI_FILES_PASSTHROUGH").is_some());
 
-    rocket::ignite().mount(
-        "/",
-        routes![get_game_state,files,root]
-    ).launch();
+    rocket::ignite()
+        .mount(
+            "/",
+            routes![
+                get_game_state,
+                get_game_state_options,
+                files,
+                root
+            ]
+        )
+        .launch();
 }

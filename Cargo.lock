@@ -566,6 +566,7 @@ dependencies = [
  "bitflags 1.0.3 (registry+https://github.com/rust-lang/crates.io-index)",
  "clap 2.31.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "failure 0.1.1 (registry+https://github.com/rust-lang/crates.io-index)",
+ "hyper 0.10.13 (registry+https://github.com/rust-lang/crates.io-index)",
  "includedir 0.4.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "includedir_codegen 0.4.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "lazy_static 1.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -577,6 +578,7 @@ dependencies = [
  "serde_derive 1.0.62 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde_json 1.0.18 (registry+https://github.com/rust-lang/crates.io-index)",
  "serial 0.4.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "unicase 1.4.2 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
