@@ -2,39 +2,39 @@
   <div class="item-tracker">
     <div class="items">
       <div class="tracker-row">
-        <img src="../assets/bow.png" class="bow" v-bind:class="bowState">
-        <img src="../assets/hookshot.png">
-        <img src="../assets/hammer.png">
-        <img src="../assets/firerod.png">
-        <img src="../assets/glove0.png">
-        <img src="../assets/moonpearl.png">
+        <div class="item bow" :class="bowState"></div>
+        <div class="item hookshot" :class="hookshotState"></div>
+        <div class="item hammer" :class="hammerState"></div>
+        <div class="item firerod" :class="firerodState"></div>
+        <div class="item" :class="gloveState"></div>
+        <div class="item moonpearl" :class="moonpearlState"></div>
       </div>
       <div class="tracker-row">
-        <img src="../assets/somaria.png">
-        <img src="../assets/lantern.png">
-        <img src="../assets/flute.png">
-        <img src="../assets/book.png">
-        <img src="../assets/boots.png">
-        <img src="../assets/flippers.png">
-        <img src="../assets/mirror.png">
+        <div class="item somaria" :class="somariaState"></div>
+        <div class="item lantern" :class="lanternState"></div>
+        <div class="item flute" :class="fluteState"></div>
+        <div class="item book" :class="bookState"></div>
+        <div class="item boots" :class="bootsState"></div>
+        <div class="item flippers" :class="flippersState"></div>
+        <div class="item mirror" :class="mirrorState"></div>
       </div>
       <div class="tracker-row">
-        <img src="../assets/sword0.png">
-        <img src="../assets/tunic1.png">
-        <img src="../assets/shield0.png">
-        <!-- Empty Cell -->
-        <img src="../assets/bombos.png">
-        <img src="../assets/ether.png">
-        <img src="../assets/quake.png">
+        <div class="item" :class="swordState"></div>
+        <div class="item" :class="armorState"></div>
+        <div class="item" :class="shieldState"></div>
+        <div class="item"></div>
+        <div class="item bombos" :class="bombosState"></div>
+        <div class="item ether" :class="etherState"></div>
+        <div class="item quake" :class="quakeState"></div>
       </div>
       <div class="tracker-row">
-        <img src="../assets/shovel.png">
-        <img src="../assets/mushroom.png">
-        <img src="../assets/powder.png">
-        <img src="../assets/bottle0.png">
-        <img src="../assets/cape.png">
-        <img src="../assets/icerod.png">
-        <img src="../assets/silvers.png">
+        <div class="item shovel" :class="shovelState"></div>
+        <div class="item mushroom" :class="mushroomState"></div>
+        <div class="item powder" :class="powderState"></div>
+        <div class="item bottle" :class="bottleState"></div>
+        <div class="item cape" :class="capeState"></div>
+        <div class="item icerod" :class="icerodState"></div>
+        <div class="item silvers" :class="silversState"></div>
       </div>
     </div>
     <div class="dungeons">
@@ -69,6 +69,113 @@ export default {
     bowState () {
       if (!this.$store.state.game.bow) { return }
       return this.$store.state.game.bow.toLowerCase()
+    },
+
+    hookshotState () {
+      return this.$store.state.game.hookshot ? 'true' : 'false'
+    },
+
+    hammerState () {
+      return this.$store.state.game.hammer ? 'true' : 'false'
+    },
+
+    firerodState () {
+      return this.$store.state.game.fire_rod ? 'true' : 'false'
+    },
+
+    gloveState () {
+      if (!this.$store.state.game.gloves) { return }
+      if (this.$store.state.game.gloves === 'None') { return 'nogloves' }
+      return this.$store.state.game.gloves.toLowerCase()
+    },
+
+    moonpearlState () {
+      return this.$store.state.game.moon_pearl ? 'true' : 'false'
+    },
+
+    somariaState () {
+      return this.$store.state.game.cane_somaria ? 'true' : 'false'
+    },
+
+    lanternState () {
+      return this.$store.state.game.lantern ? 'true' : 'false'
+    },
+
+    fluteState () {
+      return this.$store.state.game.flute ? 'true' : 'false'
+    },
+
+    bookState () {
+      return this.$store.state.game.book ? 'true' : 'false'
+    },
+
+    bootsState () {
+      return this.$store.state.game.boots ? 'true' : 'false'
+    },
+
+    flippersState () {
+      return this.$store.state.game.flippers ? 'true' : 'false'
+    },
+
+    mirrorState () {
+      return this.$store.state.game.mirror ? 'true' : 'false'
+    },
+
+    swordState () {
+      if (!this.$store.state.game.sword_level) { return }
+      if (this.$store.state.game.sword_level === 'None') { return 'nosword' }
+      return this.$store.state.game.sword_level.toLowerCase()
+    },
+
+    armorState () {
+      if (!this.$store.state.game.armor_level) { return }
+      return this.$store.state.game.armor_level.toLowerCase()
+    },
+
+    shieldState () {
+      if (!this.$store.state.game.shield_level) { return }
+      if (this.$store.state.game.shield_level === 'None') { return 'noshield' }
+      return this.$store.state.game.shield_level.toLowerCase()
+    },
+
+    bombosState () {
+      return this.$store.state.game.bombos_medallion ? 'true' : 'false'
+    },
+
+    etherState () {
+      return this.$store.state.game.ether_medallion ? 'true' : 'false'
+    },
+
+    quakeState () {
+      return this.$store.state.game.quake_medallion ? 'true' : 'false'
+    },
+
+    shovelState () {
+      return this.$store.state.game.shovel ? 'true' : 'false'
+    },
+
+    mushroomState () {
+      return this.$store.state.game.mushroom ? 'true' : 'false'
+    },
+
+    powderState () {
+      return this.$store.state.game.powder ? 'true' : 'false'
+    },
+
+    bottleState () {
+      return this.$store.state.game.bottle ? 'true' : 'false'
+    },
+
+    capeState () {
+      return this.$store.state.game.cape ? 'true' : 'false'
+    },
+
+    icerodState () {
+      return this.$store.state.game.ice_rod ? 'true' : 'false'
+    },
+
+    silversState () {
+      return this.$store.state.game.silvers ? 'true' : 'false'
     }
   }
 }

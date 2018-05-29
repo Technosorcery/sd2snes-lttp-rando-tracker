@@ -1,5 +1,125 @@
-.bow {
-  &.none {
-    opacity: .5;
+.item {
+  height: 64px;
+  width: 64px;
+  display: inline-block;
+  position: relative;
+
+  &.none,
+  &.false {
+    opacity: $unobtainedItemOpacity;
+  }
+
+  &.bow {
+    background-image: url("/static/item/bow.png");
+  }
+  &.hookshot {
+    background-image: url("/static/item/hookshot.png");
+  }
+  &.hammer {
+    background-image: url("/static/item/hammer.png");
+  }
+  &.firerod {
+    background-image: url("/static/item/firerod.png");
+  }
+  &.nogloves {
+    background-image: url("/static/item/glove0.png");
+    opacity: $unobtainedItemOpacity;
+  }
+  &.powerglove {
+    background-image: url("/static/item/glove1.png");
+  }
+  &.titansmitt {
+    background-image: url("/static/item/glove2.png");
+  }
+  &.moonpearl {
+    background-image: url("/static/item/moonpearl.png");
+  }
+  &.somaria {
+    background-image: url("/static/item/somaria.png");
+  }
+  &.lantern {
+    background-image: url("/static/item/lantern.png");
+  }
+  &.flute {
+    background-image: url("/static/item/flute.png");
+  }
+  &.book {
+    background-image: url("/static/item/book.png");
+  }
+  &.boots {
+    background-image: url("/static/item/boots.png");
+  }
+  &.flippers {
+    background-image: url("/static/item/flippers.png");
+  }
+  &.mirror {
+    background-image: url("/static/item/mirror.png");
+  }
+  &.nosword {
+    background-image: url("/static/item/sword0.png");
+  }
+  &.fighterssword {
+    background-image: url("/static/item/sword1.png");
+  }
+  &.mastersword {
+    background-image: url("/static/item/sword2.png");
+  }
+  &.temperedsword {
+    background-image: url("/static/item/sword3.png");
+  }
+  &.goldensword {
+    background-image: url("/static/item/sword4.png");
+  }
+  &.greenmail {
+    background-image: url("/static/item/tunic1.png");
+  }
+  &.bluemail {
+    background-image: url("/static/item/tunic2.png");
+  }
+  &.redmail {
+    background-image: url("/static/item/tunic3.png");
+  }
+  &.noshield {
+    background-image: url("/static/item/shield0.png");
+    opacity: $unobtainedItemOpacity;
+  }
+  &.fightersshield {
+    background-image: url("/static/item/shield1.png");
+  }
+  &.redshield {
+    background-image: url("/static/item/shield2.png");
+  }
+  &.mirrorshield {
+    background-image: url("/static/item/shield3.png");
+  }
+  &.bombos {
+    background-image: url("/static/item/bombos.png");
+  }
+  &.ether {
+    background-image: url("/static/item/ether.png");
+  }
+  &.quake {
+    background-image: url("/static/item/quake.png");
+  }
+  &.shovel {
+    background-image: url("/static/item/shovel.png");
+  }
+  &.mushroom {
+    background-image: url("/static/item/mushroom.png");
+  }
+  &.powder {
+    background-image: url("/static/item/powder.png");
+  }
+  &.bottle {
+    background-image: url("/static/item/bottle.png");
+  }
+  &.cape {
+    background-image: url("/static/item/cape.png");
+  }
+  &.icerod {
+    background-image: url("/static/item/icerod.png");
+  }
+  &.silvers {
+    background-image: url("/static/item/silvers.png");
   }
 }
