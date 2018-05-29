@@ -1,10 +1,10 @@
 let requestOptions = {
-  headers: { 'content-type': 'application/json' }
+  headers: { 'Content-Type': 'application/json' }
 }
 
 export default {
   retrieveState ({commit}) {
-    fetch('/game_state', requestOptions)
+    fetch('http://localhost:8000/game_state', requestOptions)
       .then(response => response.json())
       .then((data) => { commit('setState', data) })
   }
