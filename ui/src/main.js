@@ -21,12 +21,17 @@ const store = new Vuex.Store({
 
 /* eslint-disable no-new */
 new Vue({
-  el: '#app',
-  router,
   components: {
     App,
     ItemTracker
   },
+  created () {
+    setInterval(() => {
+      this.$store.dispatch('retrieveState')
+    }, 250)
+  },
+  el: '#app',
+  router,
   store,
   template: '<App/>'
 })
