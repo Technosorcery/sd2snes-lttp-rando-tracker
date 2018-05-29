@@ -2,7 +2,7 @@
   <div class="item-tracker">
     <div class="items">
       <div class="tracker-row">
-        <img src="../assets/bow.png">
+        <img src="../assets/bow.png" class="bow" v-bind:class="bowState">
         <img src="../assets/hookshot.png">
         <img src="../assets/hammer.png">
         <img src="../assets/firerod.png">
@@ -63,6 +63,12 @@ export default {
   data () {
     return {
       msg: 'Welcome to Your Vue.js App'
+    }
+  },
+  computed: {
+    bowState () {
+      if (!this.$store.state.game.bow) { return }
+      return this.$store.state.game.bow.toLowerCase()
     }
   }
 }

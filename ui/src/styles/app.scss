@@ -1,0 +1,13 @@
+@import 'variables';
+@import 'item-states';
+
+body {
+  background-color: $black;
+  color: $white;
+}
+
+.app {
+  font-family: 'Avenir', Helvetica, Arial, sans-serif;
+  margin-top: 60px;
+  text-align: center;
+}
