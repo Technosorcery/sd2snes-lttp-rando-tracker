@@ -18,7 +18,7 @@ export default {
   },
   data () {
     return {
-      msg: 'The Dasboard'
+      msg: 'The Dashboard'
     }
   }
 }
