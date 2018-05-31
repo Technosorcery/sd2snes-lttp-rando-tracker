@@ -207,3 +207,69 @@ impl TryFrom<Vec<u8>> for GameState {
         })
     }
 }
+
+impl GameState {
+    /// Return a new GameState merging in the items from the old GameState.
+    /// Things like bomb count, hearts, rupees, etc are taken from self.
+    pub fn merge(&self, old: GameState) -> Self {
+        GameState {
+            bow:               self.bow              || old.bow,
+            blue_boomerang:    self.blue_boomerang   || old.blue_boomerang,
+            red_boomerang:     self.red_boomerang    || old.red_boomerang,
+            hook_shot:         self.hook_shot        || old.hook_shot,
+            bomb:              self.bomb,
+            mushroom:          self.mushroom         || old.mushroom,
+            powder:            self.powder           || old.powder,
+            fire_rod:          self.fire_rod         || old.fire_rod,
+            ice_rod:           self.ice_rod          || old.ice_rod,
+            bombos_medallion:  self.bombos_medallion || old.bombos_medallion,
+            ether_medallion:   self.ether_medallion  || old.ether_medallion,
+            quake_medallion:   self.quake_medallion  || old.quake_medallion,
+            lantern:           self.lantern          || old.lantern,
+            hammer:            self.hammer           || old.hammer,
+            flute:             self.flute            || old.flute,
+            shovel:            self.shovel           || old.shovel,
+            net:               self.net              || old.net,
+            book:              self.book             || old.book,
+            bottle:            self.bottle           || old.bottle,
+            cane_somaria:      self.cane_somaria     || old.cane_somaria,
+            cane_byrna:        self.cane_byrna       || old.cane_byrna,
+            cape:              self.cape             || old.cape,
+            mirror:            self.mirror           || old.mirror,
+            silvers:           self.silvers          || old.silvers,
+
+            gloves:            self.gloves,
+            boots:             self.boots            || old.boots,
+            flippers:          self.flippers         || old.flippers,
+            moon_pearl:        self.moon_pearl       || old.moon_pearl,
+
+            sword_level:       self.sword_level,
+            shield_level:      self.shield_level,
+            armor_level:       self.armor_level,
+
+            bottle_content1:   self.bottle_content1,
+            bottle_content2:   self.bottle_content2,
+            bottle_content3:   self.bottle_content3,
+            bottle_content4:   self.bottle_content4,
+
+            // Rupees are spread across two bytes, as the randomizer lifted the
+            // 255 Rupee limit, and it's stored little-endian.
+            rupees:            self.rupees,
+            heart_quarters:    self.heart_quarters,
+            bomb_capacity:     self.bomb_capacity,
+            hearts:            self.hearts,
+            max_hearts:        self.max_hearts,
+
+            arrows:            self.arrows,
+            arrow_capacity:    self.arrow_capacity,
+
+            magic_progression: self.magic_progression,
+
+            small_keys:        self.small_keys,
+            big_key:           self.big_key,
+
+            pendant:           self.pendant,
+            crystal:           self.crystal,
+        }
+    }
+}

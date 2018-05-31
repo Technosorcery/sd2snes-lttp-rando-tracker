@@ -162,16 +162,14 @@ fn update_tracker_serial_data(serial_port: &str) {
         let mut buffer = File::create("raw_response.txt").unwrap();
         buffer.write(&response[..]).unwrap();
 
-        let game_state = match GameState::try_from(response[(item_start as usize)..(mem_size as usize)].to_vec()) {
-            Ok(gs) => gs,
+        let prev_game_state = GAME_STATE.lock().unwrap().clone();
+        match GameState::try_from(response[(item_start as usize)..(mem_size as usize)].to_vec()) {
+            Ok(gs) => *GAME_STATE.lock().unwrap() = gs.merge(prev_game_state),
             Err(e) => {
                 println!("Unable to parse game state: {}", e);
                 continue;
             }
         };
-
-        // println!("Game State: {:#?}", &game_state);
-        { *GAME_STATE.lock().unwrap() = game_state; }
     }
 }
 
@@ -193,15 +191,14 @@ fn update_tracker_file_data(file_path: &str) {
             continue;
         };
 
-        let game_state: GameState = match serde_json::from_str(&state_json) {
-            Ok(gs) => gs,
+        let prev_game_state = GAME_STATE.lock().unwrap().clone();
+        match serde_json::from_str::<GameState>(&state_json) {
+            Ok(gs) => *GAME_STATE.lock().unwrap() = gs.merge(prev_game_state),
             Err(e) => {
                 println!("Unable to parse game state {:?}: {}", &file_path, e);
                 continue;
-            }
+            },
         };
-
-        { *GAME_STATE.lock().unwrap() = game_state; }
     }
 }
 
