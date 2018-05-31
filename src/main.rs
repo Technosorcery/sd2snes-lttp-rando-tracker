@@ -26,6 +26,8 @@ use clap::{
     ArgGroup,
 };
 
+use hyper::method::Method as hMethod;
+use rocket::config::{Config, Environment};
 use rocket::http::{
     ContentType,
     Status,
@@ -35,7 +37,6 @@ use rocket::http::hyper::header::{
     AccessControlAllowMethods,
     AccessControlAllowOrigin,
 };
-use hyper::method::Method as hMethod;
 use rocket::Response;
 
 use std::convert::TryFrom;
@@ -348,7 +349,14 @@ fn main() {
                           .group(ArgGroup::with_name("source")
                                  .required(true)
                                  .args(&["serial", "file"]))
+                          .arg(Arg::with_name("verbose")
+                               .help("Enable more verbose output")
+                               .short("v")
+                               .long("verbose")
+                               .multiple(true))
                           .get_matches();
+
+    let verbose_level = matches.occurrences_of("verbose");
 
     thread::spawn(move || {
         if let Some(serial) = matches.value_of("serial") {
@@ -364,7 +372,15 @@ fn main() {
 
     UI_FILES.set_passthrough(env::var_os("UI_FILES_PASSTHROUGH").is_some());
 
-    rocket::ignite()
+    let rocket_env = if verbose_level > 0 { Environment::Development } else { Environment::Production };
+    let rocket_config = Config::build(rocket_env)
+        .address("0.0.0.0")
+        .port(8000)
+        // We don't actually use the secret key, so we don't really care what it is.
+        .secret_key("8Xui8SN4mI+7egV/9dlfYYLGQJeEx4+DwmSQLwDVXJg=")
+        .finalize().unwrap();
+
+    rocket::custom(rocket_config, true)
         .mount(
             "/",
             routes![
