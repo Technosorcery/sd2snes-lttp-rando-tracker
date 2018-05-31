@@ -67,8 +67,7 @@ export default {
   },
   computed: {
     bowState () {
-      if (!this.$store.state.game.bow) { return }
-      return this.$store.state.game.bow.toLowerCase()
+      return this.$store.state.game.bow ? 'true' : 'false'
     },
 
     hookshotState () {

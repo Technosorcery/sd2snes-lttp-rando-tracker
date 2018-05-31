@@ -23,11 +23,13 @@ use self::item::{
 #[derive(Debug, Default, Copy, Clone, Serialize, Deserialize)]
 pub struct GameState {
     // Items
-    pub bow:               Bow,
-    pub boomerang:         Boomerang,
+    pub bow:               bool,
+    pub blue_boomerang:    bool,
+    pub red_boomerang:     bool,
     pub hook_shot:         bool,
     pub bomb:              u8,
-    pub shroom_powder:     ShroomPowder,
+    pub mushroom:          bool,
+    pub powder:            bool,
     pub fire_rod:          bool,
     pub ice_rod:           bool,
     pub bombos_medallion:  bool,
@@ -35,7 +37,8 @@ pub struct GameState {
     pub quake_medallion:   bool,
     pub lantern:           bool,
     pub hammer:            bool,
-    pub flute_shovel:      FluteShovel,
+    pub flute:             bool,
+    pub shovel:            bool,
     pub net:               bool,
     pub book:              bool,
     pub bottle:            bool,
@@ -43,6 +46,7 @@ pub struct GameState {
     pub cane_byrna:        bool,
     pub cape:              bool,
     pub mirror:            bool,
+    pub silvers:           bool,
     // Abilities
     pub gloves:            Gloves,
     pub boots:             bool,
@@ -81,11 +85,13 @@ impl TryFrom<Vec<u8>> for GameState {
 
     fn try_from(response: Vec<u8>) -> Result<GameState, Self::Error> {
         Ok(GameState {
-            bow:               Bow::try_from(response[0x00])?,
-            boomerang:         Boomerang::try_from(response[0x01])?,
+            bow:               Bow::try_from(response[0x00])? != Bow::None,
+            blue_boomerang:    Boomerang::try_from(response[0x01])? == Boomerang::Blue,
+            red_boomerang:     Boomerang::try_from(response[0x01])? == Boomerang::Red,
             hook_shot:         response[0x02] > 0,
             bomb:              response[0x03],
-            shroom_powder:     ShroomPowder::try_from(response[0x04])?,
+            mushroom:          ShroomPowder::try_from(response[0x04])? == ShroomPowder::Shroom,
+            powder:            ShroomPowder::try_from(response[0x04])? == ShroomPowder::Powder,
             fire_rod:          response[0x05] > 0,
             ice_rod:           response[0x06] > 0,
             bombos_medallion:  response[0x07] > 0,
@@ -93,7 +99,8 @@ impl TryFrom<Vec<u8>> for GameState {
             quake_medallion:   response[0x09] > 0,
             lantern:           response[0x0A] > 0,
             hammer:            response[0x0B] > 0,
-            flute_shovel:      FluteShovel::try_from(response[0x0C])?,
+            flute:             FluteShovel::try_from(response[0x0C])? == FluteShovel::Flute || FluteShovel::try_from(response[0x0C])? == FluteShovel::FluteAndBird,
+            shovel:            FluteShovel::try_from(response[0x0C])? == FluteShovel::Shovel,
             net:               response[0x0D] > 0,
             book:              response[0x0E] > 0,
             bottle:            response[0x0F] > 0,
@@ -101,6 +108,7 @@ impl TryFrom<Vec<u8>> for GameState {
             cane_byrna:        response[0x11] > 0,
             cape:              response[0x12] > 0,
             mirror:            response[0x13] > 0,
+            silvers:           Bow::try_from(response[0x00])? == Bow::Silver || Bow::try_from(response[0x00])? == Bow::SilverWithArrows,
 
             gloves:            Gloves::try_from(response[0x14])?,
             boots:             response[0x15] > 0,
