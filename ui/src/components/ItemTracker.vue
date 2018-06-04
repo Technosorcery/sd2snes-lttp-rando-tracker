@@ -1,6 +1,14 @@
 <template>
   <div class="item-tracker">
     <div class="items">
+      <div v-for="(row, index) in items"
+        class="tracker-row"
+        :key="index">
+        <div v-for="item in row"
+             :key="item.name"
+             :class="item.classFn"
+             class="item"></div>
+      </div>
       <div class="tracker-row">
         <div class="item bow" :class="bowState"></div>
         <div class="item hookshot" :class="hookshotState"></div>
@@ -62,20 +70,47 @@ export default {
   name: 'ItemTracker',
   data () {
     return {
-      msg: 'Welcome to Your Vue.js App'
+      items: [
+        [
+          { name: 'bow', classFn: this.bowClass },
+          { name: 'hookshot', classFn: 'hookshotClass' },
+          { name: 'hammer', classFn: 'hammerClass' },
+          { name: 'firerod', classFn: 'firerodClass' },
+          { name: 'glove', classFn: 'gloveClass' },
+          { name: 'moonpearl', classFn: 'moonpearlClass' }
+        ],
+        [
+          { name: 'somaria', classFn: 'somariaClass' },
+          { name: 'lantern', classFn: 'lanternClass' },
+          { name: 'flute', classFn: 'fluteClass' },
+          { name: 'book', classFn: 'bookClass' },
+          { name: 'boots', classFn: 'bootsClass' },
+          { name: 'flippers', classFn: 'flippersClass' },
+          { name: 'mirror', classFn: 'mirrorClass' }
+        ]
+      ]
     }
   },
   computed: {
     bowState () {
       return this.$store.state.game.bow ? 'true' : 'false'
     },
+    bowClass () {
+      return 'bow ' + this.bowState()
+    },
 
     hookshotState () {
       return this.$store.state.game.hook_shot ? 'true' : 'false'
     },
+    hookshotClass () {
+      return 'hookshot ' + this.hookshotState()
+    },
 
     hammerState () {
       return this.$store.state.game.hammer ? 'true' : 'false'
+    },
+    hammerClass () {
+      return 'hammer ' + this.hammerState()
     },
 
     firerodState () {
