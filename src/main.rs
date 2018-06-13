@@ -1,3 +1,10 @@
+#![
+deny(warnings,
+     missing_debug_implementations,
+     missing_copy_implementations,
+//     missing_docs
+)
+]
 #![feature(try_from, plugin)]
 #![plugin(rocket_codegen)]
 
