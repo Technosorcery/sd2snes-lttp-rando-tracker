@@ -57,6 +57,7 @@
   }
   &.nosword {
     background-image: url("/static/item/sword0.png");
+    opacity: $unobtainedItemOpacity;
   }
   &.fighterssword {
     background-image: url("/static/item/sword1.png");
