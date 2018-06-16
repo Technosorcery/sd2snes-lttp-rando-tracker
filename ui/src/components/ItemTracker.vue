@@ -71,7 +71,7 @@ export default {
     },
 
     hookshotState () {
-      return this.$store.state.game.hookshot ? 'true' : 'false'
+      return this.$store.state.game.hook_shot ? 'true' : 'false'
     },
 
     hammerState () {
