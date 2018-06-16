@@ -31,7 +31,7 @@
         <div class="item shovel" :class="shovelState"></div>
         <div class="item mushroom" :class="mushroomState"></div>
         <div class="item powder" :class="powderState"></div>
-        <div class="item bottle" :class="bottleState"></div>
+        <div class="item" :class="bottleState"></div>
         <div class="item cape" :class="capeState"></div>
         <div class="item icerod" :class="icerodState"></div>
         <div class="item silvers" :class="silversState"></div>
@@ -162,7 +162,7 @@ export default {
     },
 
     bottleState () {
-      return this.$store.state.game.bottle ? 'true' : 'false'
+      return 'bottle' + this.$store.state.game.bottle_count
     },
 
     capeState () {

@@ -111,8 +111,21 @@
   &.powder {
     background-image: url("/static/item/powder.png");
   }
-  &.bottle {
-    background-image: url("/static/item/bottle.png");
+  &.bottle0 {
+    background-image: url("/static/item/bottle0.png");
+    opacity: $unobtainedItemOpacity;
+  }
+  &.bottle1 {
+    background-image: url("/static/item/bottle1.png");
+  }
+  &.bottle2 {
+    background-image: url("/static/item/bottle2.png");
+  }
+  &.bottle3 {
+    background-image: url("/static/item/bottle3.png");
+  }
+  &.bottle4 {
+    background-image: url("/static/item/bottle4.png");
   }
   &.cape {
     background-image: url("/static/item/cape.png");
