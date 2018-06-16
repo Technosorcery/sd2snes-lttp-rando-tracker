@@ -42,6 +42,7 @@ pub struct GameState {
     pub net:               bool,
     pub book:              bool,
     pub bottle:            bool,
+    pub bottle_count:      u8,
     pub cane_somaria:      bool,
     pub cane_byrna:        bool,
     pub cape:              bool,
@@ -84,6 +85,17 @@ impl TryFrom<Vec<u8>> for GameState {
     type Error = failure::Error;
 
     fn try_from(response: Vec<u8>) -> Result<GameState, Self::Error> {
+        let bottle1 = Bottle::try_from(response[0x1C])?;
+        let bottle2 = Bottle::try_from(response[0x1D])?;
+        let bottle3 = Bottle::try_from(response[0x1E])?;
+        let bottle4 = Bottle::try_from(response[0x1F])?;
+
+        let mut bottle_count = 0;
+        if bottle1 != Bottle::NoBottle { bottle_count += 1 };
+        if bottle2 != Bottle::NoBottle { bottle_count += 1 };
+        if bottle3 != Bottle::NoBottle { bottle_count += 1 };
+        if bottle4 != Bottle::NoBottle { bottle_count += 1 };
+
         Ok(GameState {
             bow:               Bow::try_from(response[0x00])? != Bow::None,
             blue_boomerang:    Boomerang::try_from(response[0x01])? == Boomerang::Blue,
@@ -104,6 +116,7 @@ impl TryFrom<Vec<u8>> for GameState {
             net:               response[0x0D] > 0,
             book:              response[0x0E] > 0,
             bottle:            response[0x0F] > 0,
+            bottle_count:      bottle_count,
             cane_somaria:      response[0x10] > 0,
             cane_byrna:        response[0x11] > 0,
             cape:              response[0x12] > 0,
@@ -119,10 +132,10 @@ impl TryFrom<Vec<u8>> for GameState {
             shield_level:      Shield::try_from(response[0x1A])?,
             armor_level:       Armor::try_from(response[0x1B])?,
 
-            bottle_content1:   Bottle::try_from(response[0x1C])?,
-            bottle_content2:   Bottle::try_from(response[0x1D])?,
-            bottle_content3:   Bottle::try_from(response[0x1E])?,
-            bottle_content4:   Bottle::try_from(response[0x1F])?,
+            bottle_content1:   bottle1,
+            bottle_content2:   bottle2,
+            bottle_content3:   bottle3,
+            bottle_content4:   bottle4,
 
             // Rupees are spread across two bytes, as the randomizer lifted the
             // 255 Rupee limit, and it's stored little-endian.
@@ -232,6 +245,7 @@ impl GameState {
             net:               self.net              || old.net,
             book:              self.book             || old.book,
             bottle:            self.bottle           || old.bottle,
+            bottle_count:      self.bottle_count,
             cane_somaria:      self.cane_somaria     || old.cane_somaria,
             cane_byrna:        self.cane_byrna       || old.cane_byrna,
             cape:              self.cape             || old.cape,

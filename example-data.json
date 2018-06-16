@@ -18,6 +18,7 @@
   "net": false,
   "book": false,
   "bottle": true,
+  "bottle_count": 1,
   "cane_somaria": false,
   "cane_byrna": false,
   "cape": false,
