@@ -23,5 +23,9 @@ serde_json = "1.0"
 serial = "0.4"
 unicase = "1.4.2"
 
+[dependencies.lazy-panic]
+version = "0.3.2"
+features = ['backtrace-on']
+
 [build-dependencies]
 includedir_codegen = "0.4.0"

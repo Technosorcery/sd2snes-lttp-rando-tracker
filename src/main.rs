@@ -15,6 +15,8 @@ extern crate failure;
 extern crate hyper;
 extern crate includedir;
 #[macro_use]
+extern crate lazy_panic;
+#[macro_use]
 extern crate lazy_static;
 extern crate phf;
 extern crate rocket;
@@ -361,6 +363,12 @@ fn main() {
                           .get_matches();
 
     let verbose_level = matches.occurrences_of("verbose");
+
+    match verbose_level {
+        0 => set_panic_message!(lazy_panic::formatter::JustError),
+        1 => set_panic_message!(lazy_panic::formatter::Simple),
+        _ => set_panic_message!(lazy_panic::formatter::Debug),
+    }
 
     thread::spawn(move || {
         if let Some(serial) = matches.value_of("serial") {
