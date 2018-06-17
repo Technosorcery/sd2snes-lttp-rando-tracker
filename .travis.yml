@@ -10,3 +10,7 @@ script:
   - (cd ui && yarn install && yarn run unit && yarn run build)
   - cargo build --verbose --all
   - cargo test --verbose --all
+branches:
+  only:
+  - master
+  - /^v\d+\.\d+\.\d+(-\S+)?$/
