@@ -1,3 +1,10 @@
+#![
+deny(warnings,
+     missing_debug_implementations,
+     missing_copy_implementations,
+//     missing_docs
+)
+]
 #![feature(try_from, plugin)]
 #![plugin(rocket_codegen)]
 
@@ -7,6 +14,8 @@ extern crate clap;
 extern crate failure;
 extern crate hyper;
 extern crate includedir;
+#[macro_use]
+extern crate lazy_panic;
 #[macro_use]
 extern crate lazy_static;
 extern crate phf;
@@ -26,6 +35,8 @@ use clap::{
     ArgGroup,
 };
 
+use hyper::method::Method as hMethod;
+use rocket::config::{Config, Environment};
 use rocket::http::{
     ContentType,
     Status,
@@ -35,7 +46,6 @@ use rocket::http::hyper::header::{
     AccessControlAllowMethods,
     AccessControlAllowOrigin,
 };
-use hyper::method::Method as hMethod;
 use rocket::Response;
 
 use std::convert::TryFrom;
@@ -161,16 +171,14 @@ fn update_tracker_serial_data(serial_port: &str) {
         let mut buffer = File::create("raw_response.txt").unwrap();
         buffer.write(&response[..]).unwrap();
 
-        let game_state = match GameState::try_from(response[(item_start as usize)..(mem_size as usize)].to_vec()) {
-            Ok(gs) => gs,
+        let prev_game_state = GAME_STATE.lock().unwrap().clone();
+        match GameState::try_from(response[(item_start as usize)..(mem_size as usize)].to_vec()) {
+            Ok(gs) => *GAME_STATE.lock().unwrap() = gs.merge(prev_game_state),
             Err(e) => {
                 println!("Unable to parse game state: {}", e);
                 continue;
             }
         };
-
-        // println!("Game State: {:#?}", &game_state);
-        { *GAME_STATE.lock().unwrap() = game_state; }
     }
 }
 
@@ -192,15 +200,14 @@ fn update_tracker_file_data(file_path: &str) {
             continue;
         };
 
-        let game_state: GameState = match serde_json::from_str(&state_json) {
-            Ok(gs) => gs,
+        let prev_game_state = GAME_STATE.lock().unwrap().clone();
+        match serde_json::from_str::<GameState>(&state_json) {
+            Ok(gs) => *GAME_STATE.lock().unwrap() = gs.merge(prev_game_state),
             Err(e) => {
                 println!("Unable to parse game state {:?}: {}", &file_path, e);
                 continue;
-            }
+            },
         };
-
-        { *GAME_STATE.lock().unwrap() = game_state; }
     }
 }
 
@@ -348,7 +355,20 @@ fn main() {
                           .group(ArgGroup::with_name("source")
                                  .required(true)
                                  .args(&["serial", "file"]))
+                          .arg(Arg::with_name("verbose")
+                               .help("Enable more verbose output")
+                               .short("v")
+                               .long("verbose")
+                               .multiple(true))
                           .get_matches();
+
+    let verbose_level = matches.occurrences_of("verbose");
+
+    match verbose_level {
+        0 => set_panic_message!(lazy_panic::formatter::JustError),
+        1 => set_panic_message!(lazy_panic::formatter::Simple),
+        _ => set_panic_message!(lazy_panic::formatter::Debug),
+    }
 
     thread::spawn(move || {
         if let Some(serial) = matches.value_of("serial") {
@@ -364,7 +384,15 @@ fn main() {
 
     UI_FILES.set_passthrough(env::var_os("UI_FILES_PASSTHROUGH").is_some());
 
-    rocket::ignite()
+    let rocket_env = if verbose_level > 0 { Environment::Development } else { Environment::Production };
+    let rocket_config = Config::build(rocket_env)
+        .address("0.0.0.0")
+        .port(8000)
+        // We don't actually use the secret key, so we don't really care what it is.
+        .secret_key("8Xui8SN4mI+7egV/9dlfYYLGQJeEx4+DwmSQLwDVXJg=")
+        .finalize().unwrap();
+
+    rocket::custom(rocket_config, true)
         .mount(
             "/",
             routes![

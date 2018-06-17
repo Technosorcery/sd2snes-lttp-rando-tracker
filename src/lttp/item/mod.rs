@@ -37,7 +37,7 @@ pub struct Crystal {
     pub seven: bool,
 }
 
-#[derive(Debug, Copy, Clone, Serialize, Deserialize)]
+#[derive(Debug, Copy, Clone, PartialEq, Serialize, Deserialize)]
 pub enum Bow {
     None             = 0,
     Wood             = 1,
@@ -65,7 +65,7 @@ impl TryFrom<u8> for Bow {
     }
 }
 
-#[derive(Debug, Copy, Clone, Serialize, Deserialize)]
+#[derive(Debug, Copy, Clone, PartialEq, Serialize, Deserialize)]
 pub enum Boomerang {
     None = 0,
     Blue = 1,
@@ -89,7 +89,7 @@ impl TryFrom<u8> for Boomerang {
     }
 }
 
-#[derive(Debug, Copy, Clone, Serialize, Deserialize)]
+#[derive(Debug, Copy, Clone, PartialEq, Serialize, Deserialize)]
 pub enum ShroomPowder {
     None   = 0,
     Shroom = 1,
@@ -113,7 +113,7 @@ impl TryFrom<u8> for ShroomPowder {
     }
 }
 
-#[derive(Debug, Copy, Clone, Serialize, Deserialize)]
+#[derive(Debug, Copy, Clone, PartialEq, Serialize, Deserialize)]
 pub enum FluteShovel {
     None         = 0,
     Shovel       = 1,
@@ -139,7 +139,7 @@ impl TryFrom<u8> for FluteShovel {
     }
 }
 
-#[derive(Debug, Copy, Clone, Serialize, Deserialize)]
+#[derive(Debug, Copy, Clone, PartialEq, Serialize, Deserialize)]
 pub enum Gloves {
     None       = 0,
     PowerGlove = 1,
@@ -163,7 +163,7 @@ impl TryFrom<u8> for Gloves {
     }
 }
 
-#[derive(Debug, Copy, Clone, Serialize, Deserialize)]
+#[derive(Debug, Copy, Clone, PartialEq, Serialize, Deserialize)]
 pub enum Sword {
     None          = 0,
     FightersSword = 1,
@@ -191,7 +191,7 @@ impl TryFrom<u8> for Sword {
     }
 }
 
-#[derive(Debug, Copy, Clone, Serialize, Deserialize)]
+#[derive(Debug, Copy, Clone, PartialEq, Serialize, Deserialize)]
 pub enum Shield {
     None           = 0,
     FightersShield = 1,
@@ -217,7 +217,7 @@ impl TryFrom<u8> for Shield {
     }
 }
 
-#[derive(Debug, Copy, Clone, Serialize, Deserialize)]
+#[derive(Debug, Copy, Clone, PartialEq, Serialize, Deserialize)]
 pub enum Armor {
     GreenMail = 0,
     BlueMail  = 1,
@@ -241,7 +241,7 @@ impl TryFrom<u8> for Armor {
     }
 }
 
-#[derive(Debug, Copy, Clone, Serialize, Deserialize)]
+#[derive(Debug, Copy, Clone, PartialEq, Serialize, Deserialize)]
 pub enum Bottle {
     NoBottle    = 0x00,
     Mushroom    = 0x01,
@@ -277,7 +277,7 @@ impl TryFrom<u8> for Bottle {
     }
 }
 
-#[derive(Debug, Copy, Clone, Serialize, Deserialize)]
+#[derive(Debug, Copy, Clone, PartialEq, Serialize, Deserialize)]
 pub enum Magic {
     Normal  = 0,
     Half    = 1,

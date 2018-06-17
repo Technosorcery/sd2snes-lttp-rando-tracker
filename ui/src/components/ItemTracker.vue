@@ -1,40 +1,12 @@
 <template>
   <div class="item-tracker">
     <div class="items">
-      <div class="tracker-row">
-        <img src="../assets/bow.png">
-        <img src="../assets/hookshot.png">
-        <img src="../assets/hammer.png">
-        <img src="../assets/firerod.png">
-        <img src="../assets/glove0.png">
-        <img src="../assets/moonpearl.png">
-      </div>
-      <div class="tracker-row">
-        <img src="../assets/somaria.png">
-        <img src="../assets/lantern.png">
-        <img src="../assets/flute.png">
-        <img src="../assets/book.png">
-        <img src="../assets/boots.png">
-        <img src="../assets/flippers.png">
-        <img src="../assets/mirror.png">
-      </div>
-      <div class="tracker-row">
-        <img src="../assets/sword0.png">
-        <img src="../assets/tunic1.png">
-        <img src="../assets/shield0.png">
-        <!-- Empty Cell -->
-        <img src="../assets/bombos.png">
-        <img src="../assets/ether.png">
-        <img src="../assets/quake.png">
-      </div>
-      <div class="tracker-row">
-        <img src="../assets/shovel.png">
-        <img src="../assets/mushroom.png">
-        <img src="../assets/powder.png">
-        <img src="../assets/bottle0.png">
-        <img src="../assets/cape.png">
-        <img src="../assets/icerod.png">
-        <img src="../assets/silvers.png">
+      <div v-for="(row, index) in items"
+        class="tracker-row"
+        :key="index">
+        <component v-for="item in row"
+             :key="item.name"
+             :is="item.name"></component>
       </div>
     </div>
     <div class="dungeons">
@@ -58,12 +30,108 @@
 </template>
 
 <script>
+import Armor from '@/components/items/Armor'
+import Blank from '@/components/items/Blank'
+import Bombos from '@/components/items/Bombos'
+import Book from '@/components/items/Book'
+import Boots from '@/components/items/Boots'
+import Bottle from '@/components/items/Bottle'
+import Bow from '@/components/items/Bow'
+import Cape from '@/components/items/Cape'
+import Ether from '@/components/items/Ether'
+import FireRod from '@/components/items/FireRod'
+import Flippers from '@/components/items/Flippers'
+import Flute from '@/components/items/Flute'
+import Glove from '@/components/items/Glove'
+import Hammer from '@/components/items/Hammer'
+import HookShot from '@/components/items/HookShot'
+import IceRod from '@/components/items/IceRod'
+import Lantern from '@/components/items/Lantern'
+import Mirror from '@/components/items/Mirror'
+import MoonPearl from '@/components/items/MoonPearl'
+import Mushroom from '@/components/items/Mushroom'
+import Powder from '@/components/items/Powder'
+import Quake from '@/components/items/Quake'
+import Shield from '@/components/items/Shield'
+import Shovel from '@/components/items/Shovel'
+import SilverArrows from '@/components/items/SilverArrows'
+import Somaria from '@/components/items/Somaria'
+import Sword from '@/components/items/Sword'
+
 export default {
   name: 'ItemTracker',
+  components: {
+    Armor,
+    Blank,
+    Bombos,
+    Book,
+    Boots,
+    Bottle,
+    Bow,
+    Cape,
+    Ether,
+    FireRod,
+    Flippers,
+    Flute,
+    Glove,
+    Hammer,
+    HookShot,
+    IceRod,
+    Lantern,
+    Mirror,
+    MoonPearl,
+    Mushroom,
+    Powder,
+    Quake,
+    Shield,
+    Shovel,
+    SilverArrows,
+    Somaria,
+    Sword
+  },
+
   data () {
     return {
-      msg: 'Welcome to Your Vue.js App'
+      items: [
+        [
+          { name: Bow.name },
+          { name: HookShot.name },
+          { name: Hammer.name },
+          { name: FireRod.name },
+          { name: Glove.name },
+          { name: MoonPearl.name }
+        ],
+        [
+          { name: Somaria.name },
+          { name: Lantern.name },
+          { name: Flute.name },
+          { name: Book.name },
+          { name: Boots.name },
+          { name: Flippers.name },
+          { name: Mirror.name }
+        ],
+        [
+          { name: Sword.name },
+          { name: Armor.name },
+          { name: Shield.name },
+          { name: Blank.name },
+          { name: Bombos.name },
+          { name: Ether.name },
+          { name: Quake.name }
+        ],
+        [
+          { name: Shovel.name },
+          { name: Mushroom.name },
+          { name: Powder.name },
+          { name: Bottle.name },
+          { name: Cape.name },
+          { name: IceRod.name },
+          { name: SilverArrows.name }
+        ]
+      ]
     }
+  },
+  computed: {
   }
 }
 </script>
