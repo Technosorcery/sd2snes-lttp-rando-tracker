@@ -3,9 +3,9 @@ let requestOptions = {
 }
 
 export default {
-  retrieveState ({commit}) {
-    // TODO: Only set the port in development mode.
-    let host = window.location.hostname + ':8000'
+  retrieveState ({commit}, apiPort) {
+    let host = typeof apiPort === 'undefined' ? window.location.host
+      : window.location.hostname + ':' + apiPort
 
     fetch('http://' + host + '/game_state', requestOptions)
       .then(response => response.json())

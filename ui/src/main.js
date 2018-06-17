@@ -28,7 +28,7 @@ new Vue({
   },
   created () {
     setInterval(() => {
-      this.$store.dispatch('retrieveState')
+      this.$store.dispatch('retrieveState', process.env.API_PORT)
     }, 250)
   },
   el: '#app',
