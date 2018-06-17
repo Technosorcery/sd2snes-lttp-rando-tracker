@@ -5,25 +5,17 @@
         class="tracker-row"
         :key="index">
         <component v-for="item in row"
-             :key="item.name"
-             :is="item.name"></component>
+          :key="item.name"
+          :is="item.name"></component>
       </div>
     </div>
     <div class="dungeons">
-      <div class="tracker-row">
-        <img src="../assets/boss32.png">
-        <img src="../assets/boss42.png">
-        <img src="../assets/boss52.png">
-        <img src="../assets/boss62.png">
-        <img src="../assets/boss72.png">
-        <img src="../assets/boss82.png">
-        <img src="../assets/boss92.png">
-      </div>
-      <div class="tracker-row">
-        <img src="../assets/boss02.png">
-        <img src="../assets/boss12.png">
-        <img src="../assets/boss22.png">
-        <img src="../assets/agahnim0.png">
+      <div v-for="(row, index) in dungeons"
+        class="tracker-row"
+        :key="index">
+        <Dungeon v-for="dungeon in row"
+          :key="dungeon"
+          :name="dungeon"></Dungeon>
       </div>
     </div>
   </div>
@@ -38,6 +30,7 @@ import Boots from '@/components/items/Boots'
 import Bottle from '@/components/items/Bottle'
 import Bow from '@/components/items/Bow'
 import Cape from '@/components/items/Cape'
+import Dungeon from '@/components/items/Dungeon'
 import Ether from '@/components/items/Ether'
 import FireRod from '@/components/items/FireRod'
 import Flippers from '@/components/items/Flippers'
@@ -69,6 +62,7 @@ export default {
     Bottle,
     Bow,
     Cape,
+    Dungeon,
     Ether,
     FireRod,
     Flippers,
@@ -128,10 +122,12 @@ export default {
           { name: IceRod.name },
           { name: SilverArrows.name }
         ]
+      ],
+      dungeons: [
+        [ 'PoD', 'SP', 'SW', 'TT', 'IP', 'MM', 'TR' ],
+        [ 'EP', 'DP', 'ToH', 'Aga' ]
       ]
     }
-  },
-  computed: {
   }
 }
 </script>
