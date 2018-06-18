@@ -1,6 +1,6 @@
 <template>
   <div
-    class="dungeon"
+    :class="dungeonClass"
     :style="displayStyle"
     @click="toggleCleared">
     <span
@@ -39,6 +39,14 @@ export default {
     }
   },
   computed: {
+    dungeonClass () {
+      if (this.name === 'Aga' && !this.gotReward) {
+        return 'dungeon false'
+      } else {
+        return 'dungeon'
+      }
+    },
+
     displayStyle () {
       return 'background-image: url(' + this.displayImage + ');'
     },
@@ -223,6 +231,10 @@ export default {
   height: 64px;
   position: relative;
   width: 64px;
+}
+
+.dungeon.false {
+  opacity: 0.25
 }
 
 .dungeon .corner {
