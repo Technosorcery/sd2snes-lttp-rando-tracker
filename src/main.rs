@@ -47,6 +47,7 @@ use rocket::http::hyper::header::{
     AccessControlAllowOrigin,
 };
 use rocket::Response;
+use rocket_contrib::Json;
 
 use std::convert::TryFrom;
 use std::env;
@@ -64,7 +65,11 @@ use serial::PortSettings;
 
 use unicase::UniCase;
 
-use lttp::GameState;
+use lttp::{
+    DungeonState,
+    DungeonUpdate,
+    GameState,
+};
 
 include!(concat!(env!("OUT_DIR"), "/ui_files.rs"));
 
@@ -117,6 +122,7 @@ pub enum ServerFlag {
 }
 
 lazy_static! {
+    static ref DUNGEON_STATE: Mutex<DungeonState> = Mutex::new(DungeonState::default());
     static ref GAME_STATE: Mutex<GameState> = Mutex::new(GameState::default());
 }
 
@@ -259,7 +265,7 @@ fn read_wram<T: SerialPort>(port: &mut T, mem_offset: u32, mem_size: u32) -> io:
     Ok(result[512..].to_vec())
 }
 
-fn game_state_response<'r>() -> Response<'r> {
+fn state_response<'r>() -> Response<'r> {
     let mut response = Response::new();
     response.set_header(ContentType::JSON);
     response.set_status(Status::Ok);
@@ -274,16 +280,58 @@ fn game_state_response<'r>() -> Response<'r> {
 }
 
 #[options("/game_state", format = "application/json")]
-fn get_game_state_options<'r>() -> Response<'r> { game_state_response() }
+fn get_game_state_options<'r>() -> Response<'r> { state_response() }
 
 #[get("/game_state", format = "application/json")]
 fn get_game_state<'r>() -> Option<Response<'r>> {
     let game_state = GAME_STATE.lock().unwrap().clone();
-    let mut response = game_state_response();
+    let mut response = state_response();
     let json = match serde_json::to_string(&game_state) {
         Ok(j) => j,
         Err(e) => {
             println!("Could not serialize game state: {:?}", e);
+            return None;
+        }
+    };
+    response.set_sized_body(Cursor::new(json));
+
+    Some(response)
+}
+
+#[options("/dungeon_state", format = "application/json")]
+fn get_dungeon_state_options<'r>() -> Response<'r> { state_response() }
+
+#[get("/dungeon_state", format = "application/json")]
+fn get_dungeon_state<'r>() -> Option<Response<'r>> {
+    let dungeon_state = DUNGEON_STATE.lock().unwrap().clone();
+    let mut response = state_response();
+    let json = match serde_json::to_string(&dungeon_state.dungeons) {
+        Ok(j) => j,
+        Err(e) => {
+            println!("Could not serialize dungeon state: {:?}", e);
+            return None;
+        }
+    };
+    response.set_sized_body(Cursor::new(json));
+
+    Some(response)
+}
+
+#[post("/dungeon_state/<dungeon>", data = "<state>", format = "application/json")]
+fn set_dungeon_state<'r>(dungeon: String, state: Json<DungeonUpdate>) -> Option<Response<'r>> {
+    let dungeon_update = state.into_inner();
+    let state;
+    {
+        let mut dungeon_state = DUNGEON_STATE.lock().unwrap();
+        dungeon_state.update(dungeon.clone(), dungeon_update);
+        state = dungeon_state.get(dungeon).clone()
+    }
+
+    let mut response = state_response();
+    let json = match serde_json::to_string(&state) {
+        Ok(j) => j,
+        Err(e) => {
+            println!("Could not serialize dungeon state: {:?}", e);
             return None;
         }
     };
@@ -396,8 +444,11 @@ fn main() {
         .mount(
             "/",
             routes![
-                get_game_state,
+                get_dungeon_state_options,
+                get_dungeon_state,
                 get_game_state_options,
+                get_game_state,
+                set_dungeon_state,
                 files,
                 root
             ]
