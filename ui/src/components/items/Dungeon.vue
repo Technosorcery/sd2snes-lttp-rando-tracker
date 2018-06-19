@@ -32,13 +32,53 @@ export default {
   },
   data() {
     return {
-      medallion: 0,
-      reward: 0,
-      foundChests: 0,
-      gotReward: false
+      medallionSequence: ['Unknown', 'Bombos', 'Ether', 'Quake'],
+      rewardSequence: [
+        'Unknown',
+        'GreenPendant',
+        'RedBluePendant',
+        'Crystal',
+        'RedCrystal'
+      ]
     }
   },
   computed: {
+    reward() {
+      if (this.$store.state.dungeons && this.$store.state.dungeons[this.name]) {
+        return this.rewardSequence.indexOf(
+          this.$store.state.dungeons[this.name].reward
+        )
+      }
+
+      return 0
+    },
+
+    foundChests() {
+      if (this.$store.state.dungeons && this.$store.state.dungeons[this.name]) {
+        return this.$store.state.dungeons[this.name].found_chests
+      }
+
+      return 0
+    },
+
+    medallion() {
+      if (this.$store.state.dungeons && this.$store.state.dungeons[this.name]) {
+        return this.medallionSequence.indexOf(
+          this.$store.state.dungeons[this.name].medallion
+        )
+      }
+
+      return 0
+    },
+
+    gotReward() {
+      if (this.$store.state.dungeons && this.$store.state.dungeons[this.name]) {
+        return this.$store.state.dungeons[this.name].cleared
+      }
+
+      return false
+    },
+
     dungeonClass() {
       if (this.name === 'Aga' && !this.gotReward) {
         return 'dungeon false'
@@ -195,32 +235,81 @@ export default {
 
   methods: {
     cycleMedallion(event) {
-      this.medallion += 1
-      if (this.medallion > 3) {
-        this.medallion = 0
-      }
       event.stopPropagation()
+
+      this.cycleSequence('medallion')
     },
 
     openChest(event) {
-      this.foundChests += 1
-      if (this.foundChests > this.totalChests) {
-        this.foundChests = 0
-      }
       event.stopPropagation()
+
+      let newFoundChests = this.foundChests + 1
+      if (newFoundChests > this.totalChests) {
+        newFoundChests = 0
+      }
+
+      let data = { found_chests: newFoundChests }
+      if (this.$store.state.dungeons && this.$store.state.dungeons[this.name]) {
+        this.$store.dispatch('updateDungeonState', {
+          name: this.name,
+          data: data
+        })
+      }
+      this.updateServerState(data)
     },
 
     cycleReward(event) {
-      this.reward += 1
-      if (this.reward > 4) {
-        this.reward = 0
-      }
       event.stopPropagation()
+
+      this.cycleSequence('reward')
+    },
+
+    cycleSequence(sequence) {
+      let newIndex = this[sequence] + 1
+      if (newIndex >= this[sequence + 'Sequence'].length) {
+        newIndex = 0
+      }
+
+      let data = {}
+      data[sequence] = this[sequence + 'Sequence'][newIndex]
+      if (this.$store.state.dungeons && this.$store.state.dungeons[this.name]) {
+        this.$store.dispatch('updateDungeonState', {
+          name: this.name,
+          data: data
+        })
+      }
+      this.updateServerState(data)
     },
 
     toggleCleared(event) {
-      this.gotReward = !this.gotReward
       event.stopPropagation()
+
+      let cleared = !this.gotReward
+      let data = { cleared: cleared }
+      if (this.$store.state.dungeons && this.$store.state.dungeons[this.name]) {
+        this.$store.dispatch('updateDungeonState', {
+          name: this.name,
+          data: data
+        })
+      }
+      this.updateServerState(data)
+    },
+
+    updateServerState(data) {
+      // TODO: Figure out where to put this, so we can do the process.env.API_PORT lookup that's done in actions.js.
+      let host = window.location.hostname + ':' + '8000'
+
+      console.log(
+        'Updating remote state for ' +
+          this.name +
+          ' with: ' +
+          JSON.stringify(data)
+      )
+
+      var xhr = new XMLHttpRequest()
+      xhr.open('POST', 'http://' + host + '/dungeon_state/' + this.name, true)
+      xhr.setRequestHeader('Content-Type', 'application/json')
+      xhr.send(JSON.stringify(data))
     }
   }
 }

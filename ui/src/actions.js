@@ -3,7 +3,7 @@ let requestOptions = {
 }
 
 export default {
-  retrieveState({ commit }, apiPort) {
+  retrieveGameState({ commit }, apiPort) {
     let host =
       typeof apiPort === 'undefined'
         ? window.location.host
@@ -12,7 +12,24 @@ export default {
     fetch('http://' + host + '/game_state', requestOptions)
       .then(response => response.json())
       .then(data => {
-        commit('setState', data)
+        commit('setGameState', data)
       })
+  },
+
+  retrieveDungeonState({commit}, apiPort) {
+    let host =
+      typeof apiPort === 'undefined'
+        ? window.location.host
+        : window.location.hostname + ':' + apiPort
+
+    fetch('http://' + host + '/dungeon_state', requestOptions)
+      .then(response => response.json())
+      .then(data => {
+        commit('setDungeonState', data)
+      })
+  },
+
+  updateDungeonState({commit}, data) {
+    commit('updateDungeonState', data)
   }
 }

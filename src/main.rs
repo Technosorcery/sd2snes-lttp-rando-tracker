@@ -362,6 +362,9 @@ fn get_dungeon_state<'r>() -> Option<Response<'r>> {
     Some(response)
 }
 
+#[options("/dungeon_state/<_dungeon>", format = "application/json")]
+fn set_dungeon_state_options<'r>(_dungeon: String) -> Response<'r> { state_response() }
+
 #[post("/dungeon_state/<dungeon>", data = "<state>", format = "application/json")]
 fn set_dungeon_state<'r>(dungeon: String, state: Json<DungeonUpdate>) -> Option<Response<'r>> {
     let dungeon_update = state.into_inner();
@@ -495,6 +498,7 @@ fn main() {
                 get_game_state,
                 get_location_state_options,
                 get_location_state,
+                set_dungeon_state_options,
                 set_dungeon_state,
                 set_location_state,
                 files,

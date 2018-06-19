@@ -364,8 +364,8 @@ pub enum DungeonReward {
     Unknown,
     GreenPendant,
     RedBluePendant,
-    RedCrystal,
     Crystal,
+    RedCrystal,
 }
 
 impl Default for DungeonReward {
