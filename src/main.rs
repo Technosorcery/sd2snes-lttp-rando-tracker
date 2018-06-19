@@ -69,6 +69,8 @@ use lttp::{
     DungeonState,
     DungeonUpdate,
     GameState,
+    LocationState,
+    LocationUpdate,
 };
 
 include!(concat!(env!("OUT_DIR"), "/ui_files.rs"));
@@ -124,6 +126,7 @@ pub enum ServerFlag {
 lazy_static! {
     static ref DUNGEON_STATE: Mutex<DungeonState> = Mutex::new(DungeonState::default());
     static ref GAME_STATE: Mutex<GameState> = Mutex::new(GameState::default());
+    static ref LOCATION_STATE: Mutex<LocationState> = Mutex::new(LocationState::default());
 }
 
 fn update_tracker_serial_data(serial_port: &str) {
@@ -298,6 +301,48 @@ fn get_game_state<'r>() -> Option<Response<'r>> {
     Some(response)
 }
 
+#[options("/location_state", format = "application/json")]
+fn get_location_state_options<'r>() -> Response<'r> { state_response() }
+
+#[get("/location_state", format = "application/json")]
+fn get_location_state<'r>() -> Option<Response<'r>> {
+    let location_state = LOCATION_STATE.lock().unwrap().clone();
+    let mut response = state_response();
+    let json = match serde_json::to_string(&location_state) {
+        Ok(j) => j,
+        Err(e) => {
+            println!("Could not serialize location state: {:?}", e);
+            return None;
+        }
+    };
+    response.set_sized_body(Cursor::new(json));
+
+    Some(response)
+}
+
+#[post("/location_state/<location>", data = "<state>", format = "application/json")]
+fn set_location_state<'r>(location: String, state: Json<LocationUpdate>) -> Option<Response<'r>> {
+    let location_update = state.into_inner();
+    let state;
+    {
+        let mut location_state = LOCATION_STATE.lock().unwrap();
+        location_state.update(location.clone(), location_update);
+        state = location_state.get(location).clone()
+    }
+
+    let mut response = state_response();
+    let json = match serde_json::to_string(&state) {
+        Ok(j) => j,
+        Err(e) => {
+            println!("Could not serialize dungeon state: {:?}", e);
+            return None;
+        }
+    };
+    response.set_sized_body(Cursor::new(json));
+
+    Some(response)
+}
+
 #[options("/dungeon_state", format = "application/json")]
 fn get_dungeon_state_options<'r>() -> Response<'r> { state_response() }
 
@@ -448,7 +493,10 @@ fn main() {
                 get_dungeon_state,
                 get_game_state_options,
                 get_game_state,
+                get_location_state_options,
+                get_location_state,
                 set_dungeon_state,
+                set_location_state,
                 files,
                 root
             ]

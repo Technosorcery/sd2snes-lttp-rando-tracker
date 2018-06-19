@@ -290,6 +290,51 @@ impl GameState {
 }
 
 #[derive(Debug, Clone, Copy, Default, Serialize)]
+pub struct Location {
+    pub cleared: bool,
+}
+
+impl Location {
+    pub fn update(&mut self, update: LocationUpdate) {
+        if let Some(cleared) = update.cleared {
+            self.cleared = cleared
+        }
+    }
+}
+
+#[derive(Debug, Clone, Copy, Deserialize)]
+pub struct LocationUpdate {
+    pub cleared: Option<bool>,
+}
+
+#[derive(Debug, Clone, Default, Serialize)]
+pub struct LocationState {
+    pub locations: HashMap<String, Location>,
+}
+
+impl LocationState {
+    pub fn get(&self, name: String) -> Location {
+        if let Some(location) = self.locations.get(&name) {
+            return location.clone();
+        }
+
+        Location::default()
+    }
+
+    pub fn update(&mut self, name: String, update: LocationUpdate) {
+        if let Some(location) = self.locations.get_mut(&name) {
+            location.update(update);
+            return;
+        }
+
+        let mut location = Location::default();
+        location.update(update);
+        self.locations.insert(name, location);
+    }
+}
+
+
+#[derive(Debug, Clone, Copy, Default, Serialize)]
 pub struct Dungeon {
     pub found_chests: u8,
     pub reward: DungeonReward,
