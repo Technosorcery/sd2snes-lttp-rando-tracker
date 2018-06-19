@@ -282,7 +282,7 @@ fn state_response<'r>() -> Response<'r> {
     response
 }
 
-#[options("/game_state", format = "application/json")]
+#[options("/game_state")]
 fn get_game_state_options<'r>() -> Response<'r> { state_response() }
 
 #[get("/game_state", format = "application/json")]
@@ -301,7 +301,7 @@ fn get_game_state<'r>() -> Option<Response<'r>> {
     Some(response)
 }
 
-#[options("/location_state", format = "application/json")]
+#[options("/location_state")]
 fn get_location_state_options<'r>() -> Response<'r> { state_response() }
 
 #[get("/location_state", format = "application/json")]
@@ -343,7 +343,7 @@ fn set_location_state<'r>(location: String, state: Json<LocationUpdate>) -> Opti
     Some(response)
 }
 
-#[options("/dungeon_state", format = "application/json")]
+#[options("/dungeon_state")]
 fn get_dungeon_state_options<'r>() -> Response<'r> { state_response() }
 
 #[get("/dungeon_state", format = "application/json")]
@@ -362,7 +362,7 @@ fn get_dungeon_state<'r>() -> Option<Response<'r>> {
     Some(response)
 }
 
-#[options("/dungeon_state/<_dungeon>", format = "application/json")]
+#[options("/dungeon_state/<_dungeon>")]
 fn set_dungeon_state_options<'r>(_dungeon: String) -> Response<'r> { state_response() }
 
 #[post("/dungeon_state/<dungeon>", data = "<state>", format = "application/json")]
