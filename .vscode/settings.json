@@ -29,6 +29,7 @@
         "shroom",
         "somaria",
         "sram",
+        "unicase",
         "wram"
     ],
     "rust.unstable_features": true,
