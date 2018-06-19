@@ -6,7 +6,7 @@
 export default {
   name: 'SilverArrows',
   computed: {
-    silversState () {
+    silversState() {
       return this.$store.state.game.silvers ? 'true' : 'false'
     }
   }

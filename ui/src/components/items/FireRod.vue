@@ -6,7 +6,7 @@
 export default {
   name: 'FireRod',
   computed: {
-    firerodState () {
+    firerodState() {
       return this.$store.state.game.fire_rod ? 'true' : 'false'
     }
   }

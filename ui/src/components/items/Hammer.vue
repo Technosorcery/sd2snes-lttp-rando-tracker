@@ -6,7 +6,7 @@
 export default {
   name: 'Hammer',
   computed: {
-    hammerState () {
+    hammerState() {
       return this.$store.state.game.hammer ? 'true' : 'false'
     }
   }

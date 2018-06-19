@@ -6,7 +6,7 @@
 export default {
   name: 'Cape',
   computed: {
-    capeState () {
+    capeState() {
       return this.$store.state.game.cape ? 'true' : 'false'
     }
   }

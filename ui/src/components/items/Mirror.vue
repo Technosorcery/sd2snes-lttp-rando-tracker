@@ -6,7 +6,7 @@
 export default {
   name: 'Mirror',
   computed: {
-    mirrorState () {
+    mirrorState() {
       return this.$store.state.game.mirror ? 'true' : 'false'
     }
   }

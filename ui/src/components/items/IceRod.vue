@@ -6,7 +6,7 @@
 export default {
   name: 'IceRod',
   computed: {
-    icerodState () {
+    icerodState() {
       return this.$store.state.game.ice_rod ? 'true' : 'false'
     }
   }

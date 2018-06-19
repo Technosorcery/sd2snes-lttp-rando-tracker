@@ -84,7 +84,7 @@ export default {
     Sword
   },
 
-  data () {
+  data() {
     return {
       items: [
         [
@@ -124,8 +124,8 @@ export default {
         ]
       ],
       dungeons: [
-        [ 'PoD', 'SP', 'SW', 'TT', 'IP', 'MM', 'TR' ],
-        [ 'EP', 'DP', 'ToH', 'Aga' ]
+        ['PoD', 'SP', 'SW', 'TT', 'IP', 'MM', 'TR'],
+        ['EP', 'DP', 'ToH', 'Aga']
       ]
     }
   }

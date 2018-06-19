@@ -6,7 +6,7 @@
 export default {
   name: 'Bow',
   computed: {
-    bowState () {
+    bowState() {
       return this.$store.state.game.bow ? 'true' : 'false'
     }
   }

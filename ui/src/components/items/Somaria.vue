@@ -6,7 +6,7 @@
 export default {
   name: 'Somaria',
   computed: {
-    somariaState () {
+    somariaState() {
       return this.$store.state.game.cane_somaria ? 'true' : 'false'
     }
   }

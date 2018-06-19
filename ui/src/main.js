@@ -26,7 +26,7 @@ new Vue({
     App,
     ItemTracker
   },
-  created () {
+  created() {
     setInterval(() => {
       this.$store.dispatch('retrieveState', process.env.API_PORT)
     }, 250)

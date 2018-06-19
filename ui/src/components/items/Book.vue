@@ -6,7 +6,7 @@
 export default {
   name: 'Book',
   computed: {
-    bookState () {
+    bookState() {
       return this.$store.state.game.book ? 'true' : 'false'
     }
   }

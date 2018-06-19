@@ -6,7 +6,7 @@
 export default {
   name: 'Lantern',
   computed: {
-    lanternState () {
+    lanternState() {
       return this.$store.state.game.lantern ? 'true' : 'false'
     }
   }

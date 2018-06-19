@@ -30,7 +30,7 @@ export default {
   props: {
     name: String
   },
-  data () {
+  data() {
     return {
       medallion: 0,
       reward: 0,
@@ -39,7 +39,7 @@ export default {
     }
   },
   computed: {
-    dungeonClass () {
+    dungeonClass() {
       if (this.name === 'Aga' && !this.gotReward) {
         return 'dungeon false'
       } else {
@@ -47,35 +47,37 @@ export default {
       }
     },
 
-    displayStyle () {
+    displayStyle() {
       return 'background-image: url(' + this.displayImage + ');'
     },
 
-    chestsStyle () {
+    chestsStyle() {
       return 'background-image: url(' + this.chestImage + ');'
     },
 
-    rewardStyle () {
+    rewardStyle() {
       return 'background-image: url(' + this.rewardImage + ');'
     },
 
-    medallionStyle () {
+    medallionStyle() {
       return 'background-image: url(' + this.medallionImage + ');'
     },
 
-    chestImage () {
-      return '/static/image/chest' + (this.totalChests - this.foundChests) + '.png'
+    chestImage() {
+      return (
+        '/static/image/chest' + (this.totalChests - this.foundChests) + '.png'
+      )
     },
 
-    medallionImage () {
+    medallionImage() {
       return '/static/image/medallion' + this.medallion + '.png'
     },
 
-    rewardImage () {
+    rewardImage() {
       return '/static/image/dungeon' + this.reward + '.png'
     },
 
-    displayImage () {
+    displayImage() {
       if (this.gotReward) {
         return '/static/image/' + this.clearedImage
       } else {
@@ -83,7 +85,7 @@ export default {
       }
     },
 
-    totalChests () {
+    totalChests() {
       switch (this.name) {
         case 'PoD':
           return 5
@@ -110,7 +112,7 @@ export default {
       }
     },
 
-    medallionRequired () {
+    medallionRequired() {
       switch (this.name) {
         case 'MM':
         case 'TR':
@@ -120,7 +122,7 @@ export default {
       }
     },
 
-    hasReward () {
+    hasReward() {
       if (this.name === 'Aga') {
         return false
       } else {
@@ -128,7 +130,7 @@ export default {
       }
     },
 
-    defaultImage () {
+    defaultImage() {
       switch (this.name) {
         case 'EP':
           return 'boss01.png'
@@ -155,7 +157,7 @@ export default {
       }
     },
 
-    clearedImage () {
+    clearedImage() {
       switch (this.name) {
         case 'EP':
           return 'boss02.png'
@@ -182,7 +184,7 @@ export default {
       }
     },
 
-    title () {
+    title() {
       if (this.name === 'Aga') {
         return ''
       } else {
@@ -192,7 +194,7 @@ export default {
   },
 
   methods: {
-    cycleMedallion: function (event) {
+    cycleMedallion(event) {
       this.medallion += 1
       if (this.medallion > 3) {
         this.medallion = 0
@@ -200,7 +202,7 @@ export default {
       event.stopPropagation()
     },
 
-    openChest: function (event) {
+    openChest(event) {
       this.foundChests += 1
       if (this.foundChests > this.totalChests) {
         this.foundChests = 0
@@ -208,7 +210,7 @@ export default {
       event.stopPropagation()
     },
 
-    cycleReward: function (event) {
+    cycleReward(event) {
       this.reward += 1
       if (this.reward > 4) {
         this.reward = 0
@@ -216,7 +218,7 @@ export default {
       event.stopPropagation()
     },
 
-    toggleCleared: function (event) {
+    toggleCleared(event) {
       this.gotReward = !this.gotReward
       event.stopPropagation()
     }
@@ -234,7 +236,7 @@ export default {
 }
 
 .dungeon.false {
-  opacity: 0.25
+  opacity: 0.25;
 }
 
 .dungeon .corner {

@@ -1,5 +1,5 @@
 export default {
-  setState (state, serverData) {
+  setState(state, serverData) {
     state.game = serverData
   }
 }

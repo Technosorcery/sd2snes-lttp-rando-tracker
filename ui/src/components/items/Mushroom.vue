@@ -6,7 +6,7 @@
 export default {
   name: 'Mushroom',
   computed: {
-    mushroomState () {
+    mushroomState() {
       return this.$store.state.game.mushroom ? 'true' : 'false'
     }
   }

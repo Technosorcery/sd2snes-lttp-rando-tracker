@@ -6,9 +6,13 @@
 export default {
   name: 'Glove',
   computed: {
-    gloveState () {
-      if (!this.$store.state.game.gloves) { return }
-      if (this.$store.state.game.gloves === 'None') { return 'nogloves' }
+    gloveState() {
+      if (!this.$store.state.game.gloves) {
+        return
+      }
+      if (this.$store.state.game.gloves === 'None') {
+        return 'nogloves'
+      }
       return this.$store.state.game.gloves.toLowerCase()
     }
   }

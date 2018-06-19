@@ -7,7 +7,7 @@
 <script>
 export default {
   name: 'MapTracker',
-  data () {
+  data() {
     return {
       msg: 'Welcome to Your Vue.js App'
     }

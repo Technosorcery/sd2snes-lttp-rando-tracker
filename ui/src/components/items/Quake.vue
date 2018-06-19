@@ -6,7 +6,7 @@
 export default {
   name: 'Quake',
   computed: {
-    quakeState () {
+    quakeState() {
       return this.$store.state.game.quake_medallion ? 'true' : 'false'
     }
   }

@@ -6,7 +6,7 @@
 export default {
   name: 'Powder',
   computed: {
-    powderState () {
+    powderState() {
       return this.$store.state.game.powder ? 'true' : 'false'
     }
   }
