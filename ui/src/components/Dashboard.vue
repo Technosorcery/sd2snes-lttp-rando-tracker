@@ -1,6 +1,5 @@
 <template>
   <div class="dashboard">
-    <h1>{{ msg }}</h1>
     <item-tracker></item-tracker>
     <map-tracker></map-tracker>
   </div>
@@ -15,11 +14,6 @@ export default {
   components: {
     ItemTracker,
     MapTracker
-  },
-  data() {
-    return {
-      msg: 'The Dashboard'
-    }
   }
 }
 </script>
