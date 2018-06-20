@@ -28,10 +28,14 @@ new Vue({
     ItemTracker
   },
   created() {
+    let updateInterval = 250
+    if (typeof this.$route.query.updateInterval !== 'undefined') {
+      updateInterval = this.$route.query.updateInterval
+    }
     setInterval(() => {
       this.$store.dispatch('retrieveGameState', process.env.API_PORT)
       this.$store.dispatch('retrieveDungeonState', process.env.API_PORT)
-    }, 250)
+    }, updateInterval)
   },
   el: '#app',
   router,
