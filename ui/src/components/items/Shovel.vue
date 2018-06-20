@@ -6,7 +6,7 @@
 export default {
   name: 'Shovel',
   computed: {
-    shovelState () {
+    shovelState() {
       return this.$store.state.game.shovel ? 'true' : 'false'
     }
   }

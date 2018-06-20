@@ -6,7 +6,7 @@
 export default {
   name: 'Flippers',
   computed: {
-    flippersState () {
+    flippersState() {
       return this.$store.state.game.flippers ? 'true' : 'false'
     }
   }

@@ -6,7 +6,7 @@
 export default {
   name: 'Bombos',
   computed: {
-    bombosState () {
+    bombosState() {
       return this.$store.state.game.bombos_medallion ? 'true' : 'false'
     }
   }

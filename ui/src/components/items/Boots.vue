@@ -6,7 +6,7 @@
 export default {
   name: 'Boots',
   computed: {
-    bootsState () {
+    bootsState() {
       return this.$store.state.game.boots ? 'true' : 'false'
     }
   }

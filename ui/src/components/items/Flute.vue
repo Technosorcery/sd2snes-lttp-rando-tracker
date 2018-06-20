@@ -6,7 +6,7 @@
 export default {
   name: 'Flute',
   computed: {
-    fluteState () {
+    fluteState() {
       return this.$store.state.game.flute ? 'true' : 'false'
     }
   }

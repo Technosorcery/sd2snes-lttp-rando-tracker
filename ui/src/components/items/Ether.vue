@@ -6,7 +6,7 @@
 export default {
   name: 'Ether',
   computed: {
-    etherState () {
+    etherState() {
       return this.$store.state.game.ether_medallion ? 'true' : 'false'
     }
   }
