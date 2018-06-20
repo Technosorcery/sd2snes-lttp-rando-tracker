@@ -7,9 +7,8 @@ export default {
   name: 'Armor',
   computed: {
     armorState() {
-      if (!this.$store.state.game.armor_level) {
-        return
-      }
+      if (!this.$store.state.game.armor_level) return
+
       return this.$store.state.game.armor_level.toLowerCase()
     }
   }
