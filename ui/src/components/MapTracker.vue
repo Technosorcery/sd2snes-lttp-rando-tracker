@@ -1,17 +1,11 @@
 <template>
   <div class="map-tracker">
-    <h1>Map Tracker</h1>
   </div>
 </template>
 
 <script>
 export default {
-  name: 'MapTracker',
-  data() {
-    return {
-      msg: 'Welcome to Your Vue.js App'
-    }
-  }
+  name: 'MapTracker'
 }
 </script>
 
