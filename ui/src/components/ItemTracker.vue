@@ -1,19 +1,29 @@
 <template>
   <div class="item-tracker">
     <div class="items">
-      <div v-for="(row, index) in items"
+      <div
+        v-for="(row, index) in items"
         class="tracker-row"
         :key="index">
-        <component v-for="item in row"
+        <div
+          class="row-spacer"
+          :style="spacerStyle(row, items)"></div>
+        <component
+          v-for="item in row"
           :key="item.name"
           :is="item.name"></component>
       </div>
     </div>
     <div class="dungeons">
-      <div v-for="(row, index) in dungeons"
+      <div
+        v-for="(row, index) in dungeons"
         class="tracker-row"
         :key="index">
-        <Dungeon v-for="dungeon in row"
+        <div
+          class="row-spacer"
+          :style="spacerStyle(row, items)"></div>
+        <Dungeon
+          v-for="dungeon in row"
           :key="dungeon"
           :name="dungeon"></Dungeon>
       </div>
@@ -128,10 +138,28 @@ export default {
         ['EP', 'DP', 'ToH', 'Aga']
       ]
     }
+  },
+
+  methods: {
+    spacerStyle(currentRow, allRows) {
+      let maxRowLen = Math.max.apply(Math, allRows.map(function (item) { return item.length }))
+      let padding = ((64 * maxRowLen) - (64 * currentRow.length)) / 2
+
+      return 'width: ' + padding + 'px;'
+    }
   }
 }
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
+.item-tracker {
+  left: 0;
+  position: relative;
+  box-sizing: border-box;
+}
+
+.item-tracker .row-spacer {
+  display: inline-block;
+}
 </style>
