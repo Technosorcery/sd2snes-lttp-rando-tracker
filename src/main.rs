@@ -308,7 +308,7 @@ fn get_location_state_options<'r>() -> Response<'r> { state_response() }
 fn get_location_state<'r>() -> Option<Response<'r>> {
     let location_state = LOCATION_STATE.lock().unwrap().clone();
     let mut response = state_response();
-    let json = match serde_json::to_string(&location_state) {
+    let json = match serde_json::to_string(&location_state.locations) {
         Ok(j) => j,
         Err(e) => {
             println!("Could not serialize location state: {:?}", e);
@@ -319,6 +319,9 @@ fn get_location_state<'r>() -> Option<Response<'r>> {
 
     Some(response)
 }
+
+#[options("/location_state/<_location>")]
+fn set_location_state_options<'r>(_location: String) -> Response<'r> { state_response() }
 
 #[post("/location_state/<location>", data = "<state>", format = "application/json")]
 fn set_location_state<'r>(location: String, state: Json<LocationUpdate>) -> Option<Response<'r>> {
@@ -492,17 +495,18 @@ fn main() {
         .mount(
             "/",
             routes![
+                files,
                 get_dungeon_state_options,
                 get_dungeon_state,
                 get_game_state_options,
                 get_game_state,
                 get_location_state_options,
                 get_location_state,
+                root,
                 set_dungeon_state_options,
                 set_dungeon_state,
+                set_location_state_options,
                 set_location_state,
-                files,
-                root
             ]
         )
         .launch();

@@ -16,7 +16,7 @@ export default {
       })
   },
 
-  retrieveDungeonState({commit}, apiPort) {
+  retrieveDungeonState({ commit }, apiPort) {
     let host =
       typeof apiPort === 'undefined'
         ? window.location.host
@@ -29,7 +29,24 @@ export default {
       })
   },
 
-  updateDungeonState({commit}, data) {
+  updateDungeonState({ commit }, data) {
     commit('updateDungeonState', data)
+  },
+
+  retrieveLocationState({ commit }, apiPort) {
+    let host =
+      typeof apiPort === 'undefined'
+        ? window.location.host
+        : window.location.hostname + ':' + apiPort
+
+    fetch('http://' + host + '/location_state', requestOptions)
+      .then(response => response.json())
+      .then(data => {
+        commit('setLocationState', data)
+      })
+  },
+
+  updateLocationState({ commit }, data) {
+    commit('updateLocationState', data)
   }
 }

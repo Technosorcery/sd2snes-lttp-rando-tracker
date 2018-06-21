@@ -17,7 +17,8 @@ const store = new Vuex.Store({
   mutations,
   state: {
     game: {},
-    dungeons: {}
+    dungeons: {},
+    locations: {}
   }
 })
 
@@ -35,6 +36,7 @@ new Vue({
     setInterval(() => {
       this.$store.dispatch('retrieveGameState', process.env.API_PORT)
       this.$store.dispatch('retrieveDungeonState', process.env.API_PORT)
+      this.$store.dispatch('retrieveLocationState', process.env.API_PORT)
     }, updateInterval)
   },
   el: '#app',
