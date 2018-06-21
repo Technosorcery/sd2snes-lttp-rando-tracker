@@ -177,8 +177,8 @@ fn update_tracker_serial_data(serial_port: &str) {
         };
 
         // Write out the raw response memory for debugging.
-        let mut buffer = File::create("raw_response.txt").unwrap();
-        buffer.write(&response[..]).unwrap();
+        //let mut buffer = File::create("raw_response.txt").unwrap();
+        //buffer.write(&response[..]).unwrap();
 
         let prev_game_state = GAME_STATE.lock().unwrap().clone();
         match GameState::try_from(response[(item_start as usize)..(mem_size as usize)].to_vec()) {
