@@ -24,45 +24,17 @@
 </template>
 
 <script>
+import poiLocations from '@/poiLocations.js'
+import dungeonLocations from '@/dungeonLocations.js'
+import bossLocations from '@/bossLocations.js'
+
 export default {
   name: 'MapTracker',
   data() {
     return {
-      poiLocations: [
-        {
-          name: "Link's House",
-          left: '27.4',
-          top: '67.9',
-          hoverText: "Link's House"
-        }
-      ],
-      dungeonLocations: [
-        {
-          name: 'Desert Palace',
-          left: '3.8',
-          top: '78.4',
-          hoverText: 'Desert Palace',
-          availableItems: [
-            ['boots', 'book'],
-            ['boots', 'flute', 'titans_mitt', 'mirror']
-          ],
-          possibleItems: [['book'], ['flute', 'titans_mitt', 'mirror']]
-        }
-      ],
-      bossLocations: [
-        {
-          name: 'Lanmolas',
-          left: '3.8',
-          top: '78.4',
-          hoverText: 'Lanmolas',
-          imageNumber: 12,
-          availableItems: [
-            ['boots', 'book'],
-            ['boots', 'flute', 'titans_mitt', 'mirror']
-          ],
-          possibleItems: [['book'], ['flute', 'titans_mitt', 'mirror']]
-        }
-      ]
+      poiLocations,
+      dungeonLocations,
+      bossLocations
     }
   },
   computed: {},
@@ -98,23 +70,31 @@ export default {
     },
     locationAvailability(location) {
       if (
-        typeof location.availableItems === 'undefined' ||
-        location.availableItems.some(this.haveItems)
+        typeof location.available === 'undefined' ||
+        location.available.some(this.haveItemsAndDungeons)
       ) {
         return 'available'
       } else if (
-        typeof location.possibleItems !== 'undefined' &&
-        location.possibleItems.some(this.haveItems)
+        typeof location.possible !== 'undefined' &&
+        location.possible.some(this.haveItemsAndDungeons)
       ) {
         return 'possible'
       }
 
       return 'unavailable'
     },
-    haveItems(items) {
-      return items.every(item => {
+    haveItemsAndDungeons(availability) {
+      return this.haveItems(availability) && this.haveDungeons(availability)
+    },
+    haveItems(availability) {
+      if (typeof availability === 'undefined') return true
+
+      return availability.items.every(item => {
         return this.$store.state.game[item]
       })
+    },
+    haveDungeons(availability) {
+      return true
     }
   }
 }
