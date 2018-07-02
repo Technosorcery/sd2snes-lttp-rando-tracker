@@ -2,7 +2,7 @@ use failure;
 
 use std::convert::TryFrom;
 
-#[derive(Debug, Default, Clone, Copy, Serialize, Deserialize)]
+#[derive(Debug, Default, Clone, Copy, PartialEq, Serialize, Deserialize)]
 pub struct BigKey {
     // Light world
     pub eastern_palace: bool,
@@ -19,14 +19,14 @@ pub struct BigKey {
     pub gannons_tower: bool,
 }
 
-#[derive(Debug, Default, Clone, Copy, Serialize, Deserialize)]
+#[derive(Debug, Default, Clone, Copy, PartialEq, Serialize, Deserialize)]
 pub struct Pendant {
     pub red: bool,
     pub blue: bool,
     pub green: bool,
 }
 
-#[derive(Debug, Default, Clone, Copy, Serialize, Deserialize)]
+#[derive(Debug, Default, Clone, Copy, PartialEq, Serialize, Deserialize)]
 pub struct Crystal {
     pub one: bool,
     pub two: bool,

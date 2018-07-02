@@ -8,10 +8,12 @@ deny(warnings,
 #![feature(try_from, plugin)]
 #![plugin(rocket_codegen)]
 
+extern crate bus;
 #[macro_use]
 extern crate clap;
 #[macro_use]
 extern crate failure;
+extern crate futures;
 extern crate hyper;
 extern crate includedir;
 #[macro_use]
@@ -25,15 +27,23 @@ extern crate rocket_contrib;
 extern crate serde_derive;
 extern crate serde_json;
 extern crate serial;
+extern crate tokio_core;
+extern crate tokio;
 extern crate unicase;
+extern crate websocket;
 
 mod lttp;
+
+use bus::{Bus, BusReader};
 
 use clap::{
     App,
     Arg,
     ArgGroup,
 };
+
+use futures::stream::{SplitSink, SplitStream};
+use futures::prelude::Poll;
 
 use hyper::method::Method as hMethod;
 use rocket::config::{Config, Environment};
@@ -51,8 +61,9 @@ use rocket_contrib::Json;
 
 use std::convert::TryFrom;
 use std::env;
-use std::io::{self, Cursor};
+use std::fmt::Debug;
 use std::fs::File;
+use std::io::{self, Cursor};
 use std::path::{Path, PathBuf};
 use std::sync::Mutex;
 use std::time::Duration;
@@ -63,7 +74,14 @@ use serial::prelude::*;
 
 use serial::PortSettings;
 
+use tokio_core::reactor::{Core, Handle};
+use tokio::prelude::task;
+
 use unicase::UniCase;
+
+use websocket::async::Server;
+use websocket::futures::{Async, Future, Sink, Stream};
+use websocket::message::OwnedMessage;
 
 use lttp::{
     DungeonState,
@@ -124,6 +142,7 @@ pub enum ServerFlag {
 }
 
 lazy_static! {
+    static ref UPDATE_BUS: Mutex<Bus<Update>> = Mutex::new(Bus::new(10));
     static ref DUNGEON_STATE: Mutex<DungeonState> = Mutex::new(DungeonState::default());
     static ref GAME_STATE: Mutex<GameState> = Mutex::new(GameState::default());
     static ref LOCATION_STATE: Mutex<LocationState> = Mutex::new(LocationState::default());
@@ -182,13 +201,28 @@ fn update_tracker_serial_data(serial_port: &str) {
 
         let prev_game_state = GAME_STATE.lock().unwrap().clone();
         match GameState::try_from(response[(item_start as usize)..(mem_size as usize)].to_vec()) {
-            Ok(gs) => *GAME_STATE.lock().unwrap() = gs.merge(prev_game_state),
+            Ok(gs) => {
+                let new_gs = gs.merge(prev_game_state);
+                let should_update_bus = new_gs != prev_game_state;
+
+                *GAME_STATE.lock().unwrap() = new_gs;
+                if should_update_bus {
+                    UPDATE_BUS.lock().unwrap().broadcast(Update::Items);
+                }
+            }
             Err(e) => {
                 println!("Unable to parse game state: {}", e);
                 continue;
             }
         };
     }
+}
+
+#[derive(Debug, Copy, Clone)]
+enum Update {
+    Dungeons,
+    Items,
+    Locations,
 }
 
 fn update_tracker_file_data(file_path: &str) {
@@ -211,7 +245,15 @@ fn update_tracker_file_data(file_path: &str) {
 
         let prev_game_state = GAME_STATE.lock().unwrap().clone();
         match serde_json::from_str::<GameState>(&state_json) {
-            Ok(gs) => *GAME_STATE.lock().unwrap() = gs.merge(prev_game_state),
+            Ok(gs) => {
+                let new_gs = gs.merge(prev_game_state);
+                let should_update_bus = new_gs != prev_game_state;
+
+                *GAME_STATE.lock().unwrap() = new_gs;
+                if should_update_bus {
+                    UPDATE_BUS.lock().unwrap().broadcast(Update::Items);
+                }
+            }
             Err(e) => {
                 println!("Unable to parse game state {:?}: {}", &file_path, e);
                 continue;
@@ -330,7 +372,8 @@ fn set_location_state<'r>(location: String, state: Json<LocationUpdate>) -> Opti
     {
         let mut location_state = LOCATION_STATE.lock().unwrap();
         location_state.update(location.clone(), location_update);
-        state = location_state.get(location).clone()
+        state = location_state.get(location).clone();
+        UPDATE_BUS.lock().unwrap().broadcast(Update::Locations);
     }
 
     let mut response = state_response();
@@ -375,7 +418,8 @@ fn set_dungeon_state<'r>(dungeon: String, state: Json<DungeonUpdate>) -> Option<
     {
         let mut dungeon_state = DUNGEON_STATE.lock().unwrap();
         dungeon_state.update(dungeon.clone(), dungeon_update);
-        state = dungeon_state.get(dungeon).clone()
+        state = dungeon_state.get(dungeon).clone();
+        UPDATE_BUS.lock().unwrap().broadcast(Update::Dungeons);
     }
 
     let mut response = state_response();
@@ -481,6 +525,10 @@ fn main() {
         }
     });
 
+    thread::spawn(move || {
+        websocket_server();
+    });
+
     UI_FILES.set_passthrough(env::var_os("UI_FILES_PASSTHROUGH").is_some());
 
     let rocket_env = if verbose_level > 0 { Environment::Development } else { Environment::Production };
@@ -510,4 +558,142 @@ fn main() {
             ]
         )
         .launch();
+}
+
+#[serde(rename_all = "camelCase", tag = "type", content = "data")]
+#[derive(Debug, Clone, Serialize)]
+enum WebSocketPayload {
+    Item(GameState),
+    Dungeon(DungeonState),
+    Location(LocationState),
+}
+
+impl WebSocketPayload {
+    pub fn to_json_string(&self) -> String {
+        match serde_json::to_string(&self) {
+            Ok(j) => j,
+            Err(e) => panic!("Could not serialize WebSocketPayload: {:?}", e),
+        }
+    }
+}
+
+fn websocket_state_message(state_kind: Update) -> OwnedMessage {
+    let payload = match state_kind {
+        Update::Items     => { WebSocketPayload::Item(GAME_STATE.lock().unwrap().clone()) },
+        Update::Dungeons  => { WebSocketPayload::Dungeon(DUNGEON_STATE.lock().unwrap().clone()) },
+        Update::Locations => { WebSocketPayload::Location(LOCATION_STATE.lock().unwrap().clone()) },
+    };
+
+    let json_payload = payload.to_json_string();
+    // println!("Message payload: {:?}", &json_payload);
+
+    OwnedMessage::Text(json_payload)
+}
+
+fn spawn_future<F, I, E>(f: F, desc: &'static str, handle: &Handle)
+    where F: Future<Item = I, Error = E> + 'static,
+          E: Debug
+{
+    handle.spawn(f.map_err(move |e| println!("{}: '{:?}'", desc, e))
+                  .map(move |_| println!("{}: Finished.", desc)));
+}
+
+#[allow(deprecated)]
+struct Peer {
+    bus: BusReader<Update>,
+    sink: Box<futures::sink::Wait<SplitSink<websocket::client::async::Framed<tokio_core::net::TcpStream,websocket::async::MessageCodec<OwnedMessage>>>>>,
+    stream: Box<SplitStream<websocket::client::async::Framed<tokio_core::net::TcpStream,websocket::async::MessageCodec<OwnedMessage>>>>,
+}
+
+impl Peer {
+    #[allow(deprecated)]
+    pub fn new(
+        bus: BusReader<Update>,
+        sink: Box<futures::sink::Wait<SplitSink<websocket::client::async::Framed<tokio_core::net::TcpStream,websocket::async::MessageCodec<OwnedMessage>>>>>,
+        stream: Box<SplitStream<websocket::client::async::Framed<tokio_core::net::TcpStream,websocket::async::MessageCodec<OwnedMessage>>>>,
+    ) -> Peer {
+        Peer { bus: bus, sink: sink, stream: stream }
+    }
+}
+
+impl Future for Peer {
+    type Item = ();
+    type Error = websocket::WebSocketError;
+
+    fn poll(&mut self) -> Poll<(), websocket::WebSocketError> {
+        if let Ok(state_update) = self.bus.recv_timeout(Duration::from_millis(10)) {
+            println!("Sending update for: {:?}", state_update);
+            if let Err(_) = self.sink.send(websocket_state_message(state_update)) {
+                return Ok(Async::Ready(()));
+            }
+            if let Err(_) = self.sink.flush() {
+                return Ok(Async::Ready(()));
+            }
+        };
+
+        while let Async::Ready(message) = self.stream.poll()? {
+            match message {
+                Some(OwnedMessage::Ping(p)) => {
+                    if let Err(_) = self.sink.send(OwnedMessage::Pong(p)) {
+                        return Ok(Async::Ready(()));
+                    };
+                    if let Err(_) = self.sink.flush() {
+                        return Ok(Async::Ready(()));
+                    };
+                },
+                Some(OwnedMessage::Close(_)) => return Ok(Async::Ready(())),
+                Some(OwnedMessage::Text(text)) => {
+                    if text == "HELLO" {
+                        println!("Sending initial state");
+                        if let Err(_) = self.sink.send(websocket_state_message(Update::Items)) {
+                            return Ok(Async::Ready(()));
+                        };
+                        if let Err(_) = self.sink.send(websocket_state_message(Update::Locations)) {
+                            return Ok(Async::Ready(()));
+                        };
+                        if let Err(_) = self.sink.send(websocket_state_message(Update::Dungeons)) {
+                            return Ok(Async::Ready(()));
+                        };
+                        if let Err(_) = self.sink.flush() {
+                            return Ok(Async::Ready(()));
+                        };
+                    } // else {
+                    //     println!("Got message: {:?}", text);
+                    // }
+                },
+                _ => {},
+            }
+        }
+
+        task::current().notify();
+        Ok(Async::NotReady)
+    }
+}
+
+fn websocket_server() {
+    println!("Opening websocket server");
+    let mut core = Core::new().unwrap();
+    let handle = core.handle();
+    let server = Server::bind("0.0.0.0:8001", &handle).unwrap();
+
+    let f = server.incoming().for_each(move |(upgrade, addr)| {
+        println!("Incoming connection from {:?}", addr);
+        let f = upgrade.accept().and_then(|(s, _)| {
+            let (sink, stream) = s.split();
+
+            println!("Creating peer");
+
+            Peer::new(
+                UPDATE_BUS.lock().unwrap().add_rx(),
+                Box::new(sink.wait()),
+                Box::new(stream)
+            )
+        });
+
+        spawn_future(f, "Client Status", &handle);
+        Ok(())
+    }).map_err(|_| {});
+
+    core.run(f).unwrap();
+    println!("Websocket server closed");
 }

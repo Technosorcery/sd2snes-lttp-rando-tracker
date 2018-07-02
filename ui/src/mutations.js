@@ -1,5 +1,5 @@
 export default {
-  setGameState(state, serverData) {
+  setItemState(state, serverData) {
     state.game = serverData
   },
 
@@ -7,17 +7,7 @@ export default {
     state.dungeons = dungeonData
   },
 
-  updateDungeonState(state, data) {
-    for (var prop in data.data) {
-      state.dungeons[data.name][prop] = data.data[prop]
-    }
-  },
-
   setLocationState(state, locationData) {
     state.locations = locationData
-  },
-
-  updateLocationState(state, data) {
-    state.dungeons[data.name]['cleared'] = data.cleared
   }
 }

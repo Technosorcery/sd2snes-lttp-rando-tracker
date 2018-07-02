@@ -1,49 +1,16 @@
-let requestOptions = {
-  headers: { 'Content-Type': 'application/json' }
-}
-
 export default {
-  retrieveGameState({ commit }, apiPort) {
-    let host =
-      typeof apiPort === 'undefined'
-        ? window.location.host
-        : window.location.hostname + ':' + apiPort
-
-    fetch('http://' + host + '/game_state', requestOptions)
-      .then(response => response.json())
-      .then(data => {
-        commit('setGameState', data)
-      })
+  setItemState({ commit }, state) {
+    commit('setItemState', state)
   },
-
-  retrieveDungeonState({ commit }, apiPort) {
-    let host =
-      typeof apiPort === 'undefined'
-        ? window.location.host
-        : window.location.hostname + ':' + apiPort
-
-    fetch('http://' + host + '/dungeon_state', requestOptions)
-      .then(response => response.json())
-      .then(data => {
-        commit('setDungeonState', data)
-      })
+  setDungeonState({ commit }, state) {
+    commit('setDungeonState', state)
+  },
+  setLocationState({ commit }, state) {
+    commit('setLocationState', state)
   },
 
   updateDungeonState({ commit }, data) {
     commit('updateDungeonState', data)
-  },
-
-  retrieveLocationState({ commit }, apiPort) {
-    let host =
-      typeof apiPort === 'undefined'
-        ? window.location.host
-        : window.location.hostname + ':' + apiPort
-
-    fetch('http://' + host + '/location_state', requestOptions)
-      .then(response => response.json())
-      .then(data => {
-        commit('setLocationState', data)
-      })
   },
 
   updateLocationState({ commit }, data) {
