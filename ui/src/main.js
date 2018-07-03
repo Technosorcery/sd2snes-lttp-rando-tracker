@@ -18,7 +18,11 @@ const store = new Vuex.Store({
   state: {
     game: {},
     dungeons: {},
-    locations: {}
+    locations: {},
+    serverConfig: {
+      apiPort: 8000,
+      websocketPort: 8001
+    }
   }
 })
 
@@ -28,7 +32,8 @@ new Vue({
     App
   },
   created() {
-    this.startStreamingApi(process.env.API_PORT)
+    this.$store.commit('fetchServerConfig', process.env.API_PORT)
+    this.startStreamingApi()
 
     setInterval(() => {
       if (this.stateApi.readyState !== 1) {
@@ -51,11 +56,8 @@ new Vue({
     }
   },
   methods: {
-    startStreamingApi(port) {
-      let apiPort = typeof port === 'undefined'
-        ? window.location.port + 1
-        : process.env.API_PORT + 1
-      let websocketServer = 'ws://' + window.location.hostname + ':' + apiPort
+    startStreamingApi() {
+      let websocketServer = 'ws://' + window.location.hostname + ':' + this.$store.state.serverConfig.websocketPort
       console.log('Using websocket server: ' + websocketServer)
       this.stateApi = new ReconnectingWebSocket(websocketServer, [], { connectionTimeout: 1500, debug: false })
       this.stateApi.addEventListener('message', this.handleSocketEvent.bind(this))

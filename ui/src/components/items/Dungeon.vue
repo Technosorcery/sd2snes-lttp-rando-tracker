@@ -278,8 +278,7 @@ export default {
     },
 
     updateServerState(data) {
-      // TODO: Figure out where to put this, so we can do the process.env.API_PORT lookup that's done in actions.js.
-      let host = window.location.hostname + ':' + '8000'
+      let host = window.location.hostname + ':' + this.$store.state.serverConfig.apiPort
 
       var xhr = new XMLHttpRequest()
       xhr.open('POST', 'http://' + host + '/dungeon_state/' + this.name, true)

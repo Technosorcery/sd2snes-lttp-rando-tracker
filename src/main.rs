@@ -146,6 +146,7 @@ lazy_static! {
     static ref DUNGEON_STATE: Mutex<DungeonState> = Mutex::new(DungeonState::default());
     static ref GAME_STATE: Mutex<GameState> = Mutex::new(GameState::default());
     static ref LOCATION_STATE: Mutex<LocationState> = Mutex::new(LocationState::default());
+    static ref SERVER_CONFIG: Mutex<ServerConfig> = Mutex::new(ServerConfig::default());
 }
 
 fn update_tracker_serial_data(serial_port: &str) {
@@ -480,6 +481,32 @@ fn files<'r>(file: PathBuf) -> Option<Response<'r>> {
 #[get("/")]
 fn root<'r>() -> Option<Response<'r>> { files(PathBuf::from("")) }
 
+#[serde(rename_all = "camelCase")]
+#[derive(Debug, Clone, Copy, Default, Serialize)]
+pub struct ServerConfig {
+    pub api_port: u16,
+    pub websocket_port: u16,
+}
+
+#[options("/config")]
+fn get_config_options<'r>() -> Response<'r> { state_response() }
+
+#[get("/config", format = "application/json")]
+fn get_config<'r>() -> Option<Response<'r>> {
+    let server_config = { SERVER_CONFIG.lock().unwrap().clone() };
+    let mut response = state_response();
+    let json = match serde_json::to_string(&server_config) {
+        Ok(j) => j,
+        Err(e) => {
+            println!("Could not serialize server config: {:?}", e);
+            return None;
+        }
+    };
+    response.set_sized_body(Cursor::new(json));
+
+    Some(response)
+}
+
 fn main() {
     let matches = App::new("SD2SNES LttP Randomizer Tracker")
                           .version(crate_version!())
@@ -503,6 +530,23 @@ fn main() {
                                .short("v")
                                .long("verbose")
                                .multiple(true))
+                          .arg(Arg::with_name("port")
+                               .help("Port number to run the web UI server on")
+                               .short("p")
+                               .long("port")
+                               .takes_value(true)
+                               .default_value("8000"))
+                          .arg(Arg::with_name("websocket-port")
+                               .help("Port number to run the websocket server on [default: <port> + 1]")
+                               .short("w")
+                               .long("websocket-port")
+                               .takes_value(true))
+                          .arg(Arg::with_name("server-address")
+                               .help("Address to bind the UI & websocket server to")
+                               .short("a")
+                               .long("address")
+                               .takes_value(true)
+                               .default_value("0.0.0.0"))
                           .get_matches();
 
     let verbose_level = matches.occurrences_of("verbose");
@@ -511,6 +555,26 @@ fn main() {
         0 => set_panic_message!(lazy_panic::formatter::JustError),
         1 => set_panic_message!(lazy_panic::formatter::Simple),
         _ => set_panic_message!(lazy_panic::formatter::Debug),
+    }
+
+    let server_port = match matches.value_of("port").unwrap().parse::<u16>() {
+        Ok(i) => i,
+        Err(e) => panic!("Invalid port number: {:?}", e),
+    };
+    let websocket_port = match matches.value_of("websocket-port") {
+        Some(i) => i.parse::<u16>().unwrap_or_else(|e| panic!("Invalid websocket port number: {:?}", e)),
+        None => server_port + 1,
+    };
+    let server_address = match matches.value_of("server-address").unwrap().parse::<std::net::IpAddr>() {
+        Ok(a) => a,
+        Err(e) => panic!("Invalid address: {}", e),
+    };
+
+    {
+        *SERVER_CONFIG.lock().unwrap() = ServerConfig {
+            api_port: server_port,
+            websocket_port: websocket_port,
+        };
     }
 
     thread::spawn(move || {
@@ -525,16 +589,17 @@ fn main() {
         }
     });
 
+    let websocket_bind_addr = format!("{}:{}", &server_address, websocket_port).parse::<std::net::SocketAddr>().unwrap_or_else(|e| panic!("Invalid IP/Port combination: {:?}", e));
     thread::spawn(move || {
-        websocket_server();
+        websocket_server(websocket_bind_addr);
     });
 
     UI_FILES.set_passthrough(env::var_os("UI_FILES_PASSTHROUGH").is_some());
 
     let rocket_env = if verbose_level > 0 { Environment::Development } else { Environment::Production };
     let rocket_config = Config::build(rocket_env)
-        .address("0.0.0.0")
-        .port(8000)
+        .address(format!("{}", &server_address))
+        .port(server_port)
         // We don't actually use the secret key, so we don't really care what it is.
         .secret_key("8Xui8SN4mI+7egV/9dlfYYLGQJeEx4+DwmSQLwDVXJg=")
         .finalize().unwrap();
@@ -544,6 +609,8 @@ fn main() {
             "/",
             routes![
                 files,
+                get_config_options,
+                get_config,
                 get_dungeon_state_options,
                 get_dungeon_state,
                 get_game_state_options,
@@ -670,11 +737,11 @@ impl Future for Peer {
     }
 }
 
-fn websocket_server() {
-    println!("Opening websocket server");
+fn websocket_server(bind_addr: std::net::SocketAddr) {
+    println!("Opening websocket server: {}", &bind_addr);
     let mut core = Core::new().unwrap();
     let handle = core.handle();
-    let server = Server::bind("0.0.0.0:8001", &handle).unwrap();
+    let server = Server::bind(bind_addr, &handle).unwrap();
 
     let f = server.incoming().for_each(move |(upgrade, addr)| {
         println!("Incoming connection from {:?}", addr);
