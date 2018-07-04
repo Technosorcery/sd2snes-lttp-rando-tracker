@@ -1,5 +1,9 @@
+let requestOptions = {
+  headers: { 'Content-Type': 'application/json' }
+}
+
 export default {
-  setGameState(state, serverData) {
+  setItemState(state, serverData) {
     state.game = serverData
   },
 
@@ -7,9 +11,21 @@ export default {
     state.dungeons = dungeonData
   },
 
-  updateDungeonState(state, data) {
-    for (var prop in data.data) {
-      state.dungeons[data.name][prop] = data.data[prop]
-    }
+  setLocationState(state, locationData) {
+    state.locations = locationData
+  },
+
+  async fetchServerConfig(state, apiPort) {
+    let host =
+      typeof apiPort === 'undefined'
+        ? window.location.host
+        : window.location.hostname + ':' + apiPort
+
+    await fetch('http://' + host + '/config', requestOptions)
+      .then(response => response.json())
+      .then(data => {
+        console.log('Storing server config: ', data)
+        state.serverConfig = data
+      })
   }
 }

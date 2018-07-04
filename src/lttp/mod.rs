@@ -21,7 +21,7 @@ use self::item::{
     Sword,
 };
 
-#[derive(Debug, Default, Copy, Clone, Serialize, Deserialize)]
+#[derive(Debug, Default, Copy, Clone, PartialEq, Serialize, Deserialize)]
 pub struct GameState {
     // Items
     pub bow:               bool,
@@ -289,7 +289,7 @@ impl GameState {
     }
 }
 
-#[derive(Debug, Clone, Copy, Default, Serialize)]
+#[derive(Debug, Clone, Copy, Default, Serialize, PartialEq)]
 pub struct Location {
     pub cleared: bool,
 }
@@ -307,8 +307,9 @@ pub struct LocationUpdate {
     pub cleared: Option<bool>,
 }
 
-#[derive(Debug, Clone, Default, Serialize)]
+#[derive(Debug, Clone, Default, Serialize, PartialEq)]
 pub struct LocationState {
+    #[serde(flatten)]
     pub locations: HashMap<String, Location>,
 }
 
@@ -334,7 +335,7 @@ impl LocationState {
 }
 
 
-#[derive(Debug, Clone, Copy, Default, Serialize)]
+#[derive(Debug, Clone, Copy, Default, Serialize, PartialEq)]
 pub struct Dungeon {
     pub found_chests: u8,
     pub reward: DungeonReward,
@@ -359,7 +360,7 @@ impl Dungeon {
     }
 }
 
-#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq)]
 pub enum DungeonReward {
     Unknown,
     GreenPendant,
@@ -372,7 +373,7 @@ impl Default for DungeonReward {
     fn default() -> DungeonReward { DungeonReward::Unknown }
 }
 
-#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq)]
 pub enum Medallion {
     Unknown,
     Bombos,
@@ -392,8 +393,9 @@ pub struct DungeonUpdate {
     pub cleared: Option<bool>,
 }
 
-#[derive(Debug, Clone, Default, Serialize)]
+#[derive(Debug, Clone, Default, Serialize, PartialEq)]
 pub struct DungeonState {
+    #[serde(flatten)]
     pub dungeons: HashMap<String, Dungeon>,
 }
 

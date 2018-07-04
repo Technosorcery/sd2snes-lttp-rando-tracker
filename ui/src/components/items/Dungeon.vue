@@ -249,12 +249,6 @@ export default {
       }
 
       let data = { found_chests: newFoundChests }
-      if (this.$store.state.dungeons && this.$store.state.dungeons[this.name]) {
-        this.$store.dispatch('updateDungeonState', {
-          name: this.name,
-          data: data
-        })
-      }
       this.updateServerState(data)
     },
 
@@ -272,12 +266,6 @@ export default {
 
       let data = {}
       data[sequence] = this[sequence + 'Sequence'][newIndex]
-      if (this.$store.state.dungeons && this.$store.state.dungeons[this.name]) {
-        this.$store.dispatch('updateDungeonState', {
-          name: this.name,
-          data: data
-        })
-      }
       this.updateServerState(data)
     },
 
@@ -286,25 +274,11 @@ export default {
 
       let cleared = !this.gotReward
       let data = { cleared: cleared }
-      if (this.$store.state.dungeons && this.$store.state.dungeons[this.name]) {
-        this.$store.dispatch('updateDungeonState', {
-          name: this.name,
-          data: data
-        })
-      }
       this.updateServerState(data)
     },
 
     updateServerState(data) {
-      // TODO: Figure out where to put this, so we can do the process.env.API_PORT lookup that's done in actions.js.
-      let host = window.location.hostname + ':' + '8000'
-
-      console.log(
-        'Updating remote state for ' +
-          this.name +
-          ' with: ' +
-          JSON.stringify(data)
-      )
+      let host = window.location.hostname + ':' + this.$store.state.serverConfig.apiPort
 
       var xhr = new XMLHttpRequest()
       xhr.open('POST', 'http://' + host + '/dungeon_state/' + this.name, true)
