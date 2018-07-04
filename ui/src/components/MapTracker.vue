@@ -1,12 +1,13 @@
 <template>
   <div class="map-tracker">
     <div id="map" class="map">
-      <span
+      <Location
         v-for="poi in poiLocations"
         :key="poi.name"
-        class="mapspan chest"
-        :class="locationAvailability(poi)"
-        :style="poiStyle(poi)"></span>
+        :name="poi.name"
+        :top="poi.top"
+        :left="poi.left"
+        :hoverText="poi.hoverText"></Location>
       <span
         v-for="dungeon in dungeonLocations"
         :key="dungeon.name"
@@ -24,12 +25,17 @@
 </template>
 
 <script>
+import Location from '@/components/map/Location.vue'
+
 import poiLocations from '@/poiLocations.js'
 import dungeonLocations from '@/dungeonLocations.js'
 import bossLocations from '@/bossLocations.js'
 
 export default {
   name: 'MapTracker',
+  components: {
+    Location
+  },
   data() {
     return {
       poiLocations,
