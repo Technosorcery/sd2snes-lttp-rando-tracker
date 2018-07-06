@@ -7,7 +7,7 @@ export default {
   name: 'HookShot',
   computed: {
     hookshotState() {
-      return this.$store.state.game.hook_shot ? 'true' : 'false'
+      return this.$store.state.game.hookShot ? 'true' : 'false'
     }
   }
 }

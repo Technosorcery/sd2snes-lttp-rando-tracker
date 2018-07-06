@@ -7,7 +7,7 @@ export default {
   name: 'Quake',
   computed: {
     quakeState() {
-      return this.$store.state.game.quake_medallion ? 'true' : 'false'
+      return this.$store.state.game.quakeMedallion ? 'true' : 'false'
     }
   }
 }

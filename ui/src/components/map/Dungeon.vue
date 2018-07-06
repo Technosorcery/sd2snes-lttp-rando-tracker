@@ -21,7 +21,7 @@ export default {
     dungeonCleared() {
       if (this.$store.state.dungeons[this.location.dungeonCode]) {
         let dungeonState = this.$store.state.dungeons[this.location.dungeonCode]
-        let remainingChests = this.location.totalChests - dungeonState.found_chests
+        let remainingChests = this.location.totalChests - dungeonState.foundChests
 
         if (this.bossCleared) {
           return remainingChests === 0

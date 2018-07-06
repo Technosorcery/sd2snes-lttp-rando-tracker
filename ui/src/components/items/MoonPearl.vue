@@ -7,7 +7,7 @@ export default {
   name: 'MoonPearl',
   computed: {
     moonpearlState() {
-      return this.$store.state.game.moon_pearl ? 'true' : 'false'
+      return this.$store.state.game.moonPearl ? 'true' : 'false'
     }
   }
 }

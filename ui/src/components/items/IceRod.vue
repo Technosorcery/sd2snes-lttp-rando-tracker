@@ -7,7 +7,7 @@ export default {
   name: 'IceRod',
   computed: {
     icerodState() {
-      return this.$store.state.game.ice_rod ? 'true' : 'false'
+      return this.$store.state.game.iceRod ? 'true' : 'false'
     }
   }
 }

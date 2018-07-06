@@ -55,7 +55,7 @@ export default {
 
     foundChests() {
       if (this.$store.state.dungeons && this.$store.state.dungeons[this.name]) {
-        return this.$store.state.dungeons[this.name].found_chests
+        return this.$store.state.dungeons[this.name].foundChests
       }
 
       return 0
@@ -248,7 +248,7 @@ export default {
         newFoundChests = 0
       }
 
-      let data = { found_chests: newFoundChests }
+      let data = { foundChests: newFoundChests }
       this.updateServerState(data)
     },
 

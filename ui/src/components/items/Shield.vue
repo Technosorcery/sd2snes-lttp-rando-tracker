@@ -7,13 +7,13 @@ export default {
   name: 'Shield',
   computed: {
     shieldState() {
-      if (!this.$store.state.game.shield_level) {
+      if (!this.$store.state.game.shieldLevel) {
         return
       }
-      if (this.$store.state.game.shield_level === 'None') {
+      if (this.$store.state.game.shieldLevel === 'None') {
         return 'noshield'
       }
-      return this.$store.state.game.shield_level.toLowerCase()
+      return this.$store.state.game.shieldLevel.toLowerCase()
     }
   }
 }

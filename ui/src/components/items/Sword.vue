@@ -7,13 +7,13 @@ export default {
   name: 'Sword',
   computed: {
     swordState() {
-      if (!this.$store.state.game.sword_level) {
+      if (!this.$store.state.game.swordLevel) {
         return
       }
-      if (this.$store.state.game.sword_level === 'None') {
+      if (this.$store.state.game.swordLevel === 'None') {
         return 'nosword'
       }
-      return this.$store.state.game.sword_level.toLowerCase()
+      return this.$store.state.game.swordLevel.toLowerCase()
     }
   }
 }

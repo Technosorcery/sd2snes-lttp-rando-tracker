@@ -21,6 +21,7 @@ use self::item::{
     Sword,
 };
 
+#[serde(rename_all = "camelCase")]
 #[derive(Debug, Default, Copy, Clone, PartialEq, Serialize, Deserialize)]
 pub struct GameState {
     // Items
@@ -289,6 +290,7 @@ impl GameState {
     }
 }
 
+#[serde(rename_all = "camelCase")]
 #[derive(Debug, Clone, Copy, Default, Serialize, PartialEq)]
 pub struct Location {
     pub cleared: bool,
@@ -302,11 +304,13 @@ impl Location {
     }
 }
 
+#[serde(rename_all = "camelCase")]
 #[derive(Debug, Clone, Copy, Deserialize)]
 pub struct LocationUpdate {
     pub cleared: Option<bool>,
 }
 
+#[serde(rename_all = "camelCase")]
 #[derive(Debug, Clone, Default, Serialize, PartialEq)]
 pub struct LocationState {
     #[serde(flatten)]
@@ -335,6 +339,7 @@ impl LocationState {
 }
 
 
+#[serde(rename_all = "camelCase")]
 #[derive(Debug, Clone, Copy, Default, Serialize, PartialEq)]
 pub struct Dungeon {
     pub found_chests: u8,
@@ -385,6 +390,7 @@ impl Default for Medallion {
     fn default() -> Medallion { Medallion::Unknown }
 }
 
+#[serde(rename_all = "camelCase")]
 #[derive(Debug, Clone, Copy, Deserialize)]
 pub struct DungeonUpdate {
     pub found_chests: Option<u8>,
@@ -393,6 +399,7 @@ pub struct DungeonUpdate {
     pub cleared: Option<bool>,
 }
 
+#[serde(rename_all = "camelCase")]
 #[derive(Debug, Clone, Default, Serialize, PartialEq)]
 pub struct DungeonState {
     #[serde(flatten)]

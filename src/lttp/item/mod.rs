@@ -2,6 +2,7 @@ use failure;
 
 use std::convert::TryFrom;
 
+#[serde(rename_all = "camelCase")]
 #[derive(Debug, Default, Clone, Copy, PartialEq, Serialize, Deserialize)]
 pub struct BigKey {
     // Light world
@@ -19,6 +20,7 @@ pub struct BigKey {
     pub gannons_tower: bool,
 }
 
+#[serde(rename_all = "camelCase")]
 #[derive(Debug, Default, Clone, Copy, PartialEq, Serialize, Deserialize)]
 pub struct Pendant {
     pub red: bool,
@@ -26,6 +28,7 @@ pub struct Pendant {
     pub green: bool,
 }
 
+#[serde(rename_all = "camelCase")]
 #[derive(Debug, Default, Clone, Copy, PartialEq, Serialize, Deserialize)]
 pub struct Crystal {
     pub one: bool,

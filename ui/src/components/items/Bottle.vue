@@ -7,7 +7,7 @@ export default {
   name: 'Bottle',
   computed: {
     bottleState() {
-      return 'bottle' + this.$store.state.game.bottle_count
+      return 'bottle' + this.$store.state.game.bottleCount
     }
   }
 }
