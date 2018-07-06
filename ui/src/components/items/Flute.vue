@@ -7,7 +7,13 @@ export default {
   name: 'Flute',
   computed: {
     fluteState() {
-      return this.$store.state.game.flute ? 'true' : 'false'
+      if (this.$store.state.game.fluteActivated) {
+        return 'true'
+      } else if (this.$store.state.game.flute) {
+        return 'unactivated'
+      }
+
+      return 'false'
     }
   }
 }

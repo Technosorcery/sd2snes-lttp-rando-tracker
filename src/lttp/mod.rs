@@ -40,6 +40,7 @@ pub struct GameState {
     pub lantern:           bool,
     pub hammer:            bool,
     pub flute:             bool,
+    pub flute_activated:   bool,
     pub shovel:            bool,
     pub net:               bool,
     pub book:              bool,
@@ -87,6 +88,8 @@ impl TryFrom<Vec<u8>> for GameState {
     type Error = failure::Error;
 
     fn try_from(response: Vec<u8>) -> Result<GameState, Self::Error> {
+        let flute_shovel = FluteShovel::try_from(response[0x0C])?;
+
         let bottle1 = Bottle::try_from(response[0x1C])?;
         let bottle2 = Bottle::try_from(response[0x1D])?;
         let bottle3 = Bottle::try_from(response[0x1E])?;
@@ -113,7 +116,8 @@ impl TryFrom<Vec<u8>> for GameState {
             quake_medallion:   response[0x09] > 0,
             lantern:           response[0x0A] > 0,
             hammer:            response[0x0B] > 0,
-            flute:             FluteShovel::try_from(response[0x0C])? == FluteShovel::Flute || FluteShovel::try_from(response[0x0C])? == FluteShovel::FluteAndBird,
+            flute:             flute_shovel == FluteShovel::Flute || flute_shovel == FluteShovel::FluteAndBird,
+            flute_activated:   flute_shovel == FluteShovel::FluteAndBird,
             shovel:            FluteShovel::try_from(response[0x0C])? == FluteShovel::Shovel,
             net:               response[0x0D] > 0,
             book:              response[0x0E] > 0,
@@ -242,7 +246,8 @@ impl GameState {
             quake_medallion:   self.quake_medallion,
             lantern:           self.lantern,
             hammer:            self.hammer,
-            flute:             self.flute            || old.flute,
+            flute:             self.flute,
+            flute_activated:   self.flute_activated,
             shovel:            self.shovel           || old.shovel,
             net:               self.net,
             book:              self.book,
