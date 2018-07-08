@@ -6,7 +6,7 @@
 ## About
 
 sd2snes-lttp-rando-tracker can be used to automatically track collected items in
-[The Legend of Zelda: A Link to the Past Randomizer](https://alttpr.com), when
+[The Legend of Zelda: A Link to the Past Randomizer](http://alttpr.com), when
 using an SD2SNES with the [USB2SNES](https://github.com/RedGuyyyy/sd2snes/releases)
 firmware. sd2snes-lttp-rando-tracker will periodically poll the SD2SNES over the
 USB serial connection to track the retrieved item states.
