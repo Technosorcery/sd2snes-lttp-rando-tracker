@@ -1,0 +1,24 @@
+version: 0.1.0.{build}
+branches:
+  only:
+    - master
+platform: x64
+install:
+  - curl -sSf -o rustup-init.exe https://win.rustup.rs/
+  - rustup-init.exe -y
+  - set Path=%Path%;C:\Users\appveyor\.cargo\bin
+  - rustup toolchain install nightly
+  - cinst nodejs --version 9.11.1
+  - cinst yarn
+build_script:
+  - ps: cd ui; yarn install; cd ..
+  - ps: cd ui; yarn run build; cd ..
+  - cargo build --verbose --all
+  - cargo build --verbose --all --release
+test_script:
+  - cargo test --verbose --all
+artifacts:
+  - path: target/release/sd2snes-lttp-rando-tracker.exe
+    name: Release build
+  - path: target/debug/sd2snes-lttp-rando-tracker.exe
+    name: Debug build
