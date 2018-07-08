@@ -13,10 +13,11 @@ install:
 build_script:
   - ps: cd ui; yarn install; cd ..
   - ps: cd ui; yarn run build; cd ..
-  - cargo build --verbose --all
-  - cargo build --verbose --all --release
+  - ps: $env:YARN_PATH = (Get-Command cmd).Path
+  - ps: cmd /c 'cargo build --verbose --all 2>&1'
+  - ps: cmd /c 'cargo build --verbose --all --release 2>&1'
 test_script:
-  - cargo test --verbose --all
+  - ps: cmd /c 'cargo test --verbose --all 2>&1'
 artifacts:
   - path: target/release/sd2snes-lttp-rando-tracker.exe
     name: Release build
