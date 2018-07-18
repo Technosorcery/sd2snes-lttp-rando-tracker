@@ -377,8 +377,8 @@ fn set_location_state<'r>(location: String, state: Json<LocationUpdate>) -> Opti
     let state;
     {
         let mut location_state = LOCATION_STATE.lock().unwrap();
-        location_state.update(location.clone(), location_update);
-        state = location_state.get(location).clone();
+        location_state.update(&location, location_update);
+        state = location_state.get(&location).clone();
         UPDATE_BUS.lock().unwrap().broadcast(Update::Locations);
     }
 
@@ -423,8 +423,8 @@ fn set_dungeon_state<'r>(dungeon: String, state: Json<DungeonUpdate>) -> Option<
     let state;
     {
         let mut dungeon_state = DUNGEON_STATE.lock().unwrap();
-        dungeon_state.update(dungeon.clone(), dungeon_update);
-        state = dungeon_state.get(dungeon).clone();
+        dungeon_state.update(&dungeon, dungeon_update);
+        state = dungeon_state.get(&dungeon).clone();
         UPDATE_BUS.lock().unwrap().broadcast(Update::Dungeons);
     }
 
