@@ -270,7 +270,7 @@ fn update_tracker_file_data(file_path: &str) {
 
 fn read_wram<T: SerialPort>(port: &mut T, mem_offset: u32, mem_size: u32) -> io::Result<Vec<u8>> {
     let mut buf: Vec<u8> = Vec::with_capacity(512);
-    buf.extend_from_slice("USBA".as_bytes());
+    buf.extend_from_slice(b"USBA");
     buf.resize(512, 0);
     buf[4] = ServerOpcode::Get as u8; // opcode
     buf[5] = ServerSpace::SNES as u8; // space
@@ -298,10 +298,10 @@ fn read_wram<T: SerialPort>(port: &mut T, mem_offset: u32, mem_size: u32) -> io:
         result.extend_from_slice(&resp_buf[..resp_size]);
     }
 
-    if result[0] != "U".as_bytes()[0] ||
-       result[1] != "S".as_bytes()[0] ||
-       result[2] != "B".as_bytes()[0] ||
-       result[3] != "A".as_bytes()[0] ||
+    if result[0] != b"U"[0] ||
+       result[1] != b"S"[0] ||
+       result[2] != b"B"[0] ||
+       result[3] != b"A"[0] ||
        result[4] != ServerOpcode::Response as u8 {
 
         let timeout = port.timeout();
