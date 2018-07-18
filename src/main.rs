@@ -279,12 +279,12 @@ fn read_wram<T: SerialPort>(port: &mut T, mem_offset: u32, mem_size: u32) -> io:
     buf[256] = ((mem_offset >> 24) & 0xFF) as u8;
     buf[257] = ((mem_offset >> 16) & 0xFF) as u8;
     buf[258] = ((mem_offset >> 8)  & 0xFF) as u8;
-    buf[259] = ((mem_offset >> 0)  & 0xFF) as u8;
+    buf[259] = ( mem_offset        & 0xFF) as u8;
     // size is big endian, and starts at index 252
     buf[252] = ((mem_size >> 24) & 0xFF) as u8;
     buf[253] = ((mem_size >> 16) & 0xFF) as u8;
     buf[254] = ((mem_size >>  8) & 0xFF) as u8;
-    buf[255] = ((mem_size >>  0) & 0xFF) as u8;
+    buf[255] = ( mem_size        & 0xFF) as u8;
 
     port.write_all(&buf[..])?;
 
