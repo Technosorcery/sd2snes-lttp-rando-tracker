@@ -205,7 +205,7 @@ fn update_tracker_serial_data(serial_port: &str) {
         //let mut buffer = File::create("raw_response.txt").unwrap();
         //buffer.write(&response[..]).unwrap();
 
-        let prev_game_state = GAME_STATE.lock().unwrap().clone();
+        let prev_game_state = *GAME_STATE.lock().unwrap();
         match GameState::try_from(response[(item_start as usize)..(mem_size as usize)].to_vec()) {
             Ok(gs) => {
                 let new_gs = gs.merge(prev_game_state);
@@ -249,7 +249,7 @@ fn update_tracker_file_data(file_path: &str) {
             continue;
         };
 
-        let prev_game_state = GAME_STATE.lock().unwrap().clone();
+        let prev_game_state = *GAME_STATE.lock().unwrap();
         match serde_json::from_str::<GameState>(&state_json) {
             Ok(gs) => {
                 let new_gs = gs.merge(prev_game_state);
@@ -335,7 +335,7 @@ fn get_game_state_options<'r>() -> Response<'r> { state_response() }
 
 #[get("/game_state", format = "application/json")]
 fn get_game_state<'r>() -> Option<Response<'r>> {
-    let game_state = GAME_STATE.lock().unwrap().clone();
+    let game_state = *GAME_STATE.lock().unwrap();
     let mut response = state_response();
     let json = match serde_json::to_string(&game_state) {
         Ok(j) => j,
@@ -498,7 +498,7 @@ fn get_config_options<'r>() -> Response<'r> { state_response() }
 
 #[get("/config", format = "application/json")]
 fn get_config<'r>() -> Option<Response<'r>> {
-    let server_config = { SERVER_CONFIG.lock().unwrap().clone() };
+    let server_config = { *SERVER_CONFIG.lock().unwrap() };
     let mut response = state_response();
     let json = match serde_json::to_string(&server_config) {
         Ok(j) => j,
@@ -691,7 +691,7 @@ impl WebSocketPayload {
 
 fn websocket_state_message(state_kind: Update) -> OwnedMessage {
     let payload = match state_kind {
-        Update::Items     => { WebSocketPayload::Item(GAME_STATE.lock().unwrap().clone()) },
+        Update::Items     => { WebSocketPayload::Item(*GAME_STATE.lock().unwrap()) },
         Update::Dungeons  => { WebSocketPayload::Dungeon(DUNGEON_STATE.lock().unwrap().clone().dungeons) },
         Update::Locations => { WebSocketPayload::Location(LOCATION_STATE.lock().unwrap().clone().locations) },
     };
