@@ -521,7 +521,7 @@ fn set_base_location_data() {
 
     match serde_yaml::from_str::<Vec<Location>>(&file) {
         Ok(locations) => {
-            *LOCATION_STATE.lock().unwrap() = LocationState { locations: locations };
+            *LOCATION_STATE.lock().unwrap() = LocationState { locations };
             UPDATE_BUS.lock().unwrap().broadcast(Update::Locations);
         }
         Err(e) => {
@@ -539,7 +539,7 @@ fn set_base_dungeon_data() {
 
     match serde_yaml::from_str::<Vec<Dungeon>>(&file) {
         Ok(dungeons) => {
-            *DUNGEON_STATE.lock().unwrap() = DungeonState { dungeons: dungeons };
+            *DUNGEON_STATE.lock().unwrap() = DungeonState { dungeons };
             UPDATE_BUS.lock().unwrap().broadcast(Update::Dungeons);
         }
         Err(e) => {
@@ -617,7 +617,7 @@ fn main() {
     {
         *SERVER_CONFIG.lock().unwrap() = ServerConfig {
             api_port: server_port,
-            websocket_port: websocket_port,
+            websocket_port,
         };
     }
 
@@ -724,7 +724,7 @@ impl Peer {
         sink: Box<futures::sink::Wait<SplitSink<websocket::client::async::Framed<tokio_core::net::TcpStream,websocket::async::MessageCodec<OwnedMessage>>>>>,
         stream: Box<SplitStream<websocket::client::async::Framed<tokio_core::net::TcpStream,websocket::async::MessageCodec<OwnedMessage>>>>,
     ) -> Peer {
-        Peer { bus: bus, sink: sink, stream: stream }
+        Peer { bus, sink, stream }
     }
 }
 

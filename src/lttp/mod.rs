@@ -121,7 +121,7 @@ impl TryFrom<Vec<u8>> for GameState {
             net:               response[0x0D] > 0,
             book:              response[0x0E] > 0,
             bottle:            response[0x0F] > 0,
-            bottle_count:      bottle_count,
+            bottle_count,
             cane_somaria:      response[0x10] > 0,
             cane_byrna:        response[0x11] > 0,
             cape:              response[0x12] > 0,
