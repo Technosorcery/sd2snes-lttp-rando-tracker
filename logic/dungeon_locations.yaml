@@ -1,0 +1,206 @@
+---
+- name: Eastern Palace
+  position:
+    horizontal:
+      left: 46.8
+      top: 38.8
+    vertical:
+      left: 0
+      top: 0
+  hoverText: Eastern Palace
+  totalChests: 3
+  hasReward: true
+  dungeonCode: EP
+  defaultImage: boss01.png
+  clearedImage: boss02.png
+  boss:
+    name: Armos Knights
+    hoverText: Armos Knights
+    imageNumber: '02'
+- name: Desert Palace
+  position:
+    horizontal:
+      left: 3.8
+      top: 78.4
+    vertical:
+      left: 0
+      top: 0
+  hoverText: Desert Palace
+  totalChests: 2
+  hasReward: true
+  dungeonCode: DP
+  defaultImage: boss11.png
+  clearedImage: boss12.png
+  boss:
+    name: Lanmolas
+    hoverText: Lanmolas
+    imageNumber: '12'
+- name: Tower of Hera
+  position:
+    horizontal:
+      left: 31
+      top: 5.5
+    vertical:
+      left: 0
+      top: 0
+  hoverText: Tower of Hera
+  totalChests: 2
+  hasReward: true
+  dungeonCode: ToH
+  defaultImage: boss21.png
+  clearedImage: boss22.png
+  boss:
+    name: Moldorm
+    hoverText: Moldorm
+    imageNumber: '22'
+- name: Palace of Darkness
+  position:
+    horizontal:
+      left: 97
+      top: 40
+    vertical:
+      left: 0
+      top: 0
+  hoverText: Palace of Darkness
+  totalChests: 5
+  hasReward: true
+  dungeonCode: PoD
+  defaultImage: boss31.png
+  clearedImage: boss32.png
+  boss:
+    name: Helmasaur King
+    hoverText: Helmasaur King
+    imageNumber: '32'
+- name: Swamp Palace
+  position:
+    horizontal:
+      left: 73.5
+      top: 91
+    vertical:
+      left: 0
+      top: 0
+  hoverText: Swamp Palace
+  totalChests: 6
+  hasReward: true
+  dungeonCode: SP
+  defaultImage: boss41.png
+  clearedImage: boss42.png
+  boss:
+    name: Arrghus
+    hoverText: Arrghus
+    imageNumber: '42'
+- name: Skull Woods
+  position:
+    horizontal:
+      left: 53.3
+      top: 5.4
+    vertical:
+      left: 0
+      top: 0
+  hoverText: Skull Woods
+  totalChests: 2
+  hasReward: true
+  dungeonCode: SW
+  defaultImage: boss51.png
+  clearedImage: boss52.png
+  boss:
+    name: Mothula
+    hoverText: Mothula
+    imageNumber: '52'
+- name: Thieves' Town
+  position:
+    horizontal:
+      left: 56.4
+      top: 47.9
+    vertical:
+      left: 0
+      top: 0
+  hoverText: Thieves' Town
+  totalChests: 4
+  hasReward: true
+  dungeonCode: TT
+  defaultImage: boss61.png
+  clearedImage: boss62.png
+  boss:
+    name: Blind the Thief
+    hoverText: Blind the Thief
+    imageNumber: '62'
+- name: Ice Palace
+  position:
+    horizontal:
+      left: 89.8
+      top: 85.8
+    vertical:
+      left: 0
+      top: 0
+  hoverText: Ice Palace
+  totalChests: 3
+  hasReward: true
+  dungeonCode: IP
+  defaultImage: boss71.png
+  clearedImage: boss72.png
+  boss:
+    name: Kholdstare
+    hoverText: Kholdstare
+    imageNumber: '72'
+- name: Misery Mire
+  position:
+    horizontal:
+      left: 55.8
+      top: 82.9
+    vertical:
+      left: 0
+      top: 0
+  hoverText: Misery Mire
+  totalChests: 2
+  hasReward: true
+  dungeonCode: MM
+  defaultImage: boss81.png
+  clearedImage: boss82.png
+  boss:
+    name: Vitreous
+    hoverText: Vitreous
+    imageNumber: '82'
+- name: Turtle Rock
+  position:
+    horizontal:
+      left: 96.9
+      top: 7
+    vertical:
+      left: 0
+      top: 0
+  hoverText: Turtle Rock
+  totalChests: 5
+  hasReward: true
+  dungeonCode: TR
+  defaultImage: boss91.png
+  clearedImage: boss92.png
+  boss:
+    name: Trinexx
+    hoverText: Trinexx
+    imageNumber: '92'
+- name: Ganon's Tower
+  position:
+    horizontal:
+      left: 77
+      top: 5.5
+    vertical:
+      left: 0
+      top: 0
+  hoverText: Ganon's Tower
+  totalChests: 20
+  hasReward: false
+  dungeonCode: GT
+  defaultImage: boss101.png
+  clearedImage: boss102.png
+  boss:
+    name: Agahnim
+    hoverText: Agahnim
+    imageNumber: '102'
+- name: Agahnim
+  hoverText: Agahnim
+  totalChests: 0
+  hasReward: false
+  dungeonCode: Aga
+  defaultImage: agahnim0.png
+  clearedImage: agahnim1.png

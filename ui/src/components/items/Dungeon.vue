@@ -7,12 +7,12 @@
       v-if="title"
       class="corner">{{ title }}</span>
     <span
-      v-if="totalChests > 0"
+      v-if="dungeon.totalChests > 0"
       class="chest"
       :style="chestsStyle"
       @click="openChest"></span>
     <span
-      v-if="hasReward"
+      v-if="dungeon.hasReward"
       class="reward"
       :style="rewardStyle"
       @click="cycleReward"></span>
@@ -28,7 +28,7 @@
 export default {
   name: 'Dungeon',
   props: {
-    name: String
+    dungeon: Object
   },
   data() {
     return {
@@ -43,44 +43,16 @@ export default {
     }
   },
   computed: {
-    reward() {
-      if (this.$store.state.dungeons && this.$store.state.dungeons[this.name]) {
-        return this.rewardSequence.indexOf(
-          this.$store.state.dungeons[this.name].reward
-        )
-      }
-
-      return 0
+    rewardNumber() {
+      return this.rewardSequence.indexOf(this.dungeon.reward)
     },
 
-    foundChests() {
-      if (this.$store.state.dungeons && this.$store.state.dungeons[this.name]) {
-        return this.$store.state.dungeons[this.name].foundChests
-      }
-
-      return 0
-    },
-
-    medallion() {
-      if (this.$store.state.dungeons && this.$store.state.dungeons[this.name]) {
-        return this.medallionSequence.indexOf(
-          this.$store.state.dungeons[this.name].medallion
-        )
-      }
-
-      return 0
-    },
-
-    gotReward() {
-      if (this.$store.state.dungeons && this.$store.state.dungeons[this.name]) {
-        return this.$store.state.dungeons[this.name].cleared
-      }
-
-      return false
+    medallionNumber() {
+      return this.medallionSequence.indexOf(this.dungeon.medallion)
     },
 
     dungeonClass() {
-      if (this.name === 'Aga' && !this.gotReward) {
+      if (this.dungeon.name === 'Aga' && !this.dungeon.cleared) {
         return 'dungeon false'
       } else {
         return 'dungeon'
@@ -105,55 +77,28 @@ export default {
 
     chestImage() {
       return (
-        '/static/image/chest' + (this.totalChests - this.foundChests) + '.png'
+        '/static/image/chest' + (this.dungeon.totalChests - this.dungeon.foundChests) + '.png'
       )
     },
 
     medallionImage() {
-      return '/static/image/medallion' + this.medallion + '.png'
+      return '/static/image/medallion' + this.medallionNumber + '.png'
     },
 
     rewardImage() {
-      return '/static/image/dungeon' + this.reward + '.png'
+      return '/static/image/dungeon' + this.rewardNumber + '.png'
     },
 
     displayImage() {
-      if (this.gotReward) {
-        return '/static/image/' + this.clearedImage
+      if (this.dungeon.cleared) {
+        return '/static/image/' + this.dungeon.clearedImage
       } else {
-        return '/static/image/' + this.defaultImage
-      }
-    },
-
-    totalChests() {
-      switch (this.name) {
-        case 'PoD':
-          return 5
-        case 'SP':
-          return 6
-        case 'SW':
-          return 2
-        case 'TT':
-          return 4
-        case 'IP':
-          return 3
-        case 'MM':
-          return 2
-        case 'TR':
-          return 5
-        case 'EP':
-          return 3
-        case 'DP':
-          return 2
-        case 'ToH':
-          return 2
-        default:
-          return 0
+        return '/static/image/' + this.dungeon.defaultImage
       }
     },
 
     medallionRequired() {
-      switch (this.name) {
+      switch (this.dungeon.dungeonCode) {
         case 'MM':
         case 'TR':
           return true
@@ -162,73 +107,11 @@ export default {
       }
     },
 
-    hasReward() {
-      if (this.name === 'Aga') {
+    title() {
+      if (this.dungeon.dungeonCode === 'Aga') {
         return false
       } else {
-        return true
-      }
-    },
-
-    defaultImage() {
-      switch (this.name) {
-        case 'EP':
-          return 'boss01.png'
-        case 'DP':
-          return 'boss11.png'
-        case 'ToH':
-          return 'boss21.png'
-        case 'PoD':
-          return 'boss31.png'
-        case 'SP':
-          return 'boss41.png'
-        case 'SW':
-          return 'boss51.png'
-        case 'TT':
-          return 'boss61.png'
-        case 'IP':
-          return 'boss71.png'
-        case 'MM':
-          return 'boss81.png'
-        case 'TR':
-          return 'boss91.png'
-        case 'Aga':
-          return 'agahnim0.png'
-      }
-    },
-
-    clearedImage() {
-      switch (this.name) {
-        case 'EP':
-          return 'boss02.png'
-        case 'DP':
-          return 'boss12.png'
-        case 'ToH':
-          return 'boss22.png'
-        case 'PoD':
-          return 'boss32.png'
-        case 'SP':
-          return 'boss42.png'
-        case 'SW':
-          return 'boss52.png'
-        case 'TT':
-          return 'boss62.png'
-        case 'IP':
-          return 'boss72.png'
-        case 'MM':
-          return 'boss82.png'
-        case 'TR':
-          return 'boss92.png'
-        case 'Aga':
-          return 'agahnim1.png'
-      }
-    },
-
-    title() {
-      if (this.name === 'Aga') {
-        return ''
-      } else {
-        return this.name
+        return this.dungeon.dungeonCode
       }
     }
   },
@@ -243,8 +126,8 @@ export default {
     openChest(event) {
       event.stopPropagation()
 
-      let newFoundChests = this.foundChests + 1
-      if (newFoundChests > this.totalChests) {
+      let newFoundChests = this.dungeon.foundChests + 1
+      if (newFoundChests > this.dungeon.totalChests) {
         newFoundChests = 0
       }
 
@@ -272,7 +155,7 @@ export default {
     toggleCleared(event) {
       event.stopPropagation()
 
-      let cleared = !this.gotReward
+      let cleared = !this.dungeon.cleared
       let data = { cleared: cleared }
       this.updateServerState(data)
     },
@@ -281,7 +164,7 @@ export default {
       let host = window.location.hostname + ':' + this.$store.state.serverConfig.apiPort
 
       var xhr = new XMLHttpRequest()
-      xhr.open('POST', 'http://' + host + '/dungeon_state/' + this.name, true)
+      xhr.open('POST', 'http://' + host + '/dungeon_state/' + this.dungeon.dungeonCode, true)
       xhr.setRequestHeader('Content-Type', 'application/json')
       xhr.send(JSON.stringify(data))
     }

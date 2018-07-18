@@ -23,9 +23,9 @@
           class="row-spacer"
           :style="spacerStyle(row, items)"></div>
         <Dungeon
-          v-for="dungeon in row"
-          :key="dungeon"
-          :name="dungeon"></Dungeon>
+          v-for="dungeon in dungeonsForRow(row)"
+          :key="dungeon.dungeonCode"
+          :dungeon="dungeon"></Dungeon>
       </div>
     </div>
   </div>
@@ -146,6 +146,21 @@ export default {
       let padding = ((64 * maxRowLen) - (64 * currentRow.length)) / 2
 
       return 'width: ' + padding + 'px;'
+    },
+
+    dungeonForCode(code) {
+      return this.$store.getters.getDungeonByDungeonCode(code)
+    },
+
+    dungeonsForRow(row) {
+      let foundDungeons = []
+      for (var i = 0, numDungeons = row.length; i < numDungeons; i++) {
+        let dungeon = this.dungeonForCode(row[i])
+        if (dungeon) {
+          foundDungeons.push(dungeon)
+        }
+      }
+      return foundDungeons
     }
   }
 }

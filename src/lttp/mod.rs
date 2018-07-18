@@ -2,7 +2,6 @@ mod item;
 
 use failure;
 
-use std::collections::HashMap;
 use std::convert::TryFrom;
 
 use self::item::{
@@ -295,9 +294,27 @@ impl GameState {
     }
 }
 
-#[serde(rename_all = "camelCase")]
-#[derive(Debug, Clone, Copy, Default, Serialize, PartialEq)]
+#[serde(deny_unknown_fields, rename_all = "camelCase")]
+#[derive(Debug, Clone, Copy, Default, Serialize, Deserialize, PartialEq)]
+pub struct LocationPosition {
+    pub horizontal: LocationCoordinates,
+    pub vertical: LocationCoordinates,
+}
+
+#[serde(deny_unknown_fields, rename_all = "camelCase")]
+#[derive(Debug, Clone, Copy, Default, Serialize, Deserialize, PartialEq)]
+pub struct LocationCoordinates {
+    pub left: f32,
+    pub top: f32,
+}
+
+#[serde(deny_unknown_fields, rename_all = "camelCase")]
+#[derive(Debug, Clone, Default, Serialize, Deserialize, PartialEq)]
 pub struct Location {
+    pub name: String,
+    pub hover_text: String,
+    pub position: LocationPosition,
+    #[serde(skip_deserializing)]
     pub cleared: bool,
 }
 
@@ -309,47 +326,60 @@ impl Location {
     }
 }
 
-#[serde(rename_all = "camelCase")]
+#[serde(deny_unknown_fields, rename_all = "camelCase")]
 #[derive(Debug, Clone, Copy, Deserialize)]
 pub struct LocationUpdate {
     pub cleared: Option<bool>,
 }
 
 #[serde(rename_all = "camelCase")]
-#[derive(Debug, Clone, Default, Serialize, PartialEq)]
+#[derive(Debug, Clone, Default, Serialize, Deserialize, PartialEq)]
 pub struct LocationState {
-    #[serde(flatten)]
-    pub locations: HashMap<String, Location>,
+    pub locations: Vec<Location>,
 }
 
 impl LocationState {
-    pub fn get(&self, name: String) -> Location {
-        if let Some(location) = self.locations.get(&name) {
-            return location.clone();
+    pub fn get(&self, name: String) -> Option<Location> {
+        match self.locations.iter().position(|&ref l| l.name == name) {
+            Some(i) => Some(self.locations[i].clone()),
+            None => None,
         }
-
-        Location::default()
     }
 
     pub fn update(&mut self, name: String, update: LocationUpdate) {
-        if let Some(location) = self.locations.get_mut(&name) {
-            location.update(update);
-            return;
+        if let Some(i) = self.locations.iter().position(|&ref l| l.name == name) {
+            self.locations[i].update(update);
         }
-
-        let mut location = Location::default();
-        location.update(update);
-        self.locations.insert(name, location);
     }
 }
 
+#[serde(deny_unknown_fields, rename_all = "camelCase")]
+#[derive(Debug, Clone, Default, Serialize, Deserialize, PartialEq)]
+pub struct DungeonBoss {
+    pub name: String,
+    pub hover_text: String,
+    pub image_number: String,
+}
 
-#[serde(rename_all = "camelCase")]
-#[derive(Debug, Clone, Copy, Default, Serialize, PartialEq)]
+#[serde(deny_unknown_fields, rename_all = "camelCase")]
+#[derive(Debug, Clone, Default, Serialize, Deserialize, PartialEq)]
 pub struct Dungeon {
+    pub name: String,
+    pub dungeon_code: String,
+    pub hover_text: String,
+    pub total_chests: u8,
+    pub cleared_image: String,
+    pub default_image: String,
+    pub has_reward: bool,
+    pub position: Option<LocationPosition>,
+    pub boss: Option<DungeonBoss>,
+    #[serde(skip_deserializing)]
     pub found_chests: u8,
+    #[serde(skip_deserializing)]
     pub reward: DungeonReward,
+    #[serde(skip_deserializing)]
     pub medallion: Medallion,
+    #[serde(skip_deserializing)]
     pub cleared: bool,
 }
 
@@ -395,7 +425,7 @@ impl Default for Medallion {
     fn default() -> Medallion { Medallion::Unknown }
 }
 
-#[serde(rename_all = "camelCase")]
+#[serde(deny_unknown_fields, rename_all = "camelCase")]
 #[derive(Debug, Clone, Copy, Deserialize)]
 pub struct DungeonUpdate {
     pub found_chests: Option<u8>,
@@ -404,30 +434,23 @@ pub struct DungeonUpdate {
     pub cleared: Option<bool>,
 }
 
-#[serde(rename_all = "camelCase")]
+#[serde(deny_unknown_fields, rename_all = "camelCase")]
 #[derive(Debug, Clone, Default, Serialize, PartialEq)]
 pub struct DungeonState {
-    #[serde(flatten)]
-    pub dungeons: HashMap<String, Dungeon>,
+    pub dungeons: Vec<Dungeon>,
 }
 
 impl DungeonState {
-    pub fn get(&self, name: String) -> Dungeon {
-        if let Some(dungeon) = self.dungeons.get(&name) {
-            return dungeon.clone();
+    pub fn get(&self, dungeon_code: String) -> Option<Dungeon> {
+        match self.dungeons.iter().position(|&ref d| d.dungeon_code == dungeon_code) {
+            Some(i) => Some(self.dungeons[i].clone()),
+            None => None,
         }
-
-        Dungeon::default()
     }
 
-    pub fn update(&mut self, name: String, update: DungeonUpdate) {
-        if let Some(dungeon) = self.dungeons.get_mut(&name) {
-            dungeon.update(update);
-            return;
+    pub fn update(&mut self, dungeon_code: String, update: DungeonUpdate) {
+        if let Some(i) = self.dungeons.iter().position(|&ref d| d.dungeon_code == dungeon_code) {
+            self.dungeons[i].update(update);
         }
-
-        let mut dungeon = Dungeon::default();
-        dungeon.update(update);
-        self.dungeons.insert(name, dungeon);
     }
 }

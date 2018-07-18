@@ -1,8 +1,9 @@
 #![
-deny(warnings,
-     missing_debug_implementations,
-     missing_copy_implementations,
-//     missing_docs
+deny(
+    // warnings,
+    missing_debug_implementations,
+    missing_copy_implementations,
+    // missing_docs,
 )
 ]
 #![feature(try_from, plugin)]
@@ -26,6 +27,7 @@ extern crate rocket_contrib;
 #[macro_use]
 extern crate serde_derive;
 extern crate serde_json;
+extern crate serde_yaml;
 extern crate serial;
 extern crate tokio_core;
 extern crate tokio;
@@ -84,14 +86,17 @@ use websocket::futures::{Async, Future, Sink, Stream};
 use websocket::message::OwnedMessage;
 
 use lttp::{
+    Dungeon,
     DungeonState,
     DungeonUpdate,
     GameState,
+    Location,
     LocationState,
     LocationUpdate,
 };
 
 include!(concat!(env!("OUT_DIR"), "/ui_files.rs"));
+include!(concat!(env!("OUT_DIR"), "/logic_files.rs"));
 
 #[derive(Debug, Copy, Clone)]
 pub enum ServerOpcode {
@@ -507,7 +512,46 @@ fn get_config<'r>() -> Option<Response<'r>> {
     Some(response)
 }
 
+fn set_base_location_data() {
+    let path = Path::new("logic/poi_locations.yaml").to_str().unwrap();
+    let file = match String::from_utf8(LOGIC_FILES.get(&path).unwrap().to_vec()) {
+        Ok(s) => s,
+        Err(e) => panic!("Unable to read POI Location data: {:?}", e),
+    };
+
+    match serde_yaml::from_str::<Vec<Location>>(&file) {
+        Ok(locations) => {
+            *LOCATION_STATE.lock().unwrap() = LocationState { locations: locations };
+            UPDATE_BUS.lock().unwrap().broadcast(Update::Locations);
+        }
+        Err(e) => {
+            panic!("Unable to parse location state {:?}: {}", &path, e);
+        },
+    };
+}
+
+fn set_base_dungeon_data() {
+    let path = Path::new("logic/dungeon_locations.yaml").to_str().unwrap();
+    let file = match String::from_utf8(LOGIC_FILES.get(&path).unwrap().to_vec()) {
+        Ok(s) => s,
+        Err(e) => panic!("Unable to read Dungeon data: {:?}", e),
+    };
+
+    match serde_yaml::from_str::<Vec<Dungeon>>(&file) {
+        Ok(dungeons) => {
+            *DUNGEON_STATE.lock().unwrap() = DungeonState { dungeons: dungeons };
+            UPDATE_BUS.lock().unwrap().broadcast(Update::Dungeons);
+        }
+        Err(e) => {
+            panic!("Unable to parse dungeon state {:?}: {}", &path, e);
+        },
+    };
+}
+
 fn main() {
+    UI_FILES.set_passthrough(env::var_os("UI_FILES_PASSTHROUGH").is_some());
+    LOGIC_FILES.set_passthrough(env::var_os("LOGIC_FILES_PASSTHROUGH").is_some());
+
     let matches = App::new("SD2SNES LttP Randomizer Tracker")
                           .version(crate_version!())
                           .author(crate_authors!())
@@ -577,6 +621,9 @@ fn main() {
         };
     }
 
+    set_base_location_data();
+    set_base_dungeon_data();
+
     thread::spawn(move || {
         if let Some(serial) = matches.value_of("serial") {
             let serial_port = serial.to_string();
@@ -593,8 +640,6 @@ fn main() {
     thread::spawn(move || {
         websocket_server(websocket_bind_addr);
     });
-
-    UI_FILES.set_passthrough(env::var_os("UI_FILES_PASSTHROUGH").is_some());
 
     let rocket_env = if verbose_level > 0 { Environment::Development } else { Environment::Production };
     let rocket_config = Config::build(rocket_env)
@@ -631,8 +676,8 @@ fn main() {
 #[derive(Debug, Clone, Serialize)]
 enum WebSocketPayload {
     Item(GameState),
-    Dungeon(DungeonState),
-    Location(LocationState),
+    Dungeon(Vec<Dungeon>),
+    Location(Vec<Location>),
 }
 
 impl WebSocketPayload {
@@ -647,8 +692,8 @@ impl WebSocketPayload {
 fn websocket_state_message(state_kind: Update) -> OwnedMessage {
     let payload = match state_kind {
         Update::Items     => { WebSocketPayload::Item(GAME_STATE.lock().unwrap().clone()) },
-        Update::Dungeons  => { WebSocketPayload::Dungeon(DUNGEON_STATE.lock().unwrap().clone()) },
-        Update::Locations => { WebSocketPayload::Location(LOCATION_STATE.lock().unwrap().clone()) },
+        Update::Dungeons  => { WebSocketPayload::Dungeon(DUNGEON_STATE.lock().unwrap().clone().dungeons) },
+        Update::Locations => { WebSocketPayload::Location(LOCATION_STATE.lock().unwrap().clone().locations) },
     };
 
     let json_payload = payload.to_json_string();

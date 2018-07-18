@@ -19,30 +19,31 @@ export default {
   },
   computed: {
     dungeonCleared() {
-      if (this.$store.state.dungeons[this.location.dungeonCode]) {
-        let dungeonState = this.$store.state.dungeons[this.location.dungeonCode]
-        let remainingChests = this.location.totalChests - dungeonState.foundChests
+      let remainingChests = this.location.totalChests - this.location.foundChests
 
-        if (this.bossCleared) {
-          return remainingChests === 0
-        } else {
-          return remainingChests <= 1
-        }
+      if (this.location.cleared) {
+        return remainingChests === 0
+      } else {
+        return remainingChests <= 1
       }
     },
     bossCleared() {
-      if (this.$store.state.dungeons[this.location.dungeonCode]) {
-        return this.$store.state.dungeons[this.location.dungeonCode].cleared
-      }
+      return this.location.cleared
+    },
+    locationLeft() {
+      return this.location.position.horizontal.left
+    },
+    locationTop() {
+      return this.location.position.horizontal.top
     }
   },
   methods: {
     dungeonStyle() {
       return (
         'background-image: url("/static/image/poi.png"); left: ' +
-        this.location.left +
+        this.locationLeft +
         '%; top: ' +
-        this.location.top +
+        this.locationTop +
         '%;'
       )
     },
@@ -51,9 +52,9 @@ export default {
         'background-image: url("/static/image/boss' +
         this.location.boss.imageNumber +
         '.png"); left: ' +
-        this.location.left +
+        this.locationLeft +
         '%; top: ' +
-        this.location.top +
+        this.locationTop +
         '%;'
       )
     },
@@ -65,7 +66,7 @@ export default {
       return 'available'
     },
     bossAvailability() {
-      if (this.bossCleared) {
+      if (this.location.cleared) {
         return 'opened'
       }
 

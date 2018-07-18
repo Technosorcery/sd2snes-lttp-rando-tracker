@@ -10,32 +10,28 @@
 export default {
   name: 'Location',
   props: {
-    name: String,
-    left: Number,
-    top: Number,
-    hoverText: String
+    location: Object
   },
   computed: {
-    cleared() {
-      if (this.$store.state.locations[this.name]) {
-        return this.$store.state.locations[this.name].cleared
-      }
-
-      return false
+    locationLeft() {
+      return this.location.position.horizontal.left
+    },
+    locationTop() {
+      return this.location.position.horizontal.top
     }
   },
   methods: {
     locationStyle() {
       return (
         'background-image: url("/static/image/poi.png"); left: ' +
-        this.left +
+        this.locationLeft +
         '%; top: ' +
-        this.top +
+        this.locationTop +
         '%;'
       )
     },
     locationAvailability() {
-      if (this.cleared) {
+      if (this.location.cleared) {
         return 'opened'
       }
 
@@ -44,7 +40,7 @@ export default {
     toggleLocation(event) {
       event.stopPropagation()
 
-      let cleared = !this.cleared
+      let cleared = !this.location.cleared
       let data = { cleared: cleared }
       this.updateLocationState(data)
     },
