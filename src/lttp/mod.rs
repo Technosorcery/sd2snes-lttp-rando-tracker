@@ -169,12 +169,12 @@ impl TryFrom<Vec<u8>> for GameState {
                 //       vvvvvvvv
                 //      |--------|
                 // Bit:  7      0
-                gannons_tower: response[0x26] & 0b00000100 > 0,
-                turtle_rock:   response[0x26] & 0b00001000 > 0,
-                thieves_town:  response[0x26] & 0b00010000 > 0,
-                tower_of_hera: response[0x26] & 0b00100000 > 0,
-                ice_palace:    response[0x26] & 0b01000000 > 0,
-                skull_woods:   response[0x26] & 0b10000000 > 0,
+                gannons_tower: response[0x26] & 0b0000_0100 > 0,
+                turtle_rock:   response[0x26] & 0b0000_1000 > 0,
+                thieves_town:  response[0x26] & 0b0001_0000 > 0,
+                tower_of_hera: response[0x26] & 0b0010_0000 > 0,
+                ice_palace:    response[0x26] & 0b0100_0000 > 0,
+                skull_woods:   response[0x26] & 0b1000_0000 > 0,
 
                 // BigKey2: 0x367
                 //       X
@@ -188,11 +188,11 @@ impl TryFrom<Vec<u8>> for GameState {
                 //       vvvvvvvv
                 //      |--------|
                 // Bit:  7      0
-                misery_mire:        response[0x27] & 0b00000001 > 0,
-                desert_palace:      response[0x27] & 0b00000010 > 0,
-                swamp_palace:       response[0x27] & 0b00000100 > 0,
-                palace_of_darkness: response[0x27] & 0b00010000 > 0,
-                eastern_palace:     response[0x27] & 0b00100000 > 0,
+                misery_mire:        response[0x27] & 0b0000_0001 > 0,
+                desert_palace:      response[0x27] & 0b0000_0010 > 0,
+                swamp_palace:       response[0x27] & 0b0000_0100 > 0,
+                palace_of_darkness: response[0x27] & 0b0001_0000 > 0,
+                eastern_palace:     response[0x27] & 0b0010_0000 > 0,
             },
 
             // 0x374 -> Pendants (Bitmask)
@@ -214,13 +214,13 @@ impl TryFrom<Vec<u8>> for GameState {
             // 32 - Gargoyle's Domain
             // 64 - Skull Woods
             crystal: Crystal {
-                one:   response[0x3A] & 0b00000001 > 0,
-                three: response[0x3A] & 0b00000010 > 0,
-                five:  response[0x3A] & 0b00000100 > 0,
-                four:  response[0x3A] & 0b00001000 > 0,
-                two:   response[0x3A] & 0b00010000 > 0,
-                six:   response[0x3A] & 0b00100000 > 0,
-                seven: response[0x3A] & 0b01000000 > 0,
+                one:   response[0x3A] & 0b0000_0001 > 0,
+                three: response[0x3A] & 0b0000_0010 > 0,
+                five:  response[0x3A] & 0b0000_0100 > 0,
+                four:  response[0x3A] & 0b0000_1000 > 0,
+                two:   response[0x3A] & 0b0001_0000 > 0,
+                six:   response[0x3A] & 0b0010_0000 > 0,
+                seven: response[0x3A] & 0b0100_0000 > 0,
             },
         })
     }
