@@ -735,10 +735,10 @@ impl Future for Peer {
     fn poll(&mut self) -> Poll<(), websocket::WebSocketError> {
         if let Ok(state_update) = self.bus.recv_timeout(Duration::from_millis(10)) {
             println!("Sending update for: {:?}", state_update);
-            if let Err(_) = self.sink.send(websocket_state_message(state_update)) {
+            if self.sink.send(websocket_state_message(state_update)).is_err() {
                 return Ok(Async::Ready(()));
             }
-            if let Err(_) = self.sink.flush() {
+            if self.sink.flush().is_err() {
                 return Ok(Async::Ready(()));
             }
         };
@@ -746,10 +746,10 @@ impl Future for Peer {
         while let Async::Ready(message) = self.stream.poll()? {
             match message {
                 Some(OwnedMessage::Ping(p)) => {
-                    if let Err(_) = self.sink.send(OwnedMessage::Pong(p)) {
+                    if self.sink.send(OwnedMessage::Pong(p)).is_err() {
                         return Ok(Async::Ready(()));
                     };
-                    if let Err(_) = self.sink.flush() {
+                    if self.sink.flush().is_err() {
                         return Ok(Async::Ready(()));
                     };
                 },
@@ -757,16 +757,16 @@ impl Future for Peer {
                 Some(OwnedMessage::Text(text)) => {
                     if text == "HELLO" {
                         println!("Sending initial state");
-                        if let Err(_) = self.sink.send(websocket_state_message(Update::Items)) {
+                        if self.sink.send(websocket_state_message(Update::Items)).is_err() {
                             return Ok(Async::Ready(()));
                         };
-                        if let Err(_) = self.sink.send(websocket_state_message(Update::Locations)) {
+                        if self.sink.send(websocket_state_message(Update::Locations)).is_err() {
                             return Ok(Async::Ready(()));
                         };
-                        if let Err(_) = self.sink.send(websocket_state_message(Update::Dungeons)) {
+                        if self.sink.send(websocket_state_message(Update::Dungeons)).is_err() {
                             return Ok(Async::Ready(()));
                         };
-                        if let Err(_) = self.sink.flush() {
+                        if self.sink.flush().is_err() {
                             return Ok(Async::Ready(()));
                         };
                     } // else {
