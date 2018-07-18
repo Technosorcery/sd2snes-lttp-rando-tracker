@@ -144,7 +144,7 @@ impl TryFrom<Vec<u8>> for GameState {
 
             // Rupees are spread across two bytes, as the randomizer lifted the
             // 255 Rupee limit, and it's stored little-endian.
-            rupees:            ((response[0x23] as u16) << 8) + response[0x22] as u16,
+            rupees:            ((u16::from(response[0x23])) << 8) + u16::from(response[0x22]),
             heart_quarters:    response[0x2B],
             bomb_capacity:     response[0x30] + 10,
             hearts:            response[0x2D],
