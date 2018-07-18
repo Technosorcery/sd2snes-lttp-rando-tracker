@@ -340,14 +340,14 @@ pub struct LocationState {
 
 impl LocationState {
     pub fn get(&self, name: String) -> Option<Location> {
-        match self.locations.iter().position(|&ref l| l.name == name) {
+        match self.locations.iter().position(|l| l.name == name) {
             Some(i) => Some(self.locations[i].clone()),
             None => None,
         }
     }
 
     pub fn update(&mut self, name: String, update: LocationUpdate) {
-        if let Some(i) = self.locations.iter().position(|&ref l| l.name == name) {
+        if let Some(i) = self.locations.iter().position(|l| l.name == name) {
             self.locations[i].update(update);
         }
     }
@@ -442,14 +442,14 @@ pub struct DungeonState {
 
 impl DungeonState {
     pub fn get(&self, dungeon_code: String) -> Option<Dungeon> {
-        match self.dungeons.iter().position(|&ref d| d.dungeon_code == dungeon_code) {
+        match self.dungeons.iter().position(|d| d.dungeon_code == dungeon_code) {
             Some(i) => Some(self.dungeons[i].clone()),
             None => None,
         }
     }
 
     pub fn update(&mut self, dungeon_code: String, update: DungeonUpdate) {
-        if let Some(i) = self.dungeons.iter().position(|&ref d| d.dungeon_code == dungeon_code) {
+        if let Some(i) = self.dungeons.iter().position(|d| d.dungeon_code == dungeon_code) {
             self.dungeons[i].update(update);
         }
     }
