@@ -286,7 +286,7 @@ fn read_wram<T: SerialPort>(port: &mut T, mem_offset: u32, mem_size: u32) -> io:
     buf[254] = ((mem_size >>  8) & 0xFF) as u8;
     buf[255] = ((mem_size >>  0) & 0xFF) as u8;
 
-    port.write(&buf[..])?;
+    port.write_all(&buf[..])?;
 
     let mut resp_buf: [u8; 512] = [0; 512];
     let mut read_bytes: u32 = 0;
