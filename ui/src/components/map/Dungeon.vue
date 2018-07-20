@@ -19,16 +19,13 @@ export default {
   },
   computed: {
     dungeonCleared() {
-      let remainingChests = this.location.totalChests - this.location.foundChests
-
-      if (this.location.cleared) {
-        return remainingChests === 0
-      } else {
-        return remainingChests <= 1
-      }
+      return this.remainingChests === 0
     },
     bossCleared() {
       return this.location.cleared
+    },
+    remainingChests() {
+      return this.location.totalChests - this.location.foundChests
     },
     locationLeft() {
       return this.location.position.horizontal.left
@@ -61,6 +58,8 @@ export default {
     dungeonAvailability() {
       if (this.dungeonCleared) {
         return 'opened'
+      } else if (!this.bossCleared && this.remainingChests === 1) {
+        return 'possible'
       }
 
       return 'available'
