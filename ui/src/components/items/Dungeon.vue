@@ -142,7 +142,7 @@ export default {
     },
 
     cycleSequence(sequence) {
-      let newIndex = this[sequence] + 1
+      let newIndex = this[sequence + 'Number'] + 1
       if (newIndex >= this[sequence + 'Sequence'].length) {
         newIndex = 0
       }
