@@ -2,6 +2,7 @@
 // (runtime-only or standalone) has been set in webpack.base.conf with an alias.
 import actions from './actions'
 import App from './App'
+import getters from './getters'
 import mutations from './mutations'
 import ReconnectingWebSocket from 'reconnecting-websocket'
 import router from './router'
@@ -15,10 +16,11 @@ Vue.use(Vuex)
 const store = new Vuex.Store({
   actions,
   mutations,
+  getters,
   state: {
     game: {},
-    dungeons: {},
-    locations: {},
+    dungeons: [],
+    locations: [],
     serverConfig: {
       apiPort: 8000,
       websocketPort: 8001

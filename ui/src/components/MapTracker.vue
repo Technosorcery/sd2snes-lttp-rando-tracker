@@ -2,14 +2,11 @@
   <div class="map-tracker">
     <div id="map" class="map">
       <Location
-        v-for="poi in poiLocations"
+        v-for="poi in locations"
         :key="poi.name"
-        :name="poi.name"
-        :top="poi.top"
-        :left="poi.left"
-        :hoverText="poi.hoverText"></Location>
+        :location="poi"></Location>
       <Dungeon
-        v-for="dungeon in dungeonLocations"
+        v-for="dungeon in dungeons"
         :key="dungeon.name"
         :location="dungeon"></Dungeon>
     </div>
@@ -17,11 +14,9 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
 import Dungeon from '@/components/map/Dungeon.vue'
 import Location from '@/components/map/Location.vue'
-
-import poiLocations from '@/poiLocations.js'
-import dungeonLocations from '@/dungeonLocations.js'
 
 export default {
   name: 'MapTracker',
@@ -29,12 +24,10 @@ export default {
     Location,
     Dungeon
   },
-  data() {
-    return {
-      poiLocations,
-      dungeonLocations
-    }
-  }
+  computed: mapGetters({
+    locations: 'mappableLocations',
+    dungeons: 'mappableDungeons'
+  })
 }
 </script>
 

@@ -1,8 +1,9 @@
 #![
-deny(warnings,
-     missing_debug_implementations,
-     missing_copy_implementations,
-//     missing_docs
+deny(
+    // warnings,
+    missing_debug_implementations,
+    missing_copy_implementations,
+    // missing_docs,
 )
 ]
 #![feature(try_from, plugin)]
@@ -26,6 +27,7 @@ extern crate rocket_contrib;
 #[macro_use]
 extern crate serde_derive;
 extern crate serde_json;
+extern crate serde_yaml;
 extern crate serial;
 extern crate tokio_core;
 extern crate tokio;
@@ -84,14 +86,17 @@ use websocket::futures::{Async, Future, Sink, Stream};
 use websocket::message::OwnedMessage;
 
 use lttp::{
+    Dungeon,
     DungeonState,
     DungeonUpdate,
     GameState,
+    Location,
     LocationState,
     LocationUpdate,
 };
 
 include!(concat!(env!("OUT_DIR"), "/ui_files.rs"));
+include!(concat!(env!("OUT_DIR"), "/logic_files.rs"));
 
 #[derive(Debug, Copy, Clone)]
 pub enum ServerOpcode {
@@ -181,8 +186,8 @@ fn update_tracker_serial_data(serial_port: &str) {
                         // 0xF50000 <-- WRAM start on SD2SNES
                         // 0x00F340 <-- Offset in WRAM to the items & other
                         //              things we're interested in tracking.
-        let mem_offset: u32 = 0xF5F340;
-        let mem_size:   u32 = 0x000200;
+        let mem_offset: u32 = 0x00F5_F340;
+        let mem_size:   u32 = 0x0000_0200;
         // Handy if we want to look at more of the WRAM, so we don't need to
         // manually update the offset into our WRAM chunk of every item.
         let item_start = 0x0000;
@@ -200,7 +205,7 @@ fn update_tracker_serial_data(serial_port: &str) {
         //let mut buffer = File::create("raw_response.txt").unwrap();
         //buffer.write(&response[..]).unwrap();
 
-        let prev_game_state = GAME_STATE.lock().unwrap().clone();
+        let prev_game_state = *GAME_STATE.lock().unwrap();
         match GameState::try_from(response[(item_start as usize)..(mem_size as usize)].to_vec()) {
             Ok(gs) => {
                 let new_gs = gs.merge(prev_game_state);
@@ -244,7 +249,7 @@ fn update_tracker_file_data(file_path: &str) {
             continue;
         };
 
-        let prev_game_state = GAME_STATE.lock().unwrap().clone();
+        let prev_game_state = *GAME_STATE.lock().unwrap();
         match serde_json::from_str::<GameState>(&state_json) {
             Ok(gs) => {
                 let new_gs = gs.merge(prev_game_state);
@@ -265,7 +270,7 @@ fn update_tracker_file_data(file_path: &str) {
 
 fn read_wram<T: SerialPort>(port: &mut T, mem_offset: u32, mem_size: u32) -> io::Result<Vec<u8>> {
     let mut buf: Vec<u8> = Vec::with_capacity(512);
-    buf.extend_from_slice("USBA".as_bytes());
+    buf.extend_from_slice(b"USBA");
     buf.resize(512, 0);
     buf[4] = ServerOpcode::Get as u8; // opcode
     buf[5] = ServerSpace::SNES as u8; // space
@@ -274,14 +279,14 @@ fn read_wram<T: SerialPort>(port: &mut T, mem_offset: u32, mem_size: u32) -> io:
     buf[256] = ((mem_offset >> 24) & 0xFF) as u8;
     buf[257] = ((mem_offset >> 16) & 0xFF) as u8;
     buf[258] = ((mem_offset >> 8)  & 0xFF) as u8;
-    buf[259] = ((mem_offset >> 0)  & 0xFF) as u8;
+    buf[259] = ( mem_offset        & 0xFF) as u8;
     // size is big endian, and starts at index 252
     buf[252] = ((mem_size >> 24) & 0xFF) as u8;
     buf[253] = ((mem_size >> 16) & 0xFF) as u8;
     buf[254] = ((mem_size >>  8) & 0xFF) as u8;
-    buf[255] = ((mem_size >>  0) & 0xFF) as u8;
+    buf[255] = ( mem_size        & 0xFF) as u8;
 
-    port.write(&buf[..])?;
+    port.write_all(&buf[..])?;
 
     let mut resp_buf: [u8; 512] = [0; 512];
     let mut read_bytes: u32 = 0;
@@ -293,10 +298,10 @@ fn read_wram<T: SerialPort>(port: &mut T, mem_offset: u32, mem_size: u32) -> io:
         result.extend_from_slice(&resp_buf[..resp_size]);
     }
 
-    if result[0] != "U".as_bytes()[0] ||
-       result[1] != "S".as_bytes()[0] ||
-       result[2] != "B".as_bytes()[0] ||
-       result[3] != "A".as_bytes()[0] ||
+    if result[0] != b"U"[0] ||
+       result[1] != b"S"[0] ||
+       result[2] != b"B"[0] ||
+       result[3] != b"A"[0] ||
        result[4] != ServerOpcode::Response as u8 {
 
         let timeout = port.timeout();
@@ -330,7 +335,7 @@ fn get_game_state_options<'r>() -> Response<'r> { state_response() }
 
 #[get("/game_state", format = "application/json")]
 fn get_game_state<'r>() -> Option<Response<'r>> {
-    let game_state = GAME_STATE.lock().unwrap().clone();
+    let game_state = *GAME_STATE.lock().unwrap();
     let mut response = state_response();
     let json = match serde_json::to_string(&game_state) {
         Ok(j) => j,
@@ -372,8 +377,8 @@ fn set_location_state<'r>(location: String, state: Json<LocationUpdate>) -> Opti
     let state;
     {
         let mut location_state = LOCATION_STATE.lock().unwrap();
-        location_state.update(location.clone(), location_update);
-        state = location_state.get(location).clone();
+        location_state.update(&location, location_update);
+        state = location_state.get(&location).clone();
         UPDATE_BUS.lock().unwrap().broadcast(Update::Locations);
     }
 
@@ -418,8 +423,8 @@ fn set_dungeon_state<'r>(dungeon: String, state: Json<DungeonUpdate>) -> Option<
     let state;
     {
         let mut dungeon_state = DUNGEON_STATE.lock().unwrap();
-        dungeon_state.update(dungeon.clone(), dungeon_update);
-        state = dungeon_state.get(dungeon).clone();
+        dungeon_state.update(&dungeon, dungeon_update);
+        state = dungeon_state.get(&dungeon).clone();
         UPDATE_BUS.lock().unwrap().broadcast(Update::Dungeons);
     }
 
@@ -493,7 +498,7 @@ fn get_config_options<'r>() -> Response<'r> { state_response() }
 
 #[get("/config", format = "application/json")]
 fn get_config<'r>() -> Option<Response<'r>> {
-    let server_config = { SERVER_CONFIG.lock().unwrap().clone() };
+    let server_config = { *SERVER_CONFIG.lock().unwrap() };
     let mut response = state_response();
     let json = match serde_json::to_string(&server_config) {
         Ok(j) => j,
@@ -507,7 +512,46 @@ fn get_config<'r>() -> Option<Response<'r>> {
     Some(response)
 }
 
+fn set_base_location_data() {
+    let path = Path::new("logic/poi_locations.yaml").to_str().unwrap();
+    let file = match String::from_utf8(LOGIC_FILES.get(&path).unwrap().to_vec()) {
+        Ok(s) => s,
+        Err(e) => panic!("Unable to read POI Location data: {:?}", e),
+    };
+
+    match serde_yaml::from_str::<Vec<Location>>(&file) {
+        Ok(locations) => {
+            *LOCATION_STATE.lock().unwrap() = LocationState { locations };
+            UPDATE_BUS.lock().unwrap().broadcast(Update::Locations);
+        }
+        Err(e) => {
+            panic!("Unable to parse location state {:?}: {}", &path, e);
+        },
+    };
+}
+
+fn set_base_dungeon_data() {
+    let path = Path::new("logic/dungeon_locations.yaml").to_str().unwrap();
+    let file = match String::from_utf8(LOGIC_FILES.get(&path).unwrap().to_vec()) {
+        Ok(s) => s,
+        Err(e) => panic!("Unable to read Dungeon data: {:?}", e),
+    };
+
+    match serde_yaml::from_str::<Vec<Dungeon>>(&file) {
+        Ok(dungeons) => {
+            *DUNGEON_STATE.lock().unwrap() = DungeonState { dungeons };
+            UPDATE_BUS.lock().unwrap().broadcast(Update::Dungeons);
+        }
+        Err(e) => {
+            panic!("Unable to parse dungeon state {:?}: {}", &path, e);
+        },
+    };
+}
+
 fn main() {
+    UI_FILES.set_passthrough(env::var_os("UI_FILES_PASSTHROUGH").is_some());
+    LOGIC_FILES.set_passthrough(env::var_os("LOGIC_FILES_PASSTHROUGH").is_some());
+
     let matches = App::new("SD2SNES LttP Randomizer Tracker")
                           .version(crate_version!())
                           .author(crate_authors!())
@@ -573,9 +617,12 @@ fn main() {
     {
         *SERVER_CONFIG.lock().unwrap() = ServerConfig {
             api_port: server_port,
-            websocket_port: websocket_port,
+            websocket_port,
         };
     }
+
+    set_base_location_data();
+    set_base_dungeon_data();
 
     thread::spawn(move || {
         if let Some(serial) = matches.value_of("serial") {
@@ -593,8 +640,6 @@ fn main() {
     thread::spawn(move || {
         websocket_server(websocket_bind_addr);
     });
-
-    UI_FILES.set_passthrough(env::var_os("UI_FILES_PASSTHROUGH").is_some());
 
     let rocket_env = if verbose_level > 0 { Environment::Development } else { Environment::Production };
     let rocket_config = Config::build(rocket_env)
@@ -631,8 +676,8 @@ fn main() {
 #[derive(Debug, Clone, Serialize)]
 enum WebSocketPayload {
     Item(GameState),
-    Dungeon(DungeonState),
-    Location(LocationState),
+    Dungeon(Vec<Dungeon>),
+    Location(Vec<Location>),
 }
 
 impl WebSocketPayload {
@@ -646,9 +691,9 @@ impl WebSocketPayload {
 
 fn websocket_state_message(state_kind: Update) -> OwnedMessage {
     let payload = match state_kind {
-        Update::Items     => { WebSocketPayload::Item(GAME_STATE.lock().unwrap().clone()) },
-        Update::Dungeons  => { WebSocketPayload::Dungeon(DUNGEON_STATE.lock().unwrap().clone()) },
-        Update::Locations => { WebSocketPayload::Location(LOCATION_STATE.lock().unwrap().clone()) },
+        Update::Items     => { WebSocketPayload::Item(*GAME_STATE.lock().unwrap()) },
+        Update::Dungeons  => { WebSocketPayload::Dungeon(DUNGEON_STATE.lock().unwrap().clone().dungeons) },
+        Update::Locations => { WebSocketPayload::Location(LOCATION_STATE.lock().unwrap().clone().locations) },
     };
 
     let json_payload = payload.to_json_string();
@@ -679,7 +724,7 @@ impl Peer {
         sink: Box<futures::sink::Wait<SplitSink<websocket::client::async::Framed<tokio_core::net::TcpStream,websocket::async::MessageCodec<OwnedMessage>>>>>,
         stream: Box<SplitStream<websocket::client::async::Framed<tokio_core::net::TcpStream,websocket::async::MessageCodec<OwnedMessage>>>>,
     ) -> Peer {
-        Peer { bus: bus, sink: sink, stream: stream }
+        Peer { bus, sink, stream }
     }
 }
 
@@ -690,10 +735,10 @@ impl Future for Peer {
     fn poll(&mut self) -> Poll<(), websocket::WebSocketError> {
         if let Ok(state_update) = self.bus.recv_timeout(Duration::from_millis(10)) {
             println!("Sending update for: {:?}", state_update);
-            if let Err(_) = self.sink.send(websocket_state_message(state_update)) {
+            if self.sink.send(websocket_state_message(state_update)).is_err() {
                 return Ok(Async::Ready(()));
             }
-            if let Err(_) = self.sink.flush() {
+            if self.sink.flush().is_err() {
                 return Ok(Async::Ready(()));
             }
         };
@@ -701,10 +746,10 @@ impl Future for Peer {
         while let Async::Ready(message) = self.stream.poll()? {
             match message {
                 Some(OwnedMessage::Ping(p)) => {
-                    if let Err(_) = self.sink.send(OwnedMessage::Pong(p)) {
+                    if self.sink.send(OwnedMessage::Pong(p)).is_err() {
                         return Ok(Async::Ready(()));
                     };
-                    if let Err(_) = self.sink.flush() {
+                    if self.sink.flush().is_err() {
                         return Ok(Async::Ready(()));
                     };
                 },
@@ -712,16 +757,16 @@ impl Future for Peer {
                 Some(OwnedMessage::Text(text)) => {
                     if text == "HELLO" {
                         println!("Sending initial state");
-                        if let Err(_) = self.sink.send(websocket_state_message(Update::Items)) {
+                        if self.sink.send(websocket_state_message(Update::Items)).is_err() {
                             return Ok(Async::Ready(()));
                         };
-                        if let Err(_) = self.sink.send(websocket_state_message(Update::Locations)) {
+                        if self.sink.send(websocket_state_message(Update::Locations)).is_err() {
                             return Ok(Async::Ready(()));
                         };
-                        if let Err(_) = self.sink.send(websocket_state_message(Update::Dungeons)) {
+                        if self.sink.send(websocket_state_message(Update::Dungeons)).is_err() {
                             return Ok(Async::Ready(()));
                         };
-                        if let Err(_) = self.sink.flush() {
+                        if self.sink.flush().is_err() {
                             return Ok(Async::Ready(()));
                         };
                     } // else {

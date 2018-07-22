@@ -5,7 +5,7 @@ use std::process::Command;
 
 fn main() {
     build_ui_files();
-    package_ui_files();
+    package_extra_files();
 }
 
 fn build_ui_files() {
@@ -36,9 +36,14 @@ fn build_ui_files() {
     }
 }
 
-fn package_ui_files() {
+fn package_extra_files() {
     includedir_codegen::start("UI_FILES")
         .dir("ui/dist", Compression::Gzip)
         .build("ui_files.rs")
+        .unwrap();
+
+    includedir_codegen::start("LOGIC_FILES")
+        .dir("logic", Compression::Gzip)
+        .build("logic_files.rs")
         .unwrap();
 }

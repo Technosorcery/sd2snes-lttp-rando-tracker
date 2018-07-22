@@ -2,7 +2,6 @@ mod item;
 
 use failure;
 
-use std::collections::HashMap;
 use std::convert::TryFrom;
 
 use self::item::{
@@ -88,6 +87,7 @@ impl TryFrom<Vec<u8>> for GameState {
     type Error = failure::Error;
 
     fn try_from(response: Vec<u8>) -> Result<GameState, Self::Error> {
+        let bow = Bow::try_from(response[0x00])?;
         let flute_shovel = FluteShovel::try_from(response[0x0C])?;
 
         let bottle1 = Bottle::try_from(response[0x1C])?;
@@ -102,7 +102,7 @@ impl TryFrom<Vec<u8>> for GameState {
         if bottle4 != Bottle::NoBottle { bottle_count += 1 };
 
         Ok(GameState {
-            bow:               Bow::try_from(response[0x00])? != Bow::None,
+            bow:               bow != Bow::None,
             blue_boomerang:    Boomerang::try_from(response[0x01])? == Boomerang::Blue,
             red_boomerang:     Boomerang::try_from(response[0x01])? == Boomerang::Red,
             hook_shot:         response[0x02] > 0,
@@ -122,12 +122,12 @@ impl TryFrom<Vec<u8>> for GameState {
             net:               response[0x0D] > 0,
             book:              response[0x0E] > 0,
             bottle:            response[0x0F] > 0,
-            bottle_count:      bottle_count,
+            bottle_count,
             cane_somaria:      response[0x10] > 0,
             cane_byrna:        response[0x11] > 0,
             cape:              response[0x12] > 0,
             mirror:            response[0x13] > 0,
-            silvers:           Bow::try_from(response[0x00])? == Bow::Silver || Bow::try_from(response[0x00])? == Bow::SilverWithArrows,
+            silvers:           bow == Bow::Silver || bow == Bow::SilverWithArrows,
 
             gloves:            Gloves::try_from(response[0x14])?,
             boots:             response[0x15] > 0,
@@ -145,7 +145,7 @@ impl TryFrom<Vec<u8>> for GameState {
 
             // Rupees are spread across two bytes, as the randomizer lifted the
             // 255 Rupee limit, and it's stored little-endian.
-            rupees:            ((response[0x23] as u16) << 8) + response[0x22] as u16,
+            rupees:            ((u16::from(response[0x23])) << 8) + u16::from(response[0x22]),
             heart_quarters:    response[0x2B],
             bomb_capacity:     response[0x30] + 10,
             hearts:            response[0x2D],
@@ -170,12 +170,12 @@ impl TryFrom<Vec<u8>> for GameState {
                 //       vvvvvvvv
                 //      |--------|
                 // Bit:  7      0
-                gannons_tower: response[0x26] & 0b00000100 > 0,
-                turtle_rock:   response[0x26] & 0b00001000 > 0,
-                thieves_town:  response[0x26] & 0b00010000 > 0,
-                tower_of_hera: response[0x26] & 0b00100000 > 0,
-                ice_palace:    response[0x26] & 0b01000000 > 0,
-                skull_woods:   response[0x26] & 0b10000000 > 0,
+                gannons_tower: response[0x26] & 0b0000_0100 > 0,
+                turtle_rock:   response[0x26] & 0b0000_1000 > 0,
+                thieves_town:  response[0x26] & 0b0001_0000 > 0,
+                tower_of_hera: response[0x26] & 0b0010_0000 > 0,
+                ice_palace:    response[0x26] & 0b0100_0000 > 0,
+                skull_woods:   response[0x26] & 0b1000_0000 > 0,
 
                 // BigKey2: 0x367
                 //       X
@@ -189,11 +189,11 @@ impl TryFrom<Vec<u8>> for GameState {
                 //       vvvvvvvv
                 //      |--------|
                 // Bit:  7      0
-                misery_mire:        response[0x27] & 0b00000001 > 0,
-                desert_palace:      response[0x27] & 0b00000010 > 0,
-                swamp_palace:       response[0x27] & 0b00000100 > 0,
-                palace_of_darkness: response[0x27] & 0b00010000 > 0,
-                eastern_palace:     response[0x27] & 0b00100000 > 0,
+                misery_mire:        response[0x27] & 0b0000_0001 > 0,
+                desert_palace:      response[0x27] & 0b0000_0010 > 0,
+                swamp_palace:       response[0x27] & 0b0000_0100 > 0,
+                palace_of_darkness: response[0x27] & 0b0001_0000 > 0,
+                eastern_palace:     response[0x27] & 0b0010_0000 > 0,
             },
 
             // 0x374 -> Pendants (Bitmask)
@@ -215,13 +215,13 @@ impl TryFrom<Vec<u8>> for GameState {
             // 32 - Gargoyle's Domain
             // 64 - Skull Woods
             crystal: Crystal {
-                one:   response[0x3A] & 0b00000001 > 0,
-                three: response[0x3A] & 0b00000010 > 0,
-                five:  response[0x3A] & 0b00000100 > 0,
-                four:  response[0x3A] & 0b00001000 > 0,
-                two:   response[0x3A] & 0b00010000 > 0,
-                six:   response[0x3A] & 0b00100000 > 0,
-                seven: response[0x3A] & 0b01000000 > 0,
+                one:   response[0x3A] & 0b0000_0001 > 0,
+                three: response[0x3A] & 0b0000_0010 > 0,
+                five:  response[0x3A] & 0b0000_0100 > 0,
+                four:  response[0x3A] & 0b0000_1000 > 0,
+                two:   response[0x3A] & 0b0001_0000 > 0,
+                six:   response[0x3A] & 0b0010_0000 > 0,
+                seven: response[0x3A] & 0b0100_0000 > 0,
             },
         })
     }
@@ -295,9 +295,27 @@ impl GameState {
     }
 }
 
-#[serde(rename_all = "camelCase")]
-#[derive(Debug, Clone, Copy, Default, Serialize, PartialEq)]
+#[serde(deny_unknown_fields, rename_all = "camelCase")]
+#[derive(Debug, Clone, Copy, Default, Serialize, Deserialize, PartialEq)]
+pub struct LocationPosition {
+    pub horizontal: LocationCoordinates,
+    pub vertical: LocationCoordinates,
+}
+
+#[serde(deny_unknown_fields, rename_all = "camelCase")]
+#[derive(Debug, Clone, Copy, Default, Serialize, Deserialize, PartialEq)]
+pub struct LocationCoordinates {
+    pub left: f32,
+    pub top: f32,
+}
+
+#[serde(deny_unknown_fields, rename_all = "camelCase")]
+#[derive(Debug, Clone, Default, Serialize, Deserialize, PartialEq)]
 pub struct Location {
+    pub name: String,
+    pub hover_text: String,
+    pub position: LocationPosition,
+    #[serde(skip_deserializing)]
     pub cleared: bool,
 }
 
@@ -309,47 +327,60 @@ impl Location {
     }
 }
 
-#[serde(rename_all = "camelCase")]
+#[serde(deny_unknown_fields, rename_all = "camelCase")]
 #[derive(Debug, Clone, Copy, Deserialize)]
 pub struct LocationUpdate {
     pub cleared: Option<bool>,
 }
 
 #[serde(rename_all = "camelCase")]
-#[derive(Debug, Clone, Default, Serialize, PartialEq)]
+#[derive(Debug, Clone, Default, Serialize, Deserialize, PartialEq)]
 pub struct LocationState {
-    #[serde(flatten)]
-    pub locations: HashMap<String, Location>,
+    pub locations: Vec<Location>,
 }
 
 impl LocationState {
-    pub fn get(&self, name: String) -> Location {
-        if let Some(location) = self.locations.get(&name) {
-            return location.clone();
+    pub fn get(&self, name: &str) -> Option<Location> {
+        match self.locations.iter().position(|l| l.name == name) {
+            Some(i) => Some(self.locations[i].clone()),
+            None => None,
         }
-
-        Location::default()
     }
 
-    pub fn update(&mut self, name: String, update: LocationUpdate) {
-        if let Some(location) = self.locations.get_mut(&name) {
-            location.update(update);
-            return;
+    pub fn update(&mut self, name: &str, update: LocationUpdate) {
+        if let Some(i) = self.locations.iter().position(|l| l.name == name) {
+            self.locations[i].update(update);
         }
-
-        let mut location = Location::default();
-        location.update(update);
-        self.locations.insert(name, location);
     }
 }
 
+#[serde(deny_unknown_fields, rename_all = "camelCase")]
+#[derive(Debug, Clone, Default, Serialize, Deserialize, PartialEq)]
+pub struct DungeonBoss {
+    pub name: String,
+    pub hover_text: String,
+    pub image_number: String,
+}
 
-#[serde(rename_all = "camelCase")]
-#[derive(Debug, Clone, Copy, Default, Serialize, PartialEq)]
+#[serde(deny_unknown_fields, rename_all = "camelCase")]
+#[derive(Debug, Clone, Default, Serialize, Deserialize, PartialEq)]
 pub struct Dungeon {
+    pub name: String,
+    pub dungeon_code: String,
+    pub hover_text: String,
+    pub total_chests: u8,
+    pub cleared_image: String,
+    pub default_image: String,
+    pub has_reward: bool,
+    pub position: Option<LocationPosition>,
+    pub boss: Option<DungeonBoss>,
+    #[serde(skip_deserializing)]
     pub found_chests: u8,
+    #[serde(skip_deserializing)]
     pub reward: DungeonReward,
+    #[serde(skip_deserializing)]
     pub medallion: Medallion,
+    #[serde(skip_deserializing)]
     pub cleared: bool,
 }
 
@@ -395,7 +426,7 @@ impl Default for Medallion {
     fn default() -> Medallion { Medallion::Unknown }
 }
 
-#[serde(rename_all = "camelCase")]
+#[serde(deny_unknown_fields, rename_all = "camelCase")]
 #[derive(Debug, Clone, Copy, Deserialize)]
 pub struct DungeonUpdate {
     pub found_chests: Option<u8>,
@@ -404,30 +435,23 @@ pub struct DungeonUpdate {
     pub cleared: Option<bool>,
 }
 
-#[serde(rename_all = "camelCase")]
+#[serde(deny_unknown_fields, rename_all = "camelCase")]
 #[derive(Debug, Clone, Default, Serialize, PartialEq)]
 pub struct DungeonState {
-    #[serde(flatten)]
-    pub dungeons: HashMap<String, Dungeon>,
+    pub dungeons: Vec<Dungeon>,
 }
 
 impl DungeonState {
-    pub fn get(&self, name: String) -> Dungeon {
-        if let Some(dungeon) = self.dungeons.get(&name) {
-            return dungeon.clone();
+    pub fn get(&self, dungeon_code: &str) -> Option<Dungeon> {
+        match self.dungeons.iter().position(|d| d.dungeon_code == dungeon_code) {
+            Some(i) => Some(self.dungeons[i].clone()),
+            None => None,
         }
-
-        Dungeon::default()
     }
 
-    pub fn update(&mut self, name: String, update: DungeonUpdate) {
-        if let Some(dungeon) = self.dungeons.get_mut(&name) {
-            dungeon.update(update);
-            return;
+    pub fn update(&mut self, dungeon_code: &str, update: DungeonUpdate) {
+        if let Some(i) = self.dungeons.iter().position(|d| d.dungeon_code == dungeon_code) {
+            self.dungeons[i].update(update);
         }
-
-        let mut dungeon = Dungeon::default();
-        dungeon.update(update);
-        self.dungeons.insert(name, dungeon);
     }
 }
