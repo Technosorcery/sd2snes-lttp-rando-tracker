@@ -73,13 +73,32 @@ export default {
 
 .available {
   background-color: rgb(0, 255, 0);
+  color: black;
 }
 
 .possible {
   background-color: rgb(255, 255, 0);
+  color: black;
 }
 
 .unavailable {
   background-color: rgb(255, 0, 0);
+}
+
+.glitchavailable {
+  background-color: rgb(0,127,0);
+}
+
+.glitchpossible {
+  background-color: rgb(192,192,0);
+}
+
+.agahnim {
+  background-color: rgb(0,255,255);
+  color: black;
+}
+
+.glitchagahnim {
+  background-color: rgb(0,160,160);
 }
 </style>

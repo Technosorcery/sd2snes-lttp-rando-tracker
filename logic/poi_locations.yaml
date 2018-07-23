@@ -1,6 +1,6 @@
 ---
 - name: King's Tomb
-  hoverText: King's Tomb
+  hoverText: "King's Tomb <img src='/static/image/boots.png' class='mini'> + <img src='/static/image/glove2.png' class='mini'>/<img src='/static/image/mirror.png' class='mini'>"
   position:
     horizontal:
       left: 30.8
@@ -8,6 +8,23 @@
     vertical:
       left: 0
       top: 0
+  availabilityRules:
+    glitchless:
+      - available: available
+        items:
+          boots: true
+          gloves: TitansMitt
+      - available: available
+        items:
+          boots: true
+          mirror: true
+          moonPearl: true
+    overworldGlitches:
+      - available: available
+        items:
+          boots: true
+          mirror: true
+          moonPearl: true
 - name: Light World Swamp
   hoverText: Light World Swamp
   position:

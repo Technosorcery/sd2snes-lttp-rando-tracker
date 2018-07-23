@@ -41,4 +41,10 @@ export default {
   height: 442px;
   left: 0;
 }
+
+.mini{
+    width: 16px;
+    height: 16px;
+    vertical-align: text-bottom;
+}
 </style>
