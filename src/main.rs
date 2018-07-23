@@ -229,6 +229,7 @@ enum Update {
     Dungeons,
     Items,
     Locations,
+    Config,
 }
 
 fn update_tracker_file_data(file_path: &str) {
@@ -487,10 +488,37 @@ fn files<'r>(file: PathBuf) -> Option<Response<'r>> {
 fn root<'r>() -> Option<Response<'r>> { files(PathBuf::from("")) }
 
 #[serde(rename_all = "camelCase")]
+#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
+pub enum GameLogic {
+    Glitchless,
+    OverworldGlitches,
+    MajorGlitches,
+}
+
+#[serde(deny_unknown_fields, rename_all = "camelCase")]
+#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
+pub struct ServerConfigUpdate {
+    logic: Option<GameLogic>,
+}
+
+impl Default for GameLogic {
+    fn default() -> GameLogic { GameLogic::Glitchless }
+}
+
+#[serde(deny_unknown_fields, rename_all = "camelCase")]
 #[derive(Debug, Clone, Copy, Default, Serialize)]
 pub struct ServerConfig {
     pub api_port: u16,
     pub websocket_port: u16,
+    pub logic: GameLogic,
+}
+
+impl ServerConfig {
+    pub fn update(&mut self, update: ServerConfigUpdate) {
+        if let Some(logic) = update.logic {
+            self.logic = logic
+        }
+    }
 }
 
 #[options("/config")]
@@ -504,6 +532,27 @@ fn get_config<'r>() -> Option<Response<'r>> {
         Ok(j) => j,
         Err(e) => {
             println!("Could not serialize server config: {:?}", e);
+            return None;
+        }
+    };
+    response.set_sized_body(Cursor::new(json));
+
+    Some(response)
+}
+
+#[post("/config", data = "<config>", format = "application/json")]
+fn set_server_config<'r>(config: Json<ServerConfigUpdate>) -> Option<Response<'r>> {
+    let config_update = config.into_inner();
+
+    let mut server_config = SERVER_CONFIG.lock().unwrap();
+    server_config.update(config_update);
+    UPDATE_BUS.lock().unwrap().broadcast(Update::Config);
+
+    let mut response = state_response();
+    let json = match serde_json::to_string(&*server_config) {
+        Ok(j) => j,
+        Err(e) => {
+            println!("Could not serialize dungeon state: {:?}", e);
             return None;
         }
     };
@@ -618,6 +667,7 @@ fn main() {
         *SERVER_CONFIG.lock().unwrap() = ServerConfig {
             api_port: server_port,
             websocket_port,
+            ..ServerConfig::default()
         };
     }
 
@@ -667,6 +717,7 @@ fn main() {
                 set_dungeon_state,
                 set_location_state_options,
                 set_location_state,
+                set_server_config,
             ]
         )
         .launch();
@@ -678,6 +729,7 @@ enum WebSocketPayload {
     Item(GameState),
     Dungeon(Vec<Dungeon>),
     Location(Vec<Location>),
+    Config(ServerConfig),
 }
 
 impl WebSocketPayload {
@@ -694,6 +746,7 @@ fn websocket_state_message(state_kind: Update) -> OwnedMessage {
         Update::Items     => { WebSocketPayload::Item(*GAME_STATE.lock().unwrap()) },
         Update::Dungeons  => { WebSocketPayload::Dungeon(DUNGEON_STATE.lock().unwrap().clone().dungeons) },
         Update::Locations => { WebSocketPayload::Location(LOCATION_STATE.lock().unwrap().clone().locations) },
+        Update::Config    => { WebSocketPayload::Config(*SERVER_CONFIG.lock().unwrap()) },
     };
 
     let json_payload = payload.to_json_string();

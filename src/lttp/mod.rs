@@ -2,6 +2,7 @@ mod item;
 
 use failure;
 
+use std::collections::HashMap;
 use std::convert::TryFrom;
 
 use self::item::{
@@ -295,26 +296,87 @@ impl GameState {
     }
 }
 
+#[allow(dead_code)]
+#[serde(rename_all = "camelCase")]
+#[derive(Debug, Clone, Copy, Serialize)]
+pub enum Available {
+    Unavailable,
+    Available,
+    Possible,
+    Agahnim,
+    GlitchAvailable,
+    GlitchPossible,
+    GlitchAgahnim,
+}
+
+impl Default for Available {
+    fn default() -> Available { Available::Unavailable }
+}
+
 #[serde(deny_unknown_fields, rename_all = "camelCase")]
-#[derive(Debug, Clone, Copy, Default, Serialize, Deserialize, PartialEq)]
+#[derive(Debug, Clone, Copy, Default, Deserialize)]
+pub struct AvailabilityRule {
+    pub available: Available,
+    pub rupees: Option<u16>,
+    pub items: Option<AvailabilityRuleItems>,
+    pub agahnim1: bool,
+    pub pendants: Option<Pendant>,
+    pub crystals: Option<Crystal>,
+}
+
+#[serde(deny_unknown_fields, rename_all = "camelCase")]
+#[derive(Debug, Clone, Copy, Default, Deserialize)]
+pub struct AvailabilityRuleItems {
+    pub bow: bool,
+    pub hook_shot: bool,
+    pub mushroom: bool,
+    pub powder: bool,
+    pub fire_rod: bool,
+    pub ice_rod: bool,
+    pub bombos_medallion: bool,
+    pub lantern: bool,
+    pub hammer: bool,
+    pub flute: bool,
+    pub shovel: bool,
+    pub book: bool,
+    pub bottle: bool,
+    pub bottle_content: Option<Bottle>,
+    pub cane_somaria: bool,
+    pub cane_byrna: bool,
+    pub cape: bool,
+    pub mirror: bool,
+    pub gloves: Option<Gloves>,
+    pub boots: bool,
+    pub flippers: bool,
+    pub moon_pearl: bool,
+    pub sword: Option<Sword>,
+    pub shield: Option<Shield>,
+}
+
+#[serde(deny_unknown_fields, rename_all = "camelCase")]
+#[derive(Debug, Clone, Copy, Default, Serialize, Deserialize)]
 pub struct LocationPosition {
     pub horizontal: LocationCoordinates,
     pub vertical: LocationCoordinates,
 }
 
 #[serde(deny_unknown_fields, rename_all = "camelCase")]
-#[derive(Debug, Clone, Copy, Default, Serialize, Deserialize, PartialEq)]
+#[derive(Debug, Clone, Copy, Default, Serialize, Deserialize)]
 pub struct LocationCoordinates {
     pub left: f32,
     pub top: f32,
 }
 
 #[serde(deny_unknown_fields, rename_all = "camelCase")]
-#[derive(Debug, Clone, Default, Serialize, Deserialize, PartialEq)]
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct Location {
     pub name: String,
     pub hover_text: String,
     pub position: LocationPosition,
+    #[serde(skip_serializing)]
+    pub availability_rules: HashMap<GameLogic, Vec<AvailabilityRule>>,
+    #[serde(skip_deserializing)]
+    pub available: Available,
     #[serde(skip_deserializing)]
     pub cleared: bool,
 }
@@ -334,7 +396,7 @@ pub struct LocationUpdate {
 }
 
 #[serde(rename_all = "camelCase")]
-#[derive(Debug, Clone, Default, Serialize, Deserialize, PartialEq)]
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct LocationState {
     pub locations: Vec<Location>,
 }
@@ -355,7 +417,7 @@ impl LocationState {
 }
 
 #[serde(deny_unknown_fields, rename_all = "camelCase")]
-#[derive(Debug, Clone, Default, Serialize, Deserialize, PartialEq)]
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct DungeonBoss {
     pub name: String,
     pub hover_text: String,
@@ -363,7 +425,7 @@ pub struct DungeonBoss {
 }
 
 #[serde(deny_unknown_fields, rename_all = "camelCase")]
-#[derive(Debug, Clone, Default, Serialize, Deserialize, PartialEq)]
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct Dungeon {
     pub name: String,
     pub dungeon_code: String,
@@ -401,7 +463,7 @@ impl Dungeon {
     }
 }
 
-#[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq)]
+#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
 pub enum DungeonReward {
     Unknown,
     GreenPendant,
@@ -414,7 +476,7 @@ impl Default for DungeonReward {
     fn default() -> DungeonReward { DungeonReward::Unknown }
 }
 
-#[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq)]
+#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
 pub enum Medallion {
     Unknown,
     Bombos,
@@ -436,7 +498,7 @@ pub struct DungeonUpdate {
 }
 
 #[serde(deny_unknown_fields, rename_all = "camelCase")]
-#[derive(Debug, Clone, Default, Serialize, PartialEq)]
+#[derive(Debug, Clone, Default, Serialize)]
 pub struct DungeonState {
     pub dungeons: Vec<Dungeon>,
 }
