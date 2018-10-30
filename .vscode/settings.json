@@ -20,6 +20,7 @@
         "codegen",
         "concat",
         "contrib",
+        "deserializing",
         "gannons",
         "includedir",
         "lttp",
