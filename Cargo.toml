@@ -29,7 +29,7 @@ unicase = "1.4.2"
 websocket = "0.21.1"
 
 [dependencies.lazy-panic]
-version = "0.3.2"
+version = "1.0.0"
 features = ['backtrace-on']
 
 [build-dependencies]
