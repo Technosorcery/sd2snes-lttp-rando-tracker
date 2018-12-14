@@ -6,8 +6,12 @@ deny(
     // missing_docs,
 )
 ]
-#![feature(try_from, plugin)]
-#![plugin(rocket_codegen)]
+#![feature(
+    try_from,
+    plugin,
+    proc_macro_hygiene,
+    decl_macro
+)]
 
 extern crate bus;
 #[macro_use]
@@ -22,6 +26,7 @@ extern crate lazy_panic;
 #[macro_use]
 extern crate lazy_static;
 extern crate phf;
+#[macro_use]
 extern crate rocket;
 extern crate rocket_contrib;
 #[macro_use]
@@ -47,7 +52,8 @@ use clap::{
 use futures::stream::{SplitSink, SplitStream};
 use futures::prelude::Poll;
 
-use hyper::method::Method as hMethod;
+use rocket::http::hyper::Method;
+// use hyper::method::Method as hMethod;
 use rocket::config::{Config, Environment};
 use rocket::http::{
     ContentType,
@@ -59,7 +65,7 @@ use rocket::http::hyper::header::{
     AccessControlAllowOrigin,
 };
 use rocket::Response;
-use rocket_contrib::Json;
+use rocket_contrib::json::Json;
 
 use std::convert::TryFrom;
 use std::env;
@@ -321,7 +327,7 @@ fn state_response<'r>() -> Response<'r> {
     response.set_header(ContentType::JSON);
     response.set_status(Status::Ok);
     response.set_header(AccessControlAllowOrigin::Any);
-    response.set_header(AccessControlAllowMethods(vec![hMethod::Get]));
+    response.set_header(AccessControlAllowMethods(vec![Method::Get]));
     response.set_header(AccessControlAllowHeaders(vec![
         UniCase("content-type".to_owned()),
         UniCase("accept".to_owned()),
@@ -649,7 +655,7 @@ fn main() {
         .secret_key("8Xui8SN4mI+7egV/9dlfYYLGQJeEx4+DwmSQLwDVXJg=")
         .finalize().unwrap();
 
-    rocket::custom(rocket_config, true)
+    rocket::custom(rocket_config)
         .mount(
             "/",
             routes![
@@ -710,7 +716,7 @@ fn spawn_future<F, I, E>(f: F, desc: &'static str, handle: &Handle)
                   .map(move |_| println!("{}: Finished.", desc)));
 }
 
-#[allow(deprecated)]
+#[allow(deprecated, missing_debug_implementations)]
 struct Peer {
     bus: BusReader<Update>,
     sink: Box<futures::sink::Wait<SplitSink<websocket::client::async::Framed<tokio_core::net::TcpStream,websocket::async::MessageCodec<OwnedMessage>>>>>,
