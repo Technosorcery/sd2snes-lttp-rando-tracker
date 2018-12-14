@@ -449,7 +449,7 @@ dependencies = [
 
 [[package]]
 name = "includedir"
-version = "0.4.0"
+version = "0.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
  "flate2 1.0.6 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -1144,7 +1144,7 @@ dependencies = [
  "failure 0.1.3 (registry+https://github.com/rust-lang/crates.io-index)",
  "futures 0.1.25 (registry+https://github.com/rust-lang/crates.io-index)",
  "hyper 0.12.18 (registry+https://github.com/rust-lang/crates.io-index)",
- "includedir 0.4.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "includedir 0.5.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "includedir_codegen 0.4.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "lazy-panic 1.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "lazy_static 1.2.0 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -1820,7 +1820,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 "checksum hyper 0.10.15 (registry+https://github.com/rust-lang/crates.io-index)" = "df0caae6b71d266b91b4a83111a61d2b94ed2e2bea024c532b933dcff867e58c"
 "checksum hyper 0.12.18 (registry+https://github.com/rust-lang/crates.io-index)" = "8dd7729fc83d88353415f6816fd4bb00897aa47c7f1506b69060e74e6e3d8e8b"
 "checksum idna 0.1.5 (registry+https://github.com/rust-lang/crates.io-index)" = "38f09e0f0b1fb55fdee1f17470ad800da77af5186a1a76c026b679358b7e844e"
-"checksum includedir 0.4.0 (registry+https://github.com/rust-lang/crates.io-index)" = "6b26c8aa0f0adbba071d100537e8192bfac07a27ccb4abdd137cbdfb2e6b98e0"
+"checksum includedir 0.5.0 (registry+https://github.com/rust-lang/crates.io-index)" = "e97402f770a519ebea51b27131c3b6558cfd2375aff21294bad806bad91bf0b6"
 "checksum includedir_codegen 0.4.0 (registry+https://github.com/rust-lang/crates.io-index)" = "e004caf6b1c85b60f87437a94ae312d614ee59049af94feb71b6fda7822d3edd"
 "checksum indexmap 1.0.2 (registry+https://github.com/rust-lang/crates.io-index)" = "7e81a7c05f79578dbc15793d8b619db9ba32b4577003ef3af1a91c416798c58d"
 "checksum inotify 0.6.1 (registry+https://github.com/rust-lang/crates.io-index)" = "40b54539f3910d6f84fbf9a643efd6e3aa6e4f001426c0329576128255994718"
