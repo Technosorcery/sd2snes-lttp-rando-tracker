@@ -7,6 +7,8 @@ cache:
   timeout: 360
   cargo: true
   yarn: true
+  directories:
+  - ui/node_modules
 script:
   - (cd ui && yarn install && yarn run unit && yarn run build)
   - cargo build --verbose --all
