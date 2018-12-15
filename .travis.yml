@@ -4,6 +4,7 @@ rust:
 node_js:
   - node
 cache:
+  timeout: 360
   cargo: true
   yarn: true
 script:
