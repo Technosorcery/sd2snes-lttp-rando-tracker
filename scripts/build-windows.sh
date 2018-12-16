@@ -15,4 +15,5 @@ export PATH=$PATH:'/c/Program Files (x86)/Yarn/bin':'/c/Program Files/nodejs'
 ls -l '/c/Program Files (x86)/Yarn/bin/'
 export YARN_PATH='/c/Program Files (x86)/Yarn/bin/yarn.cmd'
 cargo build --verbose --all
+cargo build --release --verbose --all
 cargo test --verbose --all

@@ -17,7 +17,21 @@ before_install:
   - bash ./scripts/before-install.sh
 script:
   - bash ./scripts/build.sh
+before_cache:
+  - bash ./scripts/before-cache.sh
 branches:
   only:
   - master
   - /^v\d+\.\d+\.\d+(-\S+)?$/
+matrix:
+  fast_finish: true
+  allow_failures:
+  - os: windows
+addons:
+  artifacts:
+    debug: true
+    working_dir: artifacts
+    paths:
+    - $(ls ./* | tr "\n" ":")
+    target_paths:
+    - /${TRAVIS_OS_NAME}/${TRAVIS_BUILD_NUMBER}
