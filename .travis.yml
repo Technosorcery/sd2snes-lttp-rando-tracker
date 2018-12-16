@@ -32,6 +32,6 @@ addons:
     debug: true
     working_dir: artifacts
     paths:
-    - $(ls ./* | tr "\n" ":")
+    - $(ls ./artifacts/* | tr "\n" ":")
     target_paths:
     - /${TRAVIS_OS_NAME}/${TRAVIS_BUILD_NUMBER}
