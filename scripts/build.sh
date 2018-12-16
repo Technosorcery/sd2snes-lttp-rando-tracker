@@ -29,3 +29,5 @@ for build in debug release; do
     mv -v "target/${build}/sd2snes-lttp-rando-tracker.exe" "artifacts/${build}/."
   fi
 done
+
+find artifacts -print
