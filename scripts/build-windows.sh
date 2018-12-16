@@ -1,7 +1,7 @@
 #!/bin/bash
 
-set -x
 set -e
+set -x
 
 export PATH=$PATH:'/c/Program Files (x86)/Yarn/bin':'/c/Program Files/nodejs'
 

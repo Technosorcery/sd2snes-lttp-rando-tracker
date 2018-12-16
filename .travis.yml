@@ -14,13 +14,9 @@ cache:
   directories:
   - ui/node_modules
 before_install:
-  - if [ "${TRAVIS_OS_NAME}" = "windows" ]; then cinst yarn; fi
-  - if [ "${TRAVIS_OS_NAME}" = "osx"     ]; then brew install yarn; fi
+  - bash ./scripts/before-install.sh
 script:
-  - ls -l ./scripts
-  - if [ "${TRAVIS_OS_NAME}" = "windows" ]; then bash ./scripts/build-windows.sh; fi
-  - if [ "${TRAVIS_OS_NAME}" = "linux"   ]; then bash ./scripts/build-linux.sh;   fi
-  - if [ "${TRAVIS_OS_NAME}" = "osx"     ]; then bash ./scripts/build-macos.sh;   fi
+  - bash ./scripts/build.sh
 branches:
   only:
   - master
