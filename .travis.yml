@@ -17,6 +17,8 @@ before_install:
   - bash ./scripts/before-install.sh
 script:
   - bash ./scripts/build.sh
+before_cache:
+  - bash ./scripts/before-cache.sh
 branches:
   only:
   - master
