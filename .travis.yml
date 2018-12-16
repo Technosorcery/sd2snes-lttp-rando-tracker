@@ -1,3 +1,7 @@
+os:
+  - linux
+  - windows
+  - osx
 language: rust
 rust:
   - nightly
@@ -9,10 +13,10 @@ cache:
   yarn: true
   directories:
   - ui/node_modules
+before_install:
+  - bash ./scripts/before-install.sh
 script:
-  - (cd ui && yarn install && yarn run unit && yarn run build)
-  - cargo build --verbose --all
-  - cargo test --verbose --all
+  - bash ./scripts/build.sh
 branches:
   only:
   - master

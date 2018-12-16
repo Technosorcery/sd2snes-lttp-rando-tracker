@@ -1,7 +1,6 @@
 # sd2snes-lttp-rando-tracker
 
 [![Travis CI Build Status](https://travis-ci.com/jhelwig/sd2snes-lttp-rando-tracker.svg?branch=master)](https://travis-ci.com/jhelwig/sd2snes-lttp-rando-tracker)
-[![Appveyor Build Status](https://ci.appveyor.com/api/projects/status/github/jhelwig/sd2snes-lttp-rando-tracker?branch=master&svg=true)](https://ci.appveyor.com/project/jhelwig/sd2snes-lttp-rando-tracker)
 
 ## About
 
