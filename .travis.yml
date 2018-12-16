@@ -1,3 +1,6 @@
+os:
+  - linux
+  - windows
 language: rust
 rust:
   - nightly
@@ -9,10 +12,13 @@ cache:
   yarn: true
   directories:
   - ui/node_modules
+before_install:
+  - if [ $TRAVIS_OS_NAME = windows ]; then cinst yarn; fi
 script:
-  - (cd ui && yarn install && yarn run unit && yarn run build)
-  - cargo build --verbose --all
-  - cargo test --verbose --all
+  - ls -l ./scripts
+  - if [ "${TRAVIS_OS_NAME}" = "windows" ]; then bash ./scripts/build-windows.sh; fi
+  - if [ "${TRAVIS_OS_NAME}" = "linux"   ]; then bash ./scripts/build-linux.sh;   fi
+  - if [ "${TRAVIS_OS_NAME}" = "osx"     ]; then bash ./scripts/build-macos.sh;   fi
 branches:
   only:
   - master
