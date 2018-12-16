@@ -11,4 +11,5 @@ set -x
 )
 
 cargo build --verbose --all
+cargo build --release --verbose --all
 cargo test --verbose --all
