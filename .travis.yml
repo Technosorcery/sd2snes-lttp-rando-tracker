@@ -30,6 +30,7 @@ matrix:
 addons:
   artifacts:
     debug: true
-    working_dir: artifacts
+    paths:
+    - ./artifacts/
     target_paths:
     - /${TRAVIS_OS_NAME}/${TRAVIS_BUILD_NUMBER}
