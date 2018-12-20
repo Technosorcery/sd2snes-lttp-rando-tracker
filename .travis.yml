@@ -19,6 +19,8 @@ script:
   - bash ./scripts/build.sh
 before_cache:
   - bash ./scripts/before-cache.sh
+before_deploy:
+  - bash ./scripts/before-deploy.sh
 branches:
   only:
   - master
@@ -34,3 +36,13 @@ addons:
     - ./artifacts/
     target_paths:
     - /${TRAVIS_OS_NAME}/${TRAVIS_BUILD_NUMBER}
+deploy:
+  provider: releases
+  api_key:
+    secure: "CN7/Ntj2O3/4reEVomInoJYoR72BNb58hjDhX1lorI8fNsRLJd1JtDXg6YTsBW/5lgLdlb8qHmtrgnUMeKog70utILgyVFK3+IUg48wt8eNhveRtcGX4VHfjKe/jswFlUT55ZJHMGKPqmV2UjseoSoz45U4A5pMek/yNXziF+t8zQnl52WGi7tchoxnrtMBfCm9o9qAC0AVIuE02v7HP09Bfj1/WfWj6oMB2hIr3OMrkxII4p65jZbYdP82GniQ2UUT4Td5xlVBSnN7FaKpvph3Dnv3GHoPQQlzyD3qpj6ka4y1QpR3sXx1WAf5Op0hwi8X4EadvL6HPLHDbE5eKaLKZBYgoBP8v/Ibdt3u8kW3MA2Kgy6Gk+vvMmZHEvLoXfuBDCzexK17E+BEfqinlth0wVVNs+67U8ClIL6SDLZIy2xSuRBFQZq4tC32mzItAIz2JCOOhFpI2RHAo3zeKcELYgEGjmIXdWAccpe/upngT0KvywGJfwJOM9tKwS9Cc0jEmPTniyLMHoEHl4od9QbLu61oDwM8Psfljn8+WliOGeeuOhZ2kfyEfcNgevTyXwU9z2eJwAaU+vpw8Izp/yvrnnaRWRoGc0EPpWYeDso1PEFQg8X2ShDm/7XoOClbaqHio5mNXNHSaxL4XXgSe0lwFw846MEfopxReaSbXQFo="
+  file_glob: true
+  file: ./artifacts/sd2snes-lttp-rando-tracker-${TRAVIS_OS_NAME}-${TRAVIS_TAG}-${build}.*
+  skip_cleanup: true
+  draft: true
+  on:
+    tags: true
