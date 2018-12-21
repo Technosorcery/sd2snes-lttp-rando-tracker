@@ -42,7 +42,7 @@ deploy:
   api_key:
     secure: "Bu1O5C1RnXY6RVkXmwINm4XygQBPt43ACWmgExG79IQIhFYUs9pcuO0gdVQ+D+OeYsfGsM75noYETkfkXc7RvSyxjmsVZjwXQ2KlaoY+UCsJX929K05CLMeBp9cuqLFI4yLSJfxIEKevMrZoFXweOFQZHjUZLhSLXfU3XGSqn6aDZeqw9CYvrxZ1oOiJQM0b+a9e6cb7zZPiGcBMV07pGaKmAbcwWyUqsT9ggOdbFczIAzVmvDFRD2w42tR58SBISJ+sTTPe3OGJyHYYF4RbfnxX9le8ltaDaXb/+cdLtDRdp5fkfj1MUwet06l+u1Ei5klaYQMOq1Y2kXFJ2jqz5xZtVmAeyoftlb7iAC+6Qa4BhQdzOYlUCv/26lZLVvbIBzPBINC530e60S4HyGOAh/rOSr9uGZ8dhdRu6KAZRg5FIexx9Qniov0HgC4NheZPgJYsWt8fzvK3odLicI2R22iigQ6I5AvgJFtPtTNoEIjqdlYy5eQEnQUSGLlNUnZGf00vQewAmnXvzy8V0iVGwvhP2lVLaD1aHJHfm5XM0ji/sb9DaJNq5W2zjHM/D/9Wxb38Gd0PFAladP2sub4ouhxxFHe2Sx+NymUyLk/8zB389mJAZL1l/5nLYP8+389+ScqjvyvXNB5STFI+optyKe6y354H9r34byZtzd08gKs="
   file_glob: true
-  file: ./artifacts/sd2snes-lttp-rando-tracker-${TRAVIS_OS_NAME}-${TRAVIS_TAG}-${build}.*
+  file: ./artifacts/sd2snes-lttp-rando-tracker-*
   skip_cleanup: true
   draft: true
   on:
