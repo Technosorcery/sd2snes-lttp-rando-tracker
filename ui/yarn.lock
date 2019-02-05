@@ -1585,9 +1585,9 @@ chownr@^1.0.1, chownr@^1.1.1:
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/chownr/-/chownr-1.1.1.tgz#54726b8b8fff4df053c42187e801fb4412df1494"
 
-chromedriver@^2.27.2:
-  version "2.45.0"
-  resolved "https://registry.yarnpkg.com/chromedriver/-/chromedriver-2.45.0.tgz#8c1b158adbbd3e0ca3f7af19d459082245554378"
+chromedriver@^2.46.0:
+  version "2.46.0"
+  resolved "https://registry.yarnpkg.com/chromedriver/-/chromedriver-2.46.0.tgz#3d78e7eb9bb65dd804fe327a6bf76fced12be053"
   dependencies:
     del "^3.0.0"
     extract-zip "^1.6.7"
