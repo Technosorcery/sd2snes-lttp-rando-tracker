@@ -16,7 +16,7 @@
   "dependencies": {
     "@vue/test-utils": "^1.0.0-beta.29",
     "reconnecting-websocket": "^4.0.0-rc5",
-    "vue": "^2.6.6",
+    "vue": "^2.6.7",
     "vue-router": "^3.0.2",
     "vuex": "^3.1.0"
   },
@@ -75,7 +75,7 @@
     "vue-jest": "^3.0.3",
     "vue-loader": "^13.3.0",
     "vue-style-loader": "^4.1.2",
-    "vue-template-compiler": "^2.6.6",
+    "vue-template-compiler": "^2.6.7",
     "webpack": "^3.6.0",
     "webpack-bundle-analyzer": "^2.9.0",
     "webpack-dev-server": "^2.9.1",
