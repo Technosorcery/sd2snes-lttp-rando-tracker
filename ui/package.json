@@ -57,7 +57,7 @@
     "jest-serializer-vue": "^2.0.2",
     "nightwatch": "^0.9.12",
     "node-notifier": "^5.4.0",
-    "node-sass": "^4.9.0",
+    "node-sass": "^4.12.0",
     "optimize-css-assets-webpack-plugin": "^3.2.0",
     "ora": "^3.4.0",
     "portfinder": "^1.0.20",
