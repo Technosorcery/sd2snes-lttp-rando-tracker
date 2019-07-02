@@ -7,7 +7,7 @@ build = "build.rs"
 include = ["ui/dist"]
 
 [dependencies]
-bus = "2.0.1"
+bus = "2.2.2"
 clap = "2.33.0"
 failure = "0.1.5"
 futures = "0.1.28"
