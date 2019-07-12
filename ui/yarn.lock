@@ -1790,9 +1790,9 @@ chownr@^1.0.1, chownr@^1.1.1:
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/chownr/-/chownr-1.1.1.tgz#54726b8b8fff4df053c42187e801fb4412df1494"
 
-chromedriver@^75.0.1:
-  version "75.0.1"
-  resolved "https://registry.yarnpkg.com/chromedriver/-/chromedriver-75.0.1.tgz#18f8c5317df294ebfebc82c414c981c09bfc80aa"
+chromedriver@^75.1.0:
+  version "75.1.0"
+  resolved "https://registry.yarnpkg.com/chromedriver/-/chromedriver-75.1.0.tgz#edfef5d7a9b16b6f8a12ddb58cbac76ae52732fd"
   dependencies:
     del "^4.1.1"
     extract-zip "^1.6.7"
