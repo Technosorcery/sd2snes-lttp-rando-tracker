@@ -25,7 +25,7 @@ serde_yaml = "0.8.9"
 serial = "0.4"
 tokio = "0.1.22"
 tokio-core = "0.1.17"
-unicase = "1.4.2"
+unicase = "2.5.1"
 websocket = "0.21.1"
 
 [dependencies.lazy-panic]
