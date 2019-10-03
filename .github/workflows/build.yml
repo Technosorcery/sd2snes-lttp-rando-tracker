@@ -82,3 +82,20 @@ jobs:
       with:
         command: test
         args: --verbose
+    - name: Upload debug artifact
+      uses: actions/upload-artifact@master
+      with:
+        name: sd2snes-lttp-rando-tracker_debug_${{ matrix.os }}
+        path: target/debug/sd2snes-lttp-rando-tracker*
+    - name: Build Release
+      uses: actions-rs/cargo@v1
+      with:
+        command: build
+        args: --verbose --release
+      env:
+        SKIP_UI_BUILD: true
+    - name: Upload release artifact
+      uses: actions/upload-artifact@master
+      with:
+        name: sd2snes-lttp-rando-tracker_release_${{ matrix.os }}
+        path: target/release/sd2snes-lttp-rando-tracker*
