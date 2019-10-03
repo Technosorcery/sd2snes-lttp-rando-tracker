@@ -10,7 +10,7 @@ on:
     - master
 jobs:
   web-ui:
-    name: Build and test Vue.js app
+    name: Vue.js app
 
     strategy:
       matrix:
@@ -25,11 +25,18 @@ jobs:
       uses: actions/setup-node@v1
       with:
         node-version: ${{ matrix.node-version }}
-    - name: yarn install, test, build
+    - name: Install
       run: |
         cd ui
         yarn install
+    - name: Test
+      run: |
+        cd ui
         yarn run unit
+        yarn run build
+    - name: Build
+      run: |
+        cd ui
         yarn run build
     - uses: actions/upload-artifact@master
       with:
@@ -37,7 +44,7 @@ jobs:
         path: ui/dist
 
   rust-app:
-    name: Build and test Rust app & webserver
+    name: Rust app
     needs:
     - web-ui
 
@@ -68,7 +75,7 @@ jobs:
         args: --verbose
       env:
         SKIP_UI_BUILD: true
-    - name: Run tests
+    - name: Test
       uses: actions-rs/cargo@v1
       env:
         SKIP_UI_BUILD: true
