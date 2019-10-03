@@ -56,11 +56,22 @@ jobs:
       with:
         name: ui-dist
         path: ui/dist
+    - name: Install nightly
+      uses: actions-rs/toolchain@v1
+      with:
+        toolchain: nightly
+        override: true
     - name: Build
+      uses: actions-rs/cargo@v1
+      with:
+        command: build
+        args: --verbose
       env:
         SKIP_UI_BUILD: true
-      run: cargo build --verbose
     - name: Run tests
+      uses: actions-rs/cargo@v1
       env:
         SKIP_UI_BUILD: true
-      run: cargo test --verbose
+      with:
+        command: test
+        args: --verbose
