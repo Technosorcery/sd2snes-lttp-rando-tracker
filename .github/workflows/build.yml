@@ -1,0 +1,66 @@
+name: Build and test
+on:
+  push:
+    branches:
+    - master
+    tags:
+    - v*
+  pull_request:
+    branches:
+    - master
+jobs:
+  web-ui:
+    name: Build and test Vue.js app
+
+    strategy:
+      matrix:
+        node-version:
+        - 12.x
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v1
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v1
+      with:
+        node-version: ${{ matrix.node-version }}
+    - name: yarn install, test, build
+      run: |
+        cd ui
+        yarn install
+        yarn run unit
+        yarn run build
+    - uses: actions/upload-artifact@master
+      with:
+        name: ui-build
+        path: ui/build
+
+  rust-app:
+    name: Build and test Rust app & webserver
+    needs:
+    - web-ui
+
+    strategy:
+      matrix:
+        os:
+        - ubuntu-latest
+        - windows-latest
+        - macOS-latest
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+    - uses: actions/checkout@v1
+    - uses: actions/download-artifact@master
+      with:
+        name: ui-build
+        path: ui/build
+    - name: Build
+      env:
+        SKIP_UI_BUILD: true
+      run: cargo build --verbose
+    - name: Run tests
+      env:
+        SKIP_UI_BUILD: true
+      run: cargo test --verbose
