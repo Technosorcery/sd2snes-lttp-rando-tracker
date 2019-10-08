@@ -1,0 +1,153 @@
+name: Release
+on:
+  push:
+    tags:
+    - v*
+jobs:
+  create-release:
+    name: Create draft release
+    needs:
+    - rust-app
+    runs-on: ubuntu-latest
+    steps:
+    - name: Download Linux binary
+      uses: actions/download-artifact@master
+      with:
+        name: app_ubuntu-latest
+        path: app/ubuntu
+    - name: Create Linux Release Artifact
+      run: |
+        tar -czvf sd2snes-lttp-rando-tracker-linux-release.tar.gz -C app/ubuntu .
+    - name: Download Windows binary
+      uses: actions/download-artifact@master
+      with:
+        name: app_windows-latest
+        path: app/windows
+    - name: Create Windows Release Artifact
+      run: |
+        zip --junk-paths sd2snes-lttp-rando-tracker-windows-release.zip app/windows/sd2snes-*
+    - name: Download macOS binary
+      uses: actions/download-artifact@master
+      with:
+        name: app_macOS-latest
+        path: app/macos
+    - name: Create MacOS Release Artifact
+      run: |
+        tar -czvf sd2snes-lttp-rando-tracker-macos-release.tar.gz -C app/macos .
+    - name: Create release
+      id: create_release
+      uses: actions/create-release@v1.0.0
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ github.ref }}
+        release_name: ${{ github.ref }}
+        draft: true
+        prerelease: false
+    - name: Upload Linux Release Asset
+      uses: actions/upload-release-asset@v1.0.1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./sd2snes-lttp-rando-tracker-linux-release.tar.gz
+        asset_name: sd2snes-lttp-rando-tracker-linux-${{ github.ref }}-release.tar.gz
+        asset_content_type: application/gzip
+    - name: Upload Windows Release Asset
+      uses: actions/upload-release-asset@v1.0.0
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./sd2snes-lttp-rando-tracker-windows-release.zip
+        asset_name: sd2snes-lttp-rando-tracker-windows-${{ github.ref }}-release.zip
+        asset_content_type: application/zip
+    - name: Upload MacOS Release Asset
+      uses: actions/upload-release-asset@v1.0.0
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./sd2snes-lttp-rando-tracker-macos-release.tar.gz
+        asset_name: sd2snes-lttp-rando-tracker-macos-${{ github.ref }}-release.tar.gz
+        asset_content_type: application/gzip
+
+  web-ui:
+    name: Vue.js app
+    strategy:
+      matrix:
+        node-version:
+        - 12.x
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v1
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v1
+      with:
+        node-version: ${{ matrix.node-version }}
+    - name: Install
+      run: |
+        cd ui
+        yarn install
+    - name: Test
+      run: |
+        cd ui
+        yarn run unit
+        yarn run build
+    - name: Build
+      run: |
+        cd ui
+        yarn run build
+    - uses: actions/upload-artifact@master
+      with:
+        name: ui-dist
+        path: ui/dist
+
+  rust-app:
+    name: Rust app
+    needs:
+    - web-ui
+    strategy:
+      matrix:
+        os:
+        - ubuntu-latest
+        - windows-latest
+        - macOS-latest
+    runs-on: ${{ matrix.os }}
+    steps:
+    - uses: actions/checkout@v1
+    - uses: actions/download-artifact@master
+      with:
+        name: ui-dist
+        path: ui/dist
+    - name: Install nightly
+      uses: actions-rs/toolchain@v1
+      with:
+        toolchain: nightly
+        override: true
+    - name: Test
+      uses: actions-rs/cargo@v1
+      env:
+        SKIP_UI_BUILD: true
+      with:
+        command: test
+        args: --verbose
+    - name: Build
+      uses: actions-rs/cargo@v1
+      with:
+        command: build
+        args: --verbose --release
+      env:
+        SKIP_UI_BUILD: true
+    - name: Upload release artifact (Windows)
+      if: matrix.os == 'windows-latest'
+      uses: actions/upload-artifact@master
+      with:
+        name: app_${{ matrix.os }}
+        path: target/release/sd2snes-lttp-rando-tracker.exe
+    - name: Upload release artifact
+      if: matrix.os != 'windows-latest'
+      uses: actions/upload-artifact@master
+      with:
+        name: app_${{ matrix.os }}
+        path: target/release/sd2snes-lttp-rando-tracker
