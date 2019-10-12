@@ -7,7 +7,6 @@ deny(
 )
 ]
 #![feature(
-    try_from,
     plugin,
     proc_macro_hygiene,
     decl_macro
