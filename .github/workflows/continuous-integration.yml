@@ -31,7 +31,6 @@ jobs:
       run: |
         cd ui
         yarn run unit
-        yarn run build
     - name: Build
       run: |
         cd ui
