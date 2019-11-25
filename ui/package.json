@@ -55,7 +55,7 @@
     "html-webpack-plugin": "^3.2.0",
     "jest": "^24.9.0",
     "jest-serializer-vue": "^2.0.2",
-    "nightwatch": "^1.3.0",
+    "nightwatch": "^1.3.1",
     "node-notifier": "^6.0.0",
     "node-sass": "^4.13.0",
     "optimize-css-assets-webpack-plugin": "^3.2.0",
