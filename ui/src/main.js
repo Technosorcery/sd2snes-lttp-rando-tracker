@@ -1,7 +1,7 @@
 // The Vue build version to load with the `import` command
 // (runtime-only or standalone) has been set in webpack.base.conf with an alias.
 import actions from './actions'
-import App from './App'
+import App from './App.vue'
 import getters from './getters'
 import mutations from './mutations'
 import ReconnectingWebSocket from 'reconnecting-websocket'
@@ -28,7 +28,6 @@ const store = new Vuex.Store({
   }
 })
 
-/* eslint-disable no-new */
 new Vue({
   components: {
     App
@@ -60,7 +59,7 @@ new Vue({
   methods: {
     startStreamingApi() {
       let websocketServer = 'ws://' + window.location.hostname + ':' + this.$store.state.serverConfig.websocketPort
-      console.log('Using websocket server: ' + websocketServer)
+      window.console.log('Using websocket server: ' + websocketServer)
       this.stateApi = new ReconnectingWebSocket(websocketServer, [], { connectionTimeout: 1500, debug: false })
       this.stateApi.addEventListener('message', this.handleSocketEvent.bind(this))
       this.stateApi.addEventListener('error', this.handleSocketError.bind(this))
@@ -81,12 +80,13 @@ new Vue({
       }
     },
     handleSocketError(error) {
-      console.log('Socket error: ' + JSON.stringify(error))
+      window.console.log('Socket error: ' + JSON.stringify(error))
       // this.stateApi.reconnect()
     },
-    handleSocketOpen(event) {
-      console.log('Sending HELO')
+    handleSocketOpen() {
+      window.console.log('Sending HELO')
       this.stateApi.send('HELLO')
     }
-  }
-})
+  },
+  render: h => h(App)
+}).$mount('#app')
