@@ -13,7 +13,7 @@ jobs:
     strategy:
       matrix:
         node-version:
-        - 12.x
+        - 13.x
 
     runs-on: ubuntu-latest
 
@@ -27,14 +27,14 @@ jobs:
       run: |
         cd ui
         yarn install
-    - name: Test
+    - name: Lint
       run: |
         cd ui
-        yarn run unit
+        yarn lint
     - name: Build
       run: |
         cd ui
-        yarn run build
+        yarn build
     - uses: actions/upload-artifact@master
       with:
         name: ui-dist
