@@ -24,7 +24,7 @@ export default {
     await fetch('http://' + host + '/config', requestOptions)
       .then(response => response.json())
       .then(data => {
-        console.log('Storing server config: ', data)
+        window.console.log('Storing server config: ', data)
         state.serverConfig = data
       })
   }

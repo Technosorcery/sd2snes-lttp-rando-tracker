@@ -48,7 +48,7 @@ export default {
       let host = window.location.hostname + ':' + this.$store.state.serverConfig.apiPort
 
       var xhr = new XMLHttpRequest()
-      xhr.open('POST', 'http://' + host + '/location_state/' + this.name, true)
+      xhr.open('POST', 'http://' + host + '/location_state/' + this.location.name, true)
       xhr.setRequestHeader('Content-Type', 'application/json')
       xhr.send(JSON.stringify(data))
     }
