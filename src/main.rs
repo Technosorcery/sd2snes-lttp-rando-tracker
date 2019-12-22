@@ -50,6 +50,7 @@ use clap::{
 
 use futures::stream::{SplitSink, SplitStream};
 use futures::prelude::Poll;
+use futures::task;
 
 use rocket::http::hyper::Method;
 // use hyper::method::Method as hMethod;
@@ -82,7 +83,6 @@ use serial::prelude::*;
 use serial::PortSettings;
 
 use tokio_core::reactor::{Core, Handle};
-use tokio::prelude::task;
 
 use unicase::UniCase;
 
