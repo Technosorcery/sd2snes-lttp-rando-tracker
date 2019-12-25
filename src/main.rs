@@ -86,11 +86,11 @@ use tokio_core::reactor::{Core, Handle};
 
 use unicase::UniCase;
 
-use websocket::async::Server;
+use websocket::r#async::Server;
 use websocket::futures::{Async, Future, Sink, Stream};
 use websocket::message::OwnedMessage;
 
-use lttp::{
+use crate::lttp::{
     Dungeon,
     DungeonState,
     DungeonUpdate,
@@ -718,16 +718,16 @@ fn spawn_future<F, I, E>(f: F, desc: &'static str, handle: &Handle)
 #[allow(deprecated, missing_debug_implementations)]
 struct Peer {
     bus: BusReader<Update>,
-    sink: Box<futures::sink::Wait<SplitSink<websocket::client::async::Framed<tokio_core::net::TcpStream,websocket::async::MessageCodec<OwnedMessage>>>>>,
-    stream: Box<SplitStream<websocket::client::async::Framed<tokio_core::net::TcpStream,websocket::async::MessageCodec<OwnedMessage>>>>,
+    sink: Box<futures::sink::Wait<SplitSink<websocket::client::r#async::Framed<tokio_core::net::TcpStream,websocket::r#async::MessageCodec<OwnedMessage>>>>>,
+    stream: Box<SplitStream<websocket::client::r#async::Framed<tokio_core::net::TcpStream,websocket::r#async::MessageCodec<OwnedMessage>>>>,
 }
 
 impl Peer {
     #[allow(deprecated)]
     pub fn new(
         bus: BusReader<Update>,
-        sink: Box<futures::sink::Wait<SplitSink<websocket::client::async::Framed<tokio_core::net::TcpStream,websocket::async::MessageCodec<OwnedMessage>>>>>,
-        stream: Box<SplitStream<websocket::client::async::Framed<tokio_core::net::TcpStream,websocket::async::MessageCodec<OwnedMessage>>>>,
+        sink: Box<futures::sink::Wait<SplitSink<websocket::client::r#async::Framed<tokio_core::net::TcpStream,websocket::r#async::MessageCodec<OwnedMessage>>>>>,
+        stream: Box<SplitStream<websocket::client::r#async::Framed<tokio_core::net::TcpStream,websocket::r#async::MessageCodec<OwnedMessage>>>>,
     ) -> Peer {
         Peer { bus, sink, stream }
     }
