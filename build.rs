@@ -1,4 +1,4 @@
-extern crate includedir_codegen;
+use includedir_codegen;
 
 use includedir_codegen::Compression;
 use std::process::Command;
