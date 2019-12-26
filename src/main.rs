@@ -8,75 +8,114 @@ deny(
 ]
 #![feature(plugin, proc_macro_hygiene, decl_macro)]
 
+mod lttp;
+
 #[macro_use]
 extern crate clap;
 #[macro_use]
 extern crate failure;
-use futures;
-
 #[macro_use]
 extern crate lazy_panic;
 #[macro_use]
 extern crate lazy_static;
-
 #[macro_use]
 extern crate rocket;
-
 #[macro_use]
 extern crate serde_derive;
+
+use crate::lttp::{
+    Dungeon,
+    DungeonState,
+    DungeonUpdate,
+    GameState,
+    Location,
+    LocationState,
+    LocationUpdate,
+};
+use bus::{
+    Bus,
+    BusReader,
+};
+use clap::{
+    App,
+    Arg,
+    ArgGroup,
+};
+use futures::{
+    self,
+    prelude::Poll,
+    stream::{
+        SplitSink,
+        SplitStream,
+    },
+    task,
+};
+use rocket::{
+    config::{
+        Config,
+        Environment,
+    },
+    http::{
+        hyper::{
+            header::{
+                AccessControlAllowHeaders,
+                AccessControlAllowMethods,
+                AccessControlAllowOrigin,
+            },
+            Method,
+        },
+        ContentType,
+        Status,
+    },
+    Response,
+};
+use rocket_contrib::json::Json;
 use serde_json;
 use serde_yaml;
-use serial;
-use tokio_core;
-
-use websocket;
-
-mod lttp;
-
-use bus::{Bus, BusReader};
-
-use clap::{App, Arg, ArgGroup};
-
-use futures::prelude::Poll;
-use futures::stream::{SplitSink, SplitStream};
-use futures::task;
-
-use rocket::http::hyper::Method;
-// use hyper::method::Method as hMethod;
-use rocket::config::{Config, Environment};
-use rocket::http::hyper::header::{
-    AccessControlAllowHeaders, AccessControlAllowMethods, AccessControlAllowOrigin,
+use serial::{
+    self,
+    PortSettings,
 };
-use rocket::http::{ContentType, Status};
-use rocket::Response;
-use rocket_contrib::json::Json;
-
-use std::convert::TryFrom;
-use std::env;
-use std::fmt::Debug;
-use std::fs::File;
-use std::io::{self, Cursor};
-use std::path::{Path, PathBuf};
-use std::sync::Mutex;
-use std::time::Duration;
-use std::{thread, time};
+use std::{
+    convert::TryFrom,
+    env,
+    fmt::Debug,
+    fs::File,
+    io::{
+        self,
+        Cursor,
+    },
+    path::{
+        Path,
+        PathBuf,
+    },
+    sync::Mutex,
+    thread,
+    time,
+    time::Duration,
+};
+use tokio_core::{
+    self,
+    reactor::{
+        Core,
+        Handle,
+    },
+};
+use unicase::UniCase;
+use websocket::{
+    self,
+    futures::{
+        Async,
+        Future,
+        Sink,
+        Stream,
+    },
+    message::OwnedMessage,
+    r#async::Server,
+};
 
 use serial::prelude::*;
 use std::io::prelude::*;
-
-use serial::PortSettings;
-
-use tokio_core::reactor::{Core, Handle};
-
-use unicase::UniCase;
-
-use websocket::futures::{Async, Future, Sink, Stream};
-use websocket::message::OwnedMessage;
-use websocket::r#async::Server;
-
-use crate::lttp::{
-    Dungeon, DungeonState, DungeonUpdate, GameState, Location, LocationState, LocationUpdate,
-};
 
 include!(concat!(env!("OUT_DIR"), "/ui_files.rs"));
 include!(concat!(env!("OUT_DIR"), "/logic_files.rs"));
@@ -119,14 +158,14 @@ pub enum ServerSpace {
 
 #[derive(Debug, Copy, Clone)]
 pub enum ServerFlag {
-    None = 0,
-    SkipReset = 1,
-    OnlyReset = 2,
-    ClrX = 4,
-    SetX = 8,
+    None        = 0,
+    SkipReset   = 1,
+    OnlyReset   = 2,
+    ClrX        = 4,
+    SetX        = 8,
     StreamBurst = 16,
-    NoResp = 64,
-    Data64B = 128,
+    NoResp      = 64,
+    Data64B     = 128,
 }
 
 lazy_static! {
@@ -147,10 +186,10 @@ fn update_tracker_serial_data(serial_port: &str) {
     };
 
     if let Err(e) = port.configure(&PortSettings {
-        baud_rate: serial::Baud9600,
-        char_size: serial::Bits8,
-        parity: serial::ParityNone,
-        stop_bits: serial::Stop1,
+        baud_rate:    serial::Baud9600,
+        char_size:    serial::Bits8,
+        parity:       serial::ParityNone,
+        stop_bits:    serial::Stop1,
         flow_control: serial::FlowNone,
     }) {
         println!("Unable to configure '{}': {}", &serial_port, &e);
@@ -158,10 +197,7 @@ fn update_tracker_serial_data(serial_port: &str) {
     };
 
     if let Err(e) = port.set_timeout(Duration::from_millis(5000)) {
-        println!(
-            "Unable to set serial port timeout ({}): {}",
-            &serial_port, &e
-        );
+        println!("Unable to set serial port timeout ({}): {}", &serial_port, &e);
         ::std::process::exit(1);
     };
 
@@ -296,10 +332,7 @@ fn read_wram<T: SerialPort>(port: &mut T, mem_offset: u32, mem_size: u32) -> io:
         let mut buf: [u8; 64] = [0; 64];
         while let Ok(_) = port.read(&mut buf) {}
         port.set_timeout(timeout)?;
-        return Err(io::Error::new(
-            io::ErrorKind::InvalidData,
-            "Malformed response",
-        ));
+        return Err(io::Error::new(io::ErrorKind::InvalidData, "Malformed response"));
     }
 
     // Drop the first "block" as it's just the header.
@@ -321,9 +354,7 @@ fn state_response<'r>() -> Response<'r> {
 }
 
 #[options("/game_state")]
-fn get_game_state_options<'r>() -> Response<'r> {
-    state_response()
-}
+fn get_game_state_options<'r>() -> Response<'r> { state_response() }
 
 #[get("/game_state", format = "application/json")]
 fn get_game_state<'r>() -> Option<Response<'r>> {
@@ -342,9 +373,7 @@ fn get_game_state<'r>() -> Option<Response<'r>> {
 }
 
 #[options("/location_state")]
-fn get_location_state_options<'r>() -> Response<'r> {
-    state_response()
-}
+fn get_location_state_options<'r>() -> Response<'r> { state_response() }
 
 #[get("/location_state", format = "application/json")]
 fn get_location_state<'r>() -> Option<Response<'r>> {
@@ -363,15 +392,9 @@ fn get_location_state<'r>() -> Option<Response<'r>> {
 }
 
 #[options("/location_state/<_location>")]
-fn set_location_state_options<'r>(_location: String) -> Response<'r> {
-    state_response()
-}
+fn set_location_state_options<'r>(_location: String) -> Response<'r> { state_response() }
 
-#[post(
-    "/location_state/<location>",
-    data = "<state>",
-    format = "application/json"
-)]
+#[post("/location_state/<location>", data = "<state>", format = "application/json")]
 fn set_location_state<'r>(location: String, state: Json<LocationUpdate>) -> Option<Response<'r>> {
     let location_update = state.into_inner();
     let state;
@@ -396,9 +419,7 @@ fn set_location_state<'r>(location: String, state: Json<LocationUpdate>) -> Opti
 }
 
 #[options("/dungeon_state")]
-fn get_dungeon_state_options<'r>() -> Response<'r> {
-    state_response()
-}
+fn get_dungeon_state_options<'r>() -> Response<'r> { state_response() }
 
 #[get("/dungeon_state", format = "application/json")]
 fn get_dungeon_state<'r>() -> Option<Response<'r>> {
@@ -417,15 +438,9 @@ fn get_dungeon_state<'r>() -> Option<Response<'r>> {
 }
 
 #[options("/dungeon_state/<_dungeon>")]
-fn set_dungeon_state_options<'r>(_dungeon: String) -> Response<'r> {
-    state_response()
-}
+fn set_dungeon_state_options<'r>(_dungeon: String) -> Response<'r> { state_response() }
 
-#[post(
-    "/dungeon_state/<dungeon>",
-    data = "<state>",
-    format = "application/json"
-)]
+#[post("/dungeon_state/<dungeon>", data = "<state>", format = "application/json")]
 fn set_dungeon_state<'r>(dungeon: String, state: Json<DungeonUpdate>) -> Option<Response<'r>> {
     let dungeon_update = state.into_inner();
     let state;
@@ -492,21 +507,17 @@ fn files<'r>(file: PathBuf) -> Option<Response<'r>> {
 }
 
 #[get("/")]
-fn root<'r>() -> Option<Response<'r>> {
-    files(PathBuf::from(""))
-}
+fn root<'r>() -> Option<Response<'r>> { files(PathBuf::from("")) }
 
 #[serde(rename_all = "camelCase")]
 #[derive(Debug, Clone, Copy, Default, Serialize)]
 pub struct ServerConfig {
-    pub api_port: u16,
+    pub api_port:       u16,
     pub websocket_port: u16,
 }
 
 #[options("/config")]
-fn get_config_options<'r>() -> Response<'r> {
-    state_response()
-}
+fn get_config_options<'r>() -> Response<'r> { state_response() }
 
 #[get("/config", format = "application/json")]
 fn get_config<'r>() -> Option<Response<'r>> {
@@ -533,7 +544,9 @@ fn set_base_location_data() {
 
     match serde_yaml::from_str::<Vec<Location>>(&file) {
         Ok(locations) => {
-            *LOCATION_STATE.lock().unwrap() = LocationState { locations };
+            *LOCATION_STATE.lock().unwrap() = LocationState {
+                locations,
+            };
             UPDATE_BUS.lock().unwrap().broadcast(Update::Locations);
         }
         Err(e) => {
@@ -551,7 +564,9 @@ fn set_base_dungeon_data() {
 
     match serde_yaml::from_str::<Vec<Dungeon>>(&file) {
         Ok(dungeons) => {
-            *DUNGEON_STATE.lock().unwrap() = DungeonState { dungeons };
+            *DUNGEON_STATE.lock().unwrap() = DungeonState {
+                dungeons,
+            };
             UPDATE_BUS.lock().unwrap().broadcast(Update::Dungeons);
         }
         Err(e) => {
@@ -582,11 +597,7 @@ fn main() {
                 .long("file")
                 .takes_value(true),
         )
-        .group(
-            ArgGroup::with_name("source")
-                .required(true)
-                .args(&["serial", "file"]),
-        )
+        .group(ArgGroup::with_name("source").required(true).args(&["serial", "file"]))
         .arg(
             Arg::with_name("verbose")
                 .help("Enable more verbose output")
@@ -632,19 +643,16 @@ fn main() {
         Err(e) => panic!("Invalid port number: {:?}", e),
     };
     let websocket_port = match matches.value_of("websocket-port") {
-        Some(i) => i
-            .parse::<u16>()
-            .unwrap_or_else(|e| panic!("Invalid websocket port number: {:?}", e)),
+        Some(i) => {
+            i.parse::<u16>().unwrap_or_else(|e| panic!("Invalid websocket port number: {:?}", e))
+        }
         None => server_port + 1,
     };
-    let server_address = match matches
-        .value_of("server-address")
-        .unwrap()
-        .parse::<std::net::IpAddr>()
-    {
-        Ok(a) => a,
-        Err(e) => panic!("Invalid address: {}", e),
-    };
+    let server_address =
+        match matches.value_of("server-address").unwrap().parse::<std::net::IpAddr>() {
+            Ok(a) => a,
+            Err(e) => panic!("Invalid address: {}", e),
+        };
 
     {
         *SERVER_CONFIG.lock().unwrap() = ServerConfig {
@@ -758,7 +766,7 @@ where
 
 #[allow(deprecated, missing_debug_implementations)]
 struct Peer {
-    bus: BusReader<Update>,
+    bus:    BusReader<Update>,
     sink: Box<
         futures::sink::Wait<
             SplitSink<
@@ -802,22 +810,22 @@ impl Peer {
             >,
         >,
     ) -> Peer {
-        Peer { bus, sink, stream }
+        Peer {
+            bus,
+            sink,
+            stream,
+        }
     }
 }
 
 impl Future for Peer {
-    type Item = ();
     type Error = websocket::WebSocketError;
+    type Item = ();
 
     fn poll(&mut self) -> Poll<(), websocket::WebSocketError> {
         if let Ok(state_update) = self.bus.recv_timeout(Duration::from_millis(10)) {
             println!("Sending update for: {:?}", state_update);
-            if self
-                .sink
-                .send(websocket_state_message(state_update))
-                .is_err()
-            {
+            if self.sink.send(websocket_state_message(state_update)).is_err() {
                 return Ok(Async::Ready(()));
             }
             if self.sink.flush().is_err() {
@@ -839,25 +847,13 @@ impl Future for Peer {
                 Some(OwnedMessage::Text(text)) => {
                     if text == "HELLO" {
                         println!("Sending initial state");
-                        if self
-                            .sink
-                            .send(websocket_state_message(Update::Items))
-                            .is_err()
-                        {
+                        if self.sink.send(websocket_state_message(Update::Items)).is_err() {
                             return Ok(Async::Ready(()));
                         };
-                        if self
-                            .sink
-                            .send(websocket_state_message(Update::Locations))
-                            .is_err()
-                        {
+                        if self.sink.send(websocket_state_message(Update::Locations)).is_err() {
                             return Ok(Async::Ready(()));
                         };
-                        if self
-                            .sink
-                            .send(websocket_state_message(Update::Dungeons))
-                            .is_err()
-                        {
+                        if self.sink.send(websocket_state_message(Update::Dungeons)).is_err() {
                             return Ok(Async::Ready(()));
                         };
                         if self.sink.flush().is_err() {

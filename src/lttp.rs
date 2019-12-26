@@ -1,72 +1,84 @@
 mod item;
 
+use crate::lttp::{
+    item::{
+        Armor,
+        BigKey,
+        Boomerang,
+        Bottle,
+        Bow,
+        Crystal,
+        FluteShovel,
+        Gloves,
+        Magic,
+        Pendant,
+        Shield,
+        ShroomPowder,
+        Sword,
+    },
+};
 use failure;
-
 use std::convert::TryFrom;
 
-use self::item::{
-    Armor, BigKey, Boomerang, Bottle, Bow, Crystal, FluteShovel, Gloves, Magic, Pendant, Shield,
-    ShroomPowder, Sword,
-};
 
 #[serde(rename_all = "camelCase")]
 #[derive(Debug, Default, Copy, Clone, PartialEq, Serialize, Deserialize)]
 pub struct GameState {
     // Items
-    pub bow: bool,
-    pub blue_boomerang: bool,
-    pub red_boomerang: bool,
-    pub hook_shot: bool,
-    pub bomb: u8,
-    pub mushroom: bool,
-    pub powder: bool,
-    pub fire_rod: bool,
-    pub ice_rod: bool,
+    pub bow:              bool,
+    pub blue_boomerang:   bool,
+    pub red_boomerang:    bool,
+    pub hook_shot:        bool,
+    pub bomb:             u8,
+    pub mushroom:         bool,
+    pub powder:           bool,
+    pub fire_rod:         bool,
+    pub ice_rod:          bool,
     pub bombos_medallion: bool,
-    pub ether_medallion: bool,
-    pub quake_medallion: bool,
-    pub lantern: bool,
-    pub hammer: bool,
-    pub flute: bool,
-    pub flute_activated: bool,
-    pub shovel: bool,
-    pub net: bool,
-    pub book: bool,
-    pub bottle: bool,
-    pub bottle_count: u8,
-    pub cane_somaria: bool,
-    pub cane_byrna: bool,
-    pub cape: bool,
-    pub mirror: bool,
-    pub silvers: bool,
+    pub ether_medallion:  bool,
+    pub quake_medallion:  bool,
+    pub lantern:          bool,
+    pub hammer:           bool,
+    pub flute:            bool,
+    pub flute_activated:  bool,
+    pub shovel:           bool,
+    pub net:              bool,
+    pub book:             bool,
+    pub bottle:           bool,
+    pub bottle_count:     u8,
+    pub cane_somaria:     bool,
+    pub cane_byrna:       bool,
+    pub cape:             bool,
+    pub mirror:           bool,
+    pub silvers:          bool,
     // Abilities
-    pub gloves: Gloves,
-    pub boots: bool,
-    pub flippers: bool,
-    pub moon_pearl: bool,
+    pub gloves:           Gloves,
+    pub boots:            bool,
+    pub flippers:         bool,
+    pub moon_pearl:       bool,
     // Weapon & Armor Progression
-    pub sword_level: Sword,
-    pub shield_level: Shield,
-    pub armor_level: Armor,
+    pub sword_level:      Sword,
+    pub shield_level:     Shield,
+    pub armor_level:      Armor,
     // Bottle content
-    pub bottle_content1: Bottle,
-    pub bottle_content2: Bottle,
-    pub bottle_content3: Bottle,
-    pub bottle_content4: Bottle,
+    pub bottle_content1:  Bottle,
+    pub bottle_content2:  Bottle,
+    pub bottle_content3:  Bottle,
+    pub bottle_content4:  Bottle,
 
-    pub rupees: u16,
+    pub rupees:         u16,
     pub heart_quarters: u8,
-    pub bomb_capacity: u8,
-    pub hearts: u8,
-    pub max_hearts: u8,
+    pub bomb_capacity:  u8,
+    pub hearts:         u8,
+    pub max_hearts:     u8,
 
-    pub arrows: u8,
+    pub arrows:         u8,
     pub arrow_capacity: u8,
 
     pub magic_progression: Magic,
 
     pub small_keys: u8,
-    pub big_key: BigKey,
+    pub big_key:    BigKey,
 
     pub pendant: Pendant,
     pub crystal: Crystal,
@@ -172,11 +184,11 @@ impl TryFrom<Vec<u8>> for GameState {
                 //      |--------|
                 // Bit:  7      0
                 gannons_tower: response[0x26] & 0b0000_0100 > 0,
-                turtle_rock: response[0x26] & 0b0000_1000 > 0,
-                thieves_town: response[0x26] & 0b0001_0000 > 0,
+                turtle_rock:   response[0x26] & 0b0000_1000 > 0,
+                thieves_town:  response[0x26] & 0b0001_0000 > 0,
                 tower_of_hera: response[0x26] & 0b0010_0000 > 0,
-                ice_palace: response[0x26] & 0b0100_0000 > 0,
-                skull_woods: response[0x26] & 0b1000_0000 > 0,
+                ice_palace:    response[0x26] & 0b0100_0000 > 0,
+                skull_woods:   response[0x26] & 0b1000_0000 > 0,
 
                 // BigKey2: 0x367
                 //       X
@@ -190,11 +202,11 @@ impl TryFrom<Vec<u8>> for GameState {
                 //       vvvvvvvv
                 //      |--------|
                 // Bit:  7      0
-                misery_mire: response[0x27] & 0b0000_0001 > 0,
-                desert_palace: response[0x27] & 0b0000_0010 > 0,
-                swamp_palace: response[0x27] & 0b0000_0100 > 0,
+                misery_mire:        response[0x27] & 0b0000_0001 > 0,
+                desert_palace:      response[0x27] & 0b0000_0010 > 0,
+                swamp_palace:       response[0x27] & 0b0000_0100 > 0,
                 palace_of_darkness: response[0x27] & 0b0001_0000 > 0,
-                eastern_palace: response[0x27] & 0b0010_0000 > 0,
+                eastern_palace:     response[0x27] & 0b0010_0000 > 0,
             },
 
             // 0x374 -> Pendants (Bitmask)
@@ -202,8 +214,8 @@ impl TryFrom<Vec<u8>> for GameState {
             // 2 - Blue
             // 4 - Green
             pendant: Pendant {
-                red: response[0x34] & 0b0001 > 0,
-                blue: response[0x34] & 0b0010 > 0,
+                red:   response[0x34] & 0b0001 > 0,
+                blue:  response[0x34] & 0b0010 > 0,
                 green: response[0x34] & 0b0100 > 0,
             },
 
@@ -216,12 +228,12 @@ impl TryFrom<Vec<u8>> for GameState {
             // 32 - Gargoyle's Domain
             // 64 - Skull Woods
             crystal: Crystal {
-                one: response[0x3A] & 0b0000_0001 > 0,
+                one:   response[0x3A] & 0b0000_0001 > 0,
                 three: response[0x3A] & 0b0000_0010 > 0,
-                five: response[0x3A] & 0b0000_0100 > 0,
-                four: response[0x3A] & 0b0000_1000 > 0,
-                two: response[0x3A] & 0b0001_0000 > 0,
-                six: response[0x3A] & 0b0010_0000 > 0,
+                five:  response[0x3A] & 0b0000_0100 > 0,
+                four:  response[0x3A] & 0b0000_1000 > 0,
+                two:   response[0x3A] & 0b0001_0000 > 0,
+                six:   response[0x3A] & 0b0010_0000 > 0,
                 seven: response[0x3A] & 0b0100_0000 > 0,
             },
         })
@@ -233,41 +245,41 @@ impl GameState {
     /// Things like bomb count, hearts, rupees, etc are taken from self.
     pub fn merge(&self, old: GameState) -> Self {
         GameState {
-            bow: self.bow || old.bow,
-            blue_boomerang: self.blue_boomerang || old.blue_boomerang,
-            red_boomerang: self.red_boomerang || old.red_boomerang,
-            hook_shot: self.hook_shot,
-            bomb: self.bomb,
-            mushroom: self.mushroom || old.mushroom,
-            powder: self.powder || old.powder,
-            fire_rod: self.fire_rod,
-            ice_rod: self.ice_rod,
+            bow:              self.bow || old.bow,
+            blue_boomerang:   self.blue_boomerang || old.blue_boomerang,
+            red_boomerang:    self.red_boomerang || old.red_boomerang,
+            hook_shot:        self.hook_shot,
+            bomb:             self.bomb,
+            mushroom:         self.mushroom || old.mushroom,
+            powder:           self.powder || old.powder,
+            fire_rod:         self.fire_rod,
+            ice_rod:          self.ice_rod,
             bombos_medallion: self.bombos_medallion,
-            ether_medallion: self.ether_medallion,
-            quake_medallion: self.quake_medallion,
-            lantern: self.lantern,
-            hammer: self.hammer,
-            flute: self.flute,
-            flute_activated: self.flute_activated,
-            shovel: self.shovel || old.shovel,
-            net: self.net,
-            book: self.book,
-            bottle: self.bottle,
-            bottle_count: self.bottle_count,
-            cane_somaria: self.cane_somaria,
-            cane_byrna: self.cane_byrna,
-            cape: self.cape,
-            mirror: self.mirror,
-            silvers: self.silvers || old.silvers,
+            ether_medallion:  self.ether_medallion,
+            quake_medallion:  self.quake_medallion,
+            lantern:          self.lantern,
+            hammer:           self.hammer,
+            flute:            self.flute,
+            flute_activated:  self.flute_activated,
+            shovel:           self.shovel || old.shovel,
+            net:              self.net,
+            book:             self.book,
+            bottle:           self.bottle,
+            bottle_count:     self.bottle_count,
+            cane_somaria:     self.cane_somaria,
+            cane_byrna:       self.cane_byrna,
+            cape:             self.cape,
+            mirror:           self.mirror,
+            silvers:          self.silvers || old.silvers,
 
-            gloves: self.gloves,
-            boots: self.boots,
-            flippers: self.flippers,
+            gloves:     self.gloves,
+            boots:      self.boots,
+            flippers:   self.flippers,
             moon_pearl: self.moon_pearl,
 
-            sword_level: self.sword_level,
+            sword_level:  self.sword_level,
             shield_level: self.shield_level,
-            armor_level: self.armor_level,
+            armor_level:  self.armor_level,
 
             bottle_content1: self.bottle_content1,
             bottle_content2: self.bottle_content2,
@@ -276,19 +288,19 @@ impl GameState {
 
             // Rupees are spread across two bytes, as the randomizer lifted the
             // 255 Rupee limit, and it's stored little-endian.
-            rupees: self.rupees,
+            rupees:         self.rupees,
             heart_quarters: self.heart_quarters,
-            bomb_capacity: self.bomb_capacity,
-            hearts: self.hearts,
-            max_hearts: self.max_hearts,
+            bomb_capacity:  self.bomb_capacity,
+            hearts:         self.hearts,
+            max_hearts:     self.max_hearts,
 
-            arrows: self.arrows,
+            arrows:         self.arrows,
             arrow_capacity: self.arrow_capacity,
 
             magic_progression: self.magic_progression,
 
             small_keys: self.small_keys,
-            big_key: self.big_key,
+            big_key:    self.big_key,
 
             pendant: self.pendant,
             crystal: self.crystal,
@@ -300,24 +312,24 @@ impl GameState {
 #[derive(Debug, Clone, Copy, Default, Serialize, Deserialize, PartialEq)]
 pub struct LocationPosition {
     pub horizontal: LocationCoordinates,
-    pub vertical: LocationCoordinates,
+    pub vertical:   LocationCoordinates,
 }
 
 #[serde(deny_unknown_fields, rename_all = "camelCase")]
 #[derive(Debug, Clone, Copy, Default, Serialize, Deserialize, PartialEq)]
 pub struct LocationCoordinates {
     pub left: f32,
-    pub top: f32,
+    pub top:  f32,
 }
 
 #[serde(deny_unknown_fields, rename_all = "camelCase")]
 #[derive(Debug, Clone, Default, Serialize, Deserialize, PartialEq)]
 pub struct Location {
-    pub name: String,
+    pub name:       String,
     pub hover_text: String,
-    pub position: LocationPosition,
+    pub position:   LocationPosition,
     #[serde(skip_deserializing)]
-    pub cleared: bool,
+    pub cleared:    bool,
 }
 
 impl Location {
@@ -353,36 +365,40 @@ impl LocationState {
             self.locations[i].update(update);
         }
     }
+
+    pub fn update_availability(&mut self, game_state: &GameState) {
+        self.locations.iter_mut().for_each(|loc| loc.calculate_availability(&game_state));
+    }
 }
 
 #[serde(deny_unknown_fields, rename_all = "camelCase")]
 #[derive(Debug, Clone, Default, Serialize, Deserialize, PartialEq)]
 pub struct DungeonBoss {
-    pub name: String,
-    pub hover_text: String,
+    pub name:         String,
+    pub hover_text:   String,
     pub image_number: String,
 }
 
 #[serde(deny_unknown_fields, rename_all = "camelCase")]
 #[derive(Debug, Clone, Default, Serialize, Deserialize, PartialEq)]
 pub struct Dungeon {
-    pub name: String,
-    pub dungeon_code: String,
-    pub hover_text: String,
-    pub total_chests: u8,
+    pub name:          String,
+    pub dungeon_code:  String,
+    pub hover_text:    String,
+    pub total_chests:  u8,
     pub cleared_image: String,
     pub default_image: String,
-    pub has_reward: bool,
-    pub position: Option<LocationPosition>,
-    pub boss: Option<DungeonBoss>,
+    pub has_reward:    bool,
+    pub position:      Option<LocationPosition>,
+    pub boss:          Option<DungeonBoss>,
     #[serde(skip_deserializing)]
-    pub found_chests: u8,
+    pub found_chests:  u8,
     #[serde(skip_deserializing)]
-    pub reward: DungeonReward,
+    pub reward:        DungeonReward,
     #[serde(skip_deserializing)]
-    pub medallion: Medallion,
+    pub medallion:     Medallion,
     #[serde(skip_deserializing)]
-    pub cleared: bool,
+    pub cleared:       bool,
 }
 
 impl Dungeon {
@@ -412,9 +428,7 @@ pub enum DungeonReward {
 }
 
 impl Default for DungeonReward {
-    fn default() -> DungeonReward {
-        DungeonReward::Unknown
-    }
+    fn default() -> DungeonReward { DungeonReward::Unknown }
 }
 
 #[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq)]
@@ -426,18 +440,16 @@ pub enum Medallion {
 }
 
 impl Default for Medallion {
-    fn default() -> Medallion {
-        Medallion::Unknown
-    }
+    fn default() -> Medallion { Medallion::Unknown }
 }
 
 #[serde(deny_unknown_fields, rename_all = "camelCase")]
 #[derive(Debug, Clone, Copy, Deserialize)]
 pub struct DungeonUpdate {
     pub found_chests: Option<u8>,
-    pub reward: Option<DungeonReward>,
-    pub medallion: Option<Medallion>,
-    pub cleared: Option<bool>,
+    pub reward:       Option<DungeonReward>,
+    pub medallion:    Option<Medallion>,
+    pub cleared:      Option<bool>,
 }
 
 #[serde(deny_unknown_fields, rename_all = "camelCase")]
@@ -448,22 +460,14 @@ pub struct DungeonState {
 
 impl DungeonState {
     pub fn get(&self, dungeon_code: &str) -> Option<Dungeon> {
-        match self
-            .dungeons
-            .iter()
-            .position(|d| d.dungeon_code == dungeon_code)
-        {
+        match self.dungeons.iter().position(|d| d.dungeon_code == dungeon_code) {
             Some(i) => Some(self.dungeons[i].clone()),
             None => None,
         }
     }
 
     pub fn update(&mut self, dungeon_code: &str, update: DungeonUpdate) {
-        if let Some(i) = self
-            .dungeons
-            .iter()
-            .position(|d| d.dungeon_code == dungeon_code)
-        {
+        if let Some(i) = self.dungeons.iter().position(|d| d.dungeon_code == dungeon_code) {
             self.dungeons[i].update(update);
         }
     }
