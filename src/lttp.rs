@@ -1,4 +1,5 @@
 mod item;
+mod logic;
 
 use crate::lttp::{
     item::{
@@ -16,14 +17,32 @@ use crate::lttp::{
         ShroomPowder,
         Sword,
     },
+    logic::{
+        Availability,
+        Logic,
+    },
 };
 use failure;
 use std::convert::TryFrom;
 
+#[serde(rename_all = "camelCase")]
+#[derive(Debug, Clone, Copy, PartialEq, PartialOrd, Ord, Eq, Deserialize, Serialize)]
+pub enum RandoLogic {
+    Glitchless,
+    OverWorldGlitches,
+    MajorGlitches,
+}
+
+impl Default for RandoLogic {
+    fn default() -> RandoLogic { RandoLogic::Glitchless }
+}
 
 #[serde(rename_all = "camelCase")]
 #[derive(Debug, Default, Copy, Clone, PartialEq, Serialize, Deserialize)]
 pub struct GameState {
+    #[serde(skip_deserializing)]
+    pub logic: RandoLogic,
+
     // Items
     pub bow:              bool,
     pub blue_boomerang:   bool,
@@ -111,6 +130,8 @@ impl TryFrom<Vec<u8>> for GameState {
         };
 
         Ok(GameState {
+            logic: RandoLogic::default(),
+
             bow: bow != Bow::None,
             blue_boomerang: Boomerang::try_from(response[0x01])? == Boomerang::Blue,
             red_boomerang: Boomerang::try_from(response[0x01])? == Boomerang::Red,
@@ -245,6 +266,8 @@ impl GameState {
     /// Things like bomb count, hearts, rupees, etc are taken from self.
     pub fn merge(&self, old: GameState) -> Self {
         GameState {
+            logic: std::cmp::max(self.logic, old.logic),
+
             bow:              self.bow || old.bow,
             blue_boomerang:   self.blue_boomerang || old.blue_boomerang,
             red_boomerang:    self.red_boomerang || old.red_boomerang,
@@ -325,17 +348,31 @@ pub struct LocationCoordinates {
 #[serde(deny_unknown_fields, rename_all = "camelCase")]
 #[derive(Debug, Clone, Default, Serialize, Deserialize, PartialEq)]
 pub struct Location {
-    pub name:       String,
-    pub hover_text: String,
-    pub position:   LocationPosition,
+    pub name:         String,
+    pub hover_text:   String,
+    pub position:     LocationPosition,
     #[serde(skip_deserializing)]
-    pub cleared:    bool,
+    pub cleared:      bool,
+    #[serde(skip_serializing)]
+    pub logic:        Option<Vec<Logic>>,
+    #[serde(skip_deserializing)]
+    pub availability: Availability,
 }
 
 impl Location {
     pub fn update(&mut self, update: LocationUpdate) {
         if let Some(cleared) = update.cleared {
-            self.cleared = cleared
+            self.cleared = cleared;
+        }
+    }
+
+    pub fn calculate_availability(&mut self, state: &GameState) {
+        if let Some(logic) = &self.logic {
+            if let Some(found_logic) = logic.iter().find(|l| l.check(&state)) {
+                self.availability = found_logic.availability;
+            } else {
+                self.availability = Availability::Unavailable;
+            }
         }
     }
 }

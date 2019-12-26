@@ -141,7 +141,7 @@ impl TryFrom<u8> for FluteShovel {
     }
 }
 
-#[derive(Debug, Copy, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Copy, Clone, PartialEq, PartialOrd, Serialize, Deserialize)]
 pub enum Gloves {
     None       = 0,
     PowerGlove = 1,
@@ -165,7 +165,7 @@ impl TryFrom<u8> for Gloves {
     }
 }
 
-#[derive(Debug, Copy, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Copy, Clone, PartialEq, PartialOrd, Serialize, Deserialize)]
 pub enum Sword {
     None          = 0,
     FightersSword = 1,
@@ -193,7 +193,7 @@ impl TryFrom<u8> for Sword {
     }
 }
 
-#[derive(Debug, Copy, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Copy, Clone, PartialEq, PartialOrd, Serialize, Deserialize)]
 pub enum Shield {
     None           = 0,
     FightersShield = 1,
@@ -219,7 +219,7 @@ impl TryFrom<u8> for Shield {
     }
 }
 
-#[derive(Debug, Copy, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Copy, Clone, PartialEq, PartialOrd, Serialize, Deserialize)]
 pub enum Armor {
     GreenMail = 0,
     BlueMail  = 1,
@@ -279,7 +279,7 @@ impl TryFrom<u8> for Bottle {
     }
 }
 
-#[derive(Debug, Copy, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Copy, Clone, PartialEq, PartialOrd, Serialize, Deserialize)]
 pub enum Magic {
     Normal  = 0,
     Half    = 1,

@@ -1,6 +1,6 @@
 #![
 deny(
-    // warnings,
+    warnings,
     missing_debug_implementations,
     missing_copy_implementations,
     // missing_docs,
@@ -233,9 +233,13 @@ fn update_tracker_serial_data(serial_port: &str) {
                 let new_gs = gs.merge(prev_game_state);
                 let should_update_bus = new_gs != prev_game_state;
 
-                *GAME_STATE.lock().unwrap() = new_gs;
+                *GAME_STATE.lock().unwrap() = new_gs.clone();
                 if should_update_bus {
                     UPDATE_BUS.lock().unwrap().broadcast(Update::Items);
+
+                    let mut location_state = LOCATION_STATE.lock().unwrap();
+                    location_state.update_availability(&new_gs);
+                    UPDATE_BUS.lock().unwrap().broadcast(Update::Locations);
                 }
             }
             Err(e) => {
@@ -277,9 +281,13 @@ fn update_tracker_file_data(file_path: &str) {
                 let new_gs = gs.merge(prev_game_state);
                 let should_update_bus = new_gs != prev_game_state;
 
-                *GAME_STATE.lock().unwrap() = new_gs;
+                *GAME_STATE.lock().unwrap() = new_gs.clone();
                 if should_update_bus {
                     UPDATE_BUS.lock().unwrap().broadcast(Update::Items);
+
+                    let mut location_state = LOCATION_STATE.lock().unwrap();
+                    location_state.update_availability(&new_gs);
+                    UPDATE_BUS.lock().unwrap().broadcast(Update::Locations);
                 }
             }
             Err(e) => {

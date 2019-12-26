@@ -35,7 +35,7 @@ export default {
         return 'opened'
       }
 
-      return 'available'
+      return this.location.availability
     },
     toggleLocation(event) {
       event.stopPropagation()
