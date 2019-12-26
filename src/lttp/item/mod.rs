@@ -42,15 +42,17 @@ pub struct Crystal {
 
 #[derive(Debug, Copy, Clone, PartialEq, Serialize, Deserialize)]
 pub enum Bow {
-    None             = 0,
-    Wood             = 1,
-    WoodWithArrows   = 2,
-    Silver           = 3,
+    None = 0,
+    Wood = 1,
+    WoodWithArrows = 2,
+    Silver = 3,
     SilverWithArrows = 4,
 }
 
 impl Default for Bow {
-    fn default() -> Bow { Bow::None }
+    fn default() -> Bow {
+        Bow::None
+    }
 }
 
 impl TryFrom<u8> for Bow {
@@ -72,11 +74,13 @@ impl TryFrom<u8> for Bow {
 pub enum Boomerang {
     None = 0,
     Blue = 1,
-    Red  = 2,
+    Red = 2,
 }
 
 impl Default for Boomerang {
-    fn default() -> Boomerang { Boomerang::None }
+    fn default() -> Boomerang {
+        Boomerang::None
+    }
 }
 
 impl TryFrom<u8> for Boomerang {
@@ -94,13 +98,15 @@ impl TryFrom<u8> for Boomerang {
 
 #[derive(Debug, Copy, Clone, PartialEq, Serialize, Deserialize)]
 pub enum ShroomPowder {
-    None   = 0,
+    None = 0,
     Shroom = 1,
     Powder = 2,
 }
 
 impl Default for ShroomPowder {
-    fn default() -> ShroomPowder { ShroomPowder::None }
+    fn default() -> ShroomPowder {
+        ShroomPowder::None
+    }
 }
 
 impl TryFrom<u8> for ShroomPowder {
@@ -118,14 +124,16 @@ impl TryFrom<u8> for ShroomPowder {
 
 #[derive(Debug, Copy, Clone, PartialEq, Serialize, Deserialize)]
 pub enum FluteShovel {
-    None         = 0,
-    Shovel       = 1,
-    Flute        = 2,
+    None = 0,
+    Shovel = 1,
+    Flute = 2,
     FluteAndBird = 3,
 }
 
 impl Default for FluteShovel {
-    fn default() -> FluteShovel { FluteShovel::None }
+    fn default() -> FluteShovel {
+        FluteShovel::None
+    }
 }
 
 impl TryFrom<u8> for FluteShovel {
@@ -144,13 +152,15 @@ impl TryFrom<u8> for FluteShovel {
 
 #[derive(Debug, Copy, Clone, PartialEq, Serialize, Deserialize)]
 pub enum Gloves {
-    None       = 0,
+    None = 0,
     PowerGlove = 1,
     TitansMitt = 2,
 }
 
 impl Default for Gloves {
-    fn default() -> Gloves { Gloves::None }
+    fn default() -> Gloves {
+        Gloves::None
+    }
 }
 
 impl TryFrom<u8> for Gloves {
@@ -168,15 +178,17 @@ impl TryFrom<u8> for Gloves {
 
 #[derive(Debug, Copy, Clone, PartialEq, Serialize, Deserialize)]
 pub enum Sword {
-    None          = 0,
+    None = 0,
     FightersSword = 1,
-    MasterSword   = 2,
+    MasterSword = 2,
     TemperedSword = 3,
-    GoldenSword   = 4,
+    GoldenSword = 4,
 }
 
 impl Default for Sword {
-    fn default() -> Sword { Sword::None }
+    fn default() -> Sword {
+        Sword::None
+    }
 }
 
 impl TryFrom<u8> for Sword {
@@ -196,14 +208,16 @@ impl TryFrom<u8> for Sword {
 
 #[derive(Debug, Copy, Clone, PartialEq, Serialize, Deserialize)]
 pub enum Shield {
-    None           = 0,
+    None = 0,
     FightersShield = 1,
-    RedShield      = 2,
-    MirrorShield   = 3,
+    RedShield = 2,
+    MirrorShield = 3,
 }
 
 impl Default for Shield {
-    fn default() -> Shield { Shield::None }
+    fn default() -> Shield {
+        Shield::None
+    }
 }
 
 impl TryFrom<u8> for Shield {
@@ -223,12 +237,14 @@ impl TryFrom<u8> for Shield {
 #[derive(Debug, Copy, Clone, PartialEq, Serialize, Deserialize)]
 pub enum Armor {
     GreenMail = 0,
-    BlueMail  = 1,
-    RedMail   = 2,
+    BlueMail = 1,
+    RedMail = 2,
 }
 
 impl Default for Armor {
-    fn default() -> Armor { Armor::GreenMail }
+    fn default() -> Armor {
+        Armor::GreenMail
+    }
 }
 
 impl TryFrom<u8> for Armor {
@@ -246,19 +262,21 @@ impl TryFrom<u8> for Armor {
 
 #[derive(Debug, Copy, Clone, PartialEq, Serialize, Deserialize)]
 pub enum Bottle {
-    NoBottle    = 0x00,
-    Mushroom    = 0x01,
-    Empty       = 0x02,
-    RedPotion   = 0x03,
+    NoBottle = 0x00,
+    Mushroom = 0x01,
+    Empty = 0x02,
+    RedPotion = 0x03,
     GreenPotion = 0x04,
-    BluePotion  = 0x05,
-    Fairy       = 0x06,
-    Bee         = 0x07,
-    MagicBee    = 0x08,
+    BluePotion = 0x05,
+    Fairy = 0x06,
+    Bee = 0x07,
+    MagicBee = 0x08,
 }
 
 impl Default for Bottle {
-    fn default() -> Bottle { Bottle::NoBottle }
+    fn default() -> Bottle {
+        Bottle::NoBottle
+    }
 }
 
 impl TryFrom<u8> for Bottle {
@@ -275,20 +293,22 @@ impl TryFrom<u8> for Bottle {
             0x06 => Ok(Bottle::Fairy),
             0x07 => Ok(Bottle::Bee),
             0x08 => Ok(Bottle::MagicBee),
-            _    => Err(format_err!("Unknown bottle flag: 0x{:X}", number)),
+            _ => Err(format_err!("Unknown bottle flag: 0x{:X}", number)),
         }
     }
 }
 
 #[derive(Debug, Copy, Clone, PartialEq, Serialize, Deserialize)]
 pub enum Magic {
-    Normal  = 0,
-    Half    = 1,
+    Normal = 0,
+    Half = 1,
     Quarter = 2,
 }
 
 impl Default for Magic {
-    fn default() -> Magic { Magic::Normal }
+    fn default() -> Magic {
+        Magic::Normal
+    }
 }
 
 impl TryFrom<u8> for Magic {
