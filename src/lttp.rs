@@ -1,26 +1,29 @@
 mod item;
 mod logic;
 
-use crate::lttp::{
-    item::{
-        Armor,
-        BigKey,
-        Boomerang,
-        Bottle,
-        Bow,
-        Crystal,
-        FluteShovel,
-        Gloves,
-        Magic,
-        Pendant,
-        Shield,
-        ShroomPowder,
-        Sword,
+use crate::{
+    lttp::{
+        item::{
+            Armor,
+            BigKey,
+            Boomerang,
+            Bottle,
+            Bow,
+            Crystal,
+            FluteShovel,
+            Gloves,
+            Magic,
+            Pendant,
+            Shield,
+            ShroomPowder,
+            Sword,
+        },
+        logic::{
+            Availability,
+            Logic,
+        },
     },
-    logic::{
-        Availability,
-        Logic,
-    },
+    ServerConfig,
 };
 use failure;
 use std::convert::TryFrom;
@@ -40,9 +43,6 @@ impl Default for RandoLogic {
 #[serde(rename_all = "camelCase")]
 #[derive(Debug, Default, Copy, Clone, PartialEq, Serialize, Deserialize)]
 pub struct GameState {
-    #[serde(skip_deserializing)]
-    pub logic: RandoLogic,
-
     // Items
     pub bow:              bool,
     pub blue_boomerang:   bool,
@@ -130,8 +130,6 @@ impl TryFrom<Vec<u8>> for GameState {
         };
 
         Ok(GameState {
-            logic: RandoLogic::default(),
-
             bow: bow != Bow::None,
             blue_boomerang: Boomerang::try_from(response[0x01])? == Boomerang::Blue,
             red_boomerang: Boomerang::try_from(response[0x01])? == Boomerang::Red,
@@ -266,8 +264,6 @@ impl GameState {
     /// Things like bomb count, hearts, rupees, etc are taken from self.
     pub fn merge(&self, old: GameState) -> Self {
         GameState {
-            logic: std::cmp::max(self.logic, old.logic),
-
             bow:              self.bow || old.bow,
             blue_boomerang:   self.blue_boomerang || old.blue_boomerang,
             red_boomerang:    self.red_boomerang || old.red_boomerang,
@@ -366,9 +362,9 @@ impl Location {
         }
     }
 
-    pub fn calculate_availability(&mut self, state: &GameState) {
+    pub fn calculate_availability(&mut self, state: &GameState, settings: &ServerConfig) {
         if let Some(logic) = &self.logic {
-            if let Some(found_logic) = logic.iter().find(|l| l.check(&state)) {
+            if let Some(found_logic) = logic.iter().find(|l| l.check(&state, &settings)) {
                 self.availability = found_logic.availability;
             } else {
                 self.availability = Availability::Unavailable;
@@ -403,8 +399,10 @@ impl LocationState {
         }
     }
 
-    pub fn update_availability(&mut self, game_state: &GameState) {
-        self.locations.iter_mut().for_each(|loc| loc.calculate_availability(&game_state));
+    pub fn update_availability(&mut self, game_state: GameState, settings: ServerConfig) {
+        self.locations
+            .iter_mut()
+            .for_each(|loc| loc.calculate_availability(&game_state, &settings));
     }
 }
 

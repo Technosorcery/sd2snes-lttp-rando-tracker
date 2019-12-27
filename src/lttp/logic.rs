@@ -1,13 +1,16 @@
-use crate::lttp::{
-    item::{
-        Armor,
-        Gloves,
-        Magic,
-        Shield,
-        Sword,
+use crate::{
+    lttp::{
+        item::{
+            Armor,
+            Gloves,
+            Magic,
+            Shield,
+            Sword,
+        },
+        GameState,
+        RandoLogic,
     },
-    GameState,
-    RandoLogic,
+    ServerConfig,
 };
 
 #[serde(rename_all = "camelCase")]
@@ -110,11 +113,11 @@ pub enum Rule {
 }
 
 impl Rule {
-    pub fn check(&self, state: &GameState) -> bool {
+    pub fn check(&self, state: &GameState, settings: &ServerConfig) -> bool {
         match self {
-            Rule::Glitchless => state.logic >= RandoLogic::Glitchless,
-            Rule::OverWorldGlitches => state.logic >= RandoLogic::OverWorldGlitches,
-            Rule::MajorGlitches => state.logic >= RandoLogic::MajorGlitches,
+            Rule::Glitchless => settings.logic >= RandoLogic::Glitchless,
+            Rule::OverWorldGlitches => settings.logic >= RandoLogic::OverWorldGlitches,
+            Rule::MajorGlitches => settings.logic >= RandoLogic::MajorGlitches,
 
             Rule::BlueBoomerang => state.blue_boomerang,
             Rule::Bomb => state.bomb > 0,
@@ -163,77 +166,89 @@ impl Rule {
             Rule::GreenPendant => state.pendant.green,
             Rule::RedPendant => state.pendant.red,
 
-            Rule::CanLiftRocks => Rule::Gloves1.check(&state),
-            Rule::CanLiftDarkRocks => Rule::Gloves2.check(&state),
-            Rule::CanLightTorches => Rule::FireRod.check(&state) || Rule::Lantern.check(&state),
+            Rule::CanLiftRocks => Rule::Gloves1.check(&state, &settings),
+            Rule::CanLiftDarkRocks => Rule::Gloves2.check(&state, &settings),
+            Rule::CanLightTorches => {
+                Rule::FireRod.check(&state, &settings) || Rule::Lantern.check(&state, &settings)
+            }
             Rule::CanMeltThings => {
-                Rule::FireRod.check(&state)
-                    || (Rule::BombosMedallion.check(&state) && Rule::Sword1.check(&state))
+                Rule::FireRod.check(&state, &settings)
+                    || (Rule::BombosMedallion.check(&state, &settings)
+                        && Rule::Sword1.check(&state, &settings))
             }
-            Rule::CanFly => Rule::Flute.check(&state),
+            Rule::CanFly => Rule::Flute.check(&state, &settings),
             Rule::CanSpinSpeed => {
-                Rule::Boots.check(&state)
-                    && (Rule::Sword1.check(&state) || Rule::HookShot.check(&state))
+                Rule::Boots.check(&state, &settings)
+                    && (Rule::Sword1.check(&state, &settings)
+                        || Rule::HookShot.check(&state, &settings))
             }
-            Rule::CanShootArrows => Rule::Bow.check(&state),
-            Rule::CanBlockLasers => Rule::Shield3.check(&state),
-            Rule::CanExtendMagic => Rule::Magic1.check(&state) || Rule::Bottle.check(&state),
+            Rule::CanShootArrows => Rule::Bow.check(&state, &settings),
+            Rule::CanBlockLasers => Rule::Shield3.check(&state, &settings),
+            Rule::CanExtendMagic => {
+                Rule::Magic1.check(&state, &settings) || Rule::Bottle.check(&state, &settings)
+            }
             Rule::GlitchedLinkInDarkWorld => {
-                Rule::MoonPearl.check(&state) || Rule::Bottle.check(&state)
+                Rule::MoonPearl.check(&state, &settings) || Rule::Bottle.check(&state, &settings)
             }
             // TODO (#420): Logic says we should be tracking if Agahnim 1 has already been beaten or not.
             // TODO: Logic also says that the lantern isn't required if we allow "out of logic" glitches.
             Rule::CanGoBeatAgahnim1 => {
-                Rule::Lantern.check(&state)
-                    && (Rule::Cape.check(&state) || Rule::Sword2.check(&state))
-                    && Rule::Sword1.check(&state)
+                Rule::Lantern.check(&state, &settings)
+                    && (Rule::Cape.check(&state, &settings)
+                        || Rule::Sword2.check(&state, &settings))
+                    && Rule::Sword1.check(&state, &settings)
             }
             // TODO (#420): Really need to be tracking if Agahnim 1 has already been beaten.
             Rule::BeatAgahnim1 => true,
             Rule::CanEnterNorthEastDarkWorld => {
-                Rule::CanGoBeatAgahnim1.check(&state)
-                    || (Rule::Hammer.check(&state)
-                        && Rule::CanLiftRocks.check(&state)
-                        && Rule::MoonPearl.check(&state))
-                    || (Rule::CanLiftDarkRocks.check(&state)
-                        && Rule::Flippers.check(&state)
-                        && Rule::MoonPearl.check(&state))
+                Rule::CanGoBeatAgahnim1.check(&state, &settings)
+                    || (Rule::Hammer.check(&state, &settings)
+                        && Rule::CanLiftRocks.check(&state, &settings)
+                        && Rule::MoonPearl.check(&state, &settings))
+                    || (Rule::CanLiftDarkRocks.check(&state, &settings)
+                        && Rule::Flippers.check(&state, &settings)
+                        && Rule::MoonPearl.check(&state, &settings))
             }
             Rule::CanEnterNorthWestDarkWorld => {
-                Rule::MoonPearl.check(&state)
-                    && ((Rule::CanEnterNorthEastDarkWorld.check(&state)
-                        && Rule::HookShot.check(&state)
-                        && (Rule::Flippers.check(&state)
-                            || Rule::CanLiftRocks.check(&state)
-                            || Rule::Hammer.check(&state)))
-                        || (Rule::Hammer.check(&state) && Rule::CanLiftRocks.check(&state))
-                        || Rule::CanLiftDarkRocks.check(&state))
+                Rule::MoonPearl.check(&state, &settings)
+                    && ((Rule::CanEnterNorthEastDarkWorld.check(&state, &settings)
+                        && Rule::HookShot.check(&state, &settings)
+                        && (Rule::Flippers.check(&state, &settings)
+                            || Rule::CanLiftRocks.check(&state, &settings)
+                            || Rule::Hammer.check(&state, &settings)))
+                        || (Rule::Hammer.check(&state, &settings)
+                            && Rule::CanLiftRocks.check(&state, &settings))
+                        || Rule::CanLiftDarkRocks.check(&state, &settings))
             }
             Rule::CanEnterSouthDarkWorld => {
-                Rule::MoonPearl.check(&state)
-                    && (Rule::CanLiftDarkRocks.check(&state)
-                        || (Rule::Hammer.check(&state) && Rule::CanLiftRocks.check(&state))
-                        || (Rule::CanEnterNorthEastDarkWorld.check(&state)
-                            && (Rule::Hammer.check(&state)
-                                || (Rule::HookShot.check(&state)
-                                    && (Rule::Flippers.check(&state)
-                                        || Rule::CanLiftRocks.check(&state))))))
+                Rule::MoonPearl.check(&state, &settings)
+                    && (Rule::CanLiftDarkRocks.check(&state, &settings)
+                        || (Rule::Hammer.check(&state, &settings)
+                            && Rule::CanLiftRocks.check(&state, &settings))
+                        || (Rule::CanEnterNorthEastDarkWorld.check(&state, &settings)
+                            && (Rule::Hammer.check(&state, &settings)
+                                || (Rule::HookShot.check(&state, &settings)
+                                    && (Rule::Flippers.check(&state, &settings)
+                                        || Rule::CanLiftRocks.check(&state, &settings))))))
             }
             Rule::CanEnterMireArea => {
-                Rule::CanFly.check(&state) && Rule::CanLiftDarkRocks.check(&state)
+                Rule::CanFly.check(&state, &settings)
+                    && Rule::CanLiftDarkRocks.check(&state, &settings)
             }
             Rule::CanEnterWestDeathMountain => {
-                Rule::CanFly.check(&state)
-                    || (Rule::CanLiftRocks.check(&state) && Rule::Lantern.check(&state))
+                Rule::CanFly.check(&state, &settings)
+                    || (Rule::CanLiftRocks.check(&state, &settings)
+                        && Rule::Lantern.check(&state, &settings))
             }
             Rule::CanEnterEastDeathMountain => {
-                Rule::CanEnterWestDeathMountain.check(&state)
-                    && (Rule::HookShot.check(&state)
-                        || (Rule::Mirror.check(&state) && Rule::Hammer.check(&state)))
+                Rule::CanEnterWestDeathMountain.check(&state, &settings)
+                    && (Rule::HookShot.check(&state, &settings)
+                        || (Rule::Mirror.check(&state, &settings)
+                            && Rule::Hammer.check(&state, &settings)))
             }
             Rule::CanEnterEastDarkWorldDeathMountain => {
-                Rule::CanLiftDarkRocks.check(&state)
-                    && Rule::CanEnterEastDeathMountain.check(&state)
+                Rule::CanLiftDarkRocks.check(&state, &settings)
+                    && Rule::CanEnterEastDeathMountain.check(&state, &settings)
             }
             Rule::CanEnterDesertPalace => true,
 
@@ -255,7 +270,7 @@ pub struct Logic {
 }
 
 impl Logic {
-    pub fn check(&self, state: &GameState) -> bool {
-        self.rules.iter().all(|&rule| rule.check(state))
+    pub fn check(&self, state: &GameState, settings: &ServerConfig) -> bool {
+        self.rules.iter().all(|&rule| rule.check(state, settings))
     }
 }

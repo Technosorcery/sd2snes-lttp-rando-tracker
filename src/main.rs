@@ -31,6 +31,7 @@ use crate::lttp::{
     Location,
     LocationState,
     LocationUpdate,
+    RandoLogic,
 };
 use bus::{
     Bus,
@@ -235,10 +236,11 @@ fn update_tracker_serial_data(serial_port: &str) {
 
                 *GAME_STATE.lock().unwrap() = new_gs.clone();
                 if should_update_bus {
-                    UPDATE_BUS.lock().unwrap().broadcast(Update::Items);
-
+                    let settings = SERVER_CONFIG.lock().unwrap().clone();
                     let mut location_state = LOCATION_STATE.lock().unwrap();
-                    location_state.update_availability(&new_gs);
+                    location_state.update_availability(new_gs, settings);
+
+                    UPDATE_BUS.lock().unwrap().broadcast(Update::Items);
                     UPDATE_BUS.lock().unwrap().broadcast(Update::Locations);
                 }
             }
@@ -283,10 +285,11 @@ fn update_tracker_file_data(file_path: &str) {
 
                 *GAME_STATE.lock().unwrap() = new_gs.clone();
                 if should_update_bus {
-                    UPDATE_BUS.lock().unwrap().broadcast(Update::Items);
-
+                    let settings = SERVER_CONFIG.lock().unwrap().clone();
                     let mut location_state = LOCATION_STATE.lock().unwrap();
-                    location_state.update_availability(&new_gs);
+                    location_state.update_availability(new_gs, settings);
+
+                    UPDATE_BUS.lock().unwrap().broadcast(Update::Items);
                     UPDATE_BUS.lock().unwrap().broadcast(Update::Locations);
                 }
             }
@@ -520,8 +523,10 @@ fn root<'r>() -> Option<Response<'r>> { files(PathBuf::from("")) }
 #[serde(rename_all = "camelCase")]
 #[derive(Debug, Clone, Copy, Default, Serialize)]
 pub struct ServerConfig {
-    pub api_port:       u16,
-    pub websocket_port: u16,
+    pub api_port:                    u16,
+    pub websocket_port:              u16,
+    pub logic:                       RandoLogic,
+    pub allow_out_of_logic_glitches: bool,
 }
 
 #[options("/config")]
@@ -666,6 +671,7 @@ fn main() {
         *SERVER_CONFIG.lock().unwrap() = ServerConfig {
             api_port: server_port,
             websocket_port,
+            ..Default::default()
         };
     }
 
