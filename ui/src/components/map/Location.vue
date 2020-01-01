@@ -23,7 +23,7 @@ export default {
   methods: {
     locationStyle() {
       return (
-        'background-image: url("/static/image/poi.png"); left: ' +
+        'left: ' +
         this.locationLeft +
         '%; top: ' +
         this.locationTop +
@@ -65,6 +65,11 @@ export default {
   position: absolute;
   margin-left: -12px;
   margin-top: -12px;
+  background-image: url("/static/image/poi.png");
+}
+
+.chest:hover {
+  background-image: url("/static/image/highlighted.png");
 }
 
 .opened {
