@@ -1,44 +1,30 @@
 mod item;
-mod logic;
+pub mod logic;
 
-use crate::{
-    lttp::{
-        item::{
-            Armor,
-            BigKey,
-            Boomerang,
-            Bottle,
-            Bow,
-            Crystal,
-            FluteShovel,
-            Gloves,
-            Magic,
-            Pendant,
-            Shield,
-            ShroomPowder,
-            Sword,
-        },
-        logic::{
-            Availability,
-            Logic,
-        },
+use crate::lttp::{
+    item::{
+        Armor,
+        BigKey,
+        Boomerang,
+        Bottle,
+        Bow,
+        Crystal,
+        FluteShovel,
+        Gloves,
+        Magic,
+        Pendant,
+        Shield,
+        ShroomPowder,
+        Sword,
     },
-    ServerConfig,
+    logic::{
+        Availability,
+        LocationAvailability,
+        RandoLogic,
+    },
 };
 use failure;
 use std::convert::TryFrom;
-
-#[serde(rename_all = "camelCase")]
-#[derive(Debug, Clone, Copy, PartialEq, PartialOrd, Ord, Eq, Deserialize, Serialize)]
-pub enum RandoLogic {
-    Glitchless,
-    OverWorldGlitches,
-    MajorGlitches,
-}
-
-impl Default for RandoLogic {
-    fn default() -> RandoLogic { RandoLogic::Glitchless }
-}
 
 #[serde(rename_all = "camelCase")]
 #[derive(Debug, Default, Copy, Clone, PartialEq, Serialize, Deserialize)]
@@ -342,7 +328,7 @@ pub struct LocationCoordinates {
 }
 
 #[serde(deny_unknown_fields, rename_all = "camelCase")]
-#[derive(Debug, Clone, Default, Serialize, Deserialize, PartialEq)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct Location {
     pub name:         String,
     pub hover_text:   String,
@@ -350,7 +336,7 @@ pub struct Location {
     #[serde(skip_deserializing)]
     pub cleared:      bool,
     #[serde(skip_serializing)]
-    pub logic:        Option<Vec<Logic>>,
+    pub logic:        LocationAvailability,
     #[serde(skip_deserializing)]
     pub availability: Availability,
 }
@@ -362,14 +348,8 @@ impl Location {
         }
     }
 
-    pub fn calculate_availability(&mut self, state: &GameState, settings: &ServerConfig) {
-        if let Some(logic) = &self.logic {
-            if let Some(found_logic) = logic.iter().find(|l| l.check(&state, &settings)) {
-                self.availability = found_logic.availability;
-            } else {
-                self.availability = Availability::Unavailable;
-            }
-        }
+    pub fn calculate_availability(&mut self, state: &GameState, logic: &RandoLogic) {
+        self.availability = self.logic.check(&state, &logic);
     }
 }
 
@@ -399,10 +379,8 @@ impl LocationState {
         }
     }
 
-    pub fn update_availability(&mut self, game_state: GameState, settings: ServerConfig) {
-        self.locations
-            .iter_mut()
-            .for_each(|loc| loc.calculate_availability(&game_state, &settings));
+    pub fn update_availability(&mut self, game_state: GameState, logic: RandoLogic) {
+        self.locations.iter_mut().for_each(|loc| loc.calculate_availability(&game_state, &logic));
     }
 }
 

@@ -8,19 +8,7 @@
     vertical:
       left: 0
       top: 0
-  logic:
-    - availability: available
-      rules:
-      - glitchless
-      - boots
-      - canLiftDarkRocks
-    - availability: available
-      rules:
-      - glitchless
-      - boots
-      - mirror
-      - moonPearl
-      - canEnterNorthWestDarkWorld
+  logic: kingsTomb
 - name: Light World Swamp
   hoverText: Light World Swamp
   position:
@@ -30,10 +18,7 @@
     vertical:
       left: 0
       top: 0
-  logic:
-    - availability: available
-      rules:
-      - glitchless
+  logic: lightWorldSwamp
 - name: Link's House
   hoverText: Link's House
   position:
@@ -43,10 +28,7 @@
     vertical:
       left: 0
       top: 0
-  logic:
-    - availability: available
-      rules:
-      - glitchless
+  logic: linksHouse
 - name: Spiral Cave
   hoverText: Spiral Cave
   position:
@@ -56,11 +38,7 @@
     vertical:
       left: 0
       top: 0
-  logic:
-    - availability: available
-      rules:
-      - glitchless
-      - canEnterEastDeathMountain
+  logic: spiralCave
 - name: Mimic Cave
   hoverText: Mimic Cave
   position:
@@ -70,6 +48,7 @@
     vertical:
       left: 0
       top: 0
+  logic: mimicCave
 - name: Tavern
   hoverText: Tavern
   position:
@@ -79,10 +58,7 @@
     vertical:
       left: 0
       top: 0
-  logic:
-    - availability: available
-      rules:
-      - glitchless
+  logic: tavern
 - name: Chicken House
   hoverText: Chicken House
   position:
@@ -92,11 +68,7 @@
     vertical:
       left: 0
       top: 0
-  logic:
-    - availability: available
-      rules:
-      - glitchless
-      - bomb
+  logic: chickenHouse
 - name: Bombable Hut
   hoverText: Bombable Hut
   position:
@@ -106,11 +78,7 @@
     vertical:
       left: 0
       top: 0
-  logic:
-    - availability: available
-      rules:
-      - glitchless
-      - canEnterNorthWestDarkWorld
+  logic: bombableHut
 - name: C House
   hoverText: C House
   position:
@@ -120,11 +88,7 @@
     vertical:
       left: 0
       top: 0
-  logic:
-    - availability: available
-      rules:
-      - glitchless
-      - canEnterNorthWestDarkWorld
+  logic: cHouse
 - name: Aginah's Cave
   hoverText: Aginah's Cave
   position:
@@ -134,11 +98,7 @@
     vertical:
       left: 0
       top: 0
-  logic:
-    - availability: available
-      rules:
-      - glitchless
-      - bomb
+  logic: aginahsCave
 - name: West of Mire
   hoverText: West of Mire
   position:
@@ -148,12 +108,7 @@
     vertical:
       left: 0
       top: 0
-  logic:
-    - availability: available
-      rules:
-      - glitchless
-      - canEnterMireArea
-      - moonPearl
+  logic: westOfMire
 - name: DW Death Mountain
   hoverText: DW Death Mountain
   position:
@@ -163,12 +118,7 @@
     vertical:
       left: 0
       top: 0
-  logic:
-    - availability: available
-      rules:
-      - glitchless
-      - canEnterEastDarkWorldDeathMountain
-      - moonPearl
+  logic: darkWorldDeathMountain
 - name: Sahasrahla's Hut
   hoverText: Sahasrahla's Hut
   position:
@@ -178,15 +128,7 @@
     vertical:
       left: 0
       top: 0
-  logic:
-    - availability: available
-      rules:
-      - glitchless
-      - bomb
-    - availability: available
-      rules:
-      - glitchless
-      - boots
+  logic: sahasrahlasHut
 - name: Byrna Spike Cave
   hoverText: Byrna Spike Cave
   position:
@@ -196,25 +138,7 @@
     vertical:
       left: 0
       top: 0
-  logic:
-    - availability: available
-      rules:
-      - glitchless
-      - canLiftRocks
-      - hammer
-      - canEnterWestDeathMountain
-      - moonPearl
-      - canExtendMagic
-      - cape
-    - availability: available
-      rules:
-      - glitchless
-      - canLiftRocks
-      - hammer
-      - canEnterWestDeathMountain
-      - moonPearl
-      - canExtendMagic
-      - byrnaCane
+  logic: byrnaSpikeCave
 - name: Kakariko Well
   hoverText: Kakariko Well
   position:
@@ -224,11 +148,7 @@
     vertical:
       left: 0
       top: 0
-  logic:
-    - availability: available
-      rules:
-      - glitchless
-      - bomb
+  logic: kakarikoWell
 - name: Thieves' Hut
   hoverText: Thieves' Hut
   position:
@@ -238,11 +158,7 @@
     vertical:
       left: 0
       top: 0
-  logic:
-    - availability: available
-      rules:
-      - glitchless
-      - bomb
+  logic: thievesHut
 - name: Hype Cave!
   hoverText: Hype Cave!
   position:
@@ -252,11 +168,7 @@
     vertical:
       left: 0
       top: 0
-  logic:
-    - availability: available
-      rules:
-      - glitchless
-      - canEnterSouthDarkWorld
+  logic: hypeCave
 - name: Death Mountain East
   hoverText: Death Mountain East
   position:
@@ -266,11 +178,7 @@
     vertical:
       left: 0
       top: 0
-  logic:
-    - availability: available
-      rules:
-      - glitchless
-      - canEnterEastDeathMountain
+  logic: deathMountainEast
 - name: West of Sanctuary
   hoverText: West of Sanctuary
   position:
@@ -280,11 +188,7 @@
     vertical:
       left: 0
       top: 0
-  logic:
-    - availability: available
-      rules:
-      - glitchless
-      - boots
+  logic: westOfSanctuary
 - name: Minimoldorm Cave
   hoverText: Minimoldorm Cave
   position:
@@ -294,11 +198,7 @@
     vertical:
       left: 0
       top: 0
-  logic:
-    - availability: available
-      rules:
-      - glitchless
-      - bomb
+  logic: minimoldormCave
 - name: Ice Rod Cave
   hoverText: Ice Rod Cave
   position:
@@ -308,11 +208,7 @@
     vertical:
       left: 0
       top: 0
-  logic:
-    - availability: available
-      rules:
-      - glitchless
-      - bomb
+  logic: iceRodCave
 - name: Cave Under Rock (bottom chest)
   hoverText: Cave Under Rock (bottom chest)
   position:
@@ -322,19 +218,7 @@
     vertical:
       left: 0
       top: 0
-  logic:
-    - availability: available
-      rules:
-      - glitchless
-      - moonPearl
-      - hookShot
-      - canEnterEastDarkWorldDeathMountain
-    - availability: available
-      rules:
-      - glitchless
-      - moonPearl
-      - boots
-      - canEnterEastDarkWorldDeathMountain
+  logic: caveUnderRockBottomChest
 - name: Cave Under Rock (3 top chests)
   hoverText: Cave Under Rock (3 top chests)
   position:
@@ -344,13 +228,7 @@
     vertical:
       left: 0
       top: 0
-  logic:
-    - availability: available
-      rules:
-      - glitchless
-      - moonPearl
-      - hookShot
-      - canEnterEastDarkWorldDeathMountain
+  logic: caveUnderRockThreeTopChests
 - name: 'Treasure Chest Minigame: Pay 30 rupees'
   hoverText: 'Treasure Chest Minigame: Pay 30 rupees'
   position:
@@ -360,12 +238,7 @@
     vertical:
       left: 0
       top: 0
-  logic:
-    - availability: available
-      rules:
-      - glitchless
-      - canEnterNorthWestDarkWorld
-      - rupees30
+  logic: treasureChestMinigame
 - name: 'Bottle Vendor: Pay 100 rupees'
   hoverText: 'Bottle Vendor: Pay 100 rupees'
   position:
@@ -375,11 +248,7 @@
     vertical:
       left: 0
       top: 0
-  logic:
-    - availability: available
-      rules:
-      - glitchless
-      - rupees100
+  logic: bottleVendor
 - name: Sahasrahla
   hoverText: Sahasrahla
   position:
@@ -389,11 +258,7 @@
     vertical:
       left: 0
       top: 0
-  logic:
-    - availability: available
-      rules:
-      - glitchless
-      - greenPendant
+  logic: sahasrahla
 - name: Stump Kid
   hoverText: Stump Kid
   position:
@@ -403,11 +268,7 @@
     vertical:
       left: 0
       top: 0
-  logic:
-    - availability: available
-      rules:
-      - glitchless
-      - canEnterSouthDarkWorld
+  logic: stumpKid
 - name: Bug Kid
   hoverText: Bug Kid
   position:
@@ -417,11 +278,7 @@
     vertical:
       left: 0
       top: 0
-  logic:
-    - availability: available
-      rules:
-      - glitchless
-      - bottle
+  logic: bugKid
 - name: Show the Purple Chest to Gary
   hoverText: Show the Purple Chest to Gary
   position:
@@ -431,12 +288,7 @@
     vertical:
       left: 0
       top: 0
-  logic:
-    - availability: available
-      rules:
-      - glitchless
-      - canLiftDarkRocks
-      - canEnterNorthWestDarkWorld
+  logic: purpleChest
 - name: Fugitive under the bridge
   hoverText: Fugitive under the bridge
   position:
@@ -446,11 +298,7 @@
     vertical:
       left: 0
       top: 0
-  logic:
-    - availability: available
-      rules:
-      - glitchless
-      - flippers
+  logic: fugitiveUnderTheBridge
 - name: Ether Tablet
   hoverText: Ether Tablet
   position:
@@ -460,35 +308,7 @@
     vertical:
       left: 0
       top: 0
-  logic:
-    - availability: available
-      rules:
-      - glitchless
-      - book
-      - mirror
-      - canEnterWestDeathMountain
-      - sword2
-    - availability: available
-      rules:
-      - glitchless
-      - book
-      - hammer
-      - hookShot
-      - canEnterWestDeathMountain
-      - sword2
-    - availability: possible
-      rules:
-      - glitchless
-      - book
-      - mirror
-      - canEnterWestDeathMountain
-    - availability: possible
-      rules:
-      - glitchless
-      - book
-      - hammer
-      - hookShot
-      - canEnterWestDeathMountain
+  logic: etherTablet
 - name: Bombos Tablet
   hoverText: Bombos Tablet
   position:
@@ -498,27 +318,7 @@
     vertical:
       left: 0
       top: 0
-  logic:
-    - availability: available
-      rules:
-      - glitchless
-      - book
-      - mirror
-      - canEnterSouthDarkWorld
-      - sword2
-    - availability: possible
-      rules:
-      - glitchless
-      - book
-      - mirror
-      - canEnterSouthDarkWorld
-    - availability: agahnim
-      rules:
-      - glitchless
-      - book
-      - mirror
-      - sword2
-      - canEnterSouthDarkWorld
+  logic: bombosTablet
 - name: Catfish
   hoverText: Catfish
   position:
@@ -528,13 +328,7 @@
     vertical:
       left: 0
       top: 0
-  logic:
-    - availability: available
-      rules:
-      - glitchless
-      - moonPearl
-      - canLiftRocks
-      - canEnterNorthEastDarkWorld
+  logic: catfish
 - name: 'King Zora: Pay 500 rupees'
   hoverText: 'King Zora: Pay 500 rupees'
   position:
@@ -544,17 +338,7 @@
     vertical:
       left: 0
       top: 0
-  logic:
-    - availability: available
-      rules:
-      - glitchless
-      - flippers
-      - rupees500
-    - availability: available
-      rules:
-      - glitchless
-      - canLiftRocks
-      - rupees500
+  logic: kingZora
 - name: Lost Old Man
   hoverText: Lost Old Man
   position:
@@ -564,12 +348,7 @@
     vertical:
       left: 0
       top: 0
-  logic:
-    - availability: available
-      rules:
-      - glitchless
-      - canEnterWestDeathMountain
-      - lantern
+  logic: lostOldMan
 - name: Witch
   hoverText: Witch
   position:
@@ -579,11 +358,7 @@
     vertical:
       left: 0
       top: 0
-  logic:
-    - availability: available
-      rules:
-      - glitchless
-      - mushroom
+  logic: witch
 - name: Forest Hideout
   hoverText: Forest Hideout
   position:
@@ -593,10 +368,7 @@
     vertical:
       left: 0
       top: 0
-  logic:
-    - availability: available
-      rules:
-      - glitchless
+  logic: forestHideout
 - name: Lumberjack Tree
   hoverText: Lumberjack Tree
   position:
@@ -606,20 +378,7 @@
     vertical:
       left: 0
       top: 0
-  logic:
-    - availability: available
-      rules:
-      - glitchless
-      - boots
-      - beatAgahnim1
-    - availability: agahnim
-      rules:
-      - glitchless
-      - boots
-      - canGoBeatAgahnim1
-    - availability: possible
-      rules:
-      - glitchless
+  logic: lumberjackTree
 - name: Spectacle Rock Cave
   hoverText: Spectacle Rock Cave
   position:
@@ -629,11 +388,7 @@
     vertical:
       left: 0
       top: 0
-  logic:
-    - availability: available
-      rules:
-      - glitchless
-      - canEnterWestDeathMountain
+  logic: spectacleRockCave
 - name: South of Grove
   hoverText: South of Grove
   position:
@@ -643,12 +398,7 @@
     vertical:
       left: 0
       top: 0
-  logic:
-    - availability: available
-      rules:
-      - glitchless
-      - mirror
-      - canEnterSouthDarkWorld
+  logic: southOfGrove
 - name: Graveyard Cliff Cave
   hoverText: Graveyard Cliff Cave
   position:
@@ -658,13 +408,7 @@
     vertical:
       left: 0
       top: 0
-  logic:
-    - availability: available
-      rules:
-      - glitchless
-      - mirror
-      - moonPearl
-      - canEnterNorthWestDarkWorld
+  logic: graveyardCliffCave
 - name: Checkerboard Cave
   hoverText: Checkerboard Cave
   position:
@@ -674,13 +418,7 @@
     vertical:
       left: 0
       top: 0
-  logic:
-    - availability: available
-      rules:
-      - glitchless
-      - canFly
-      - canLiftDarkRocks
-      - mirror
+  logic: checkerboardCave
 - name: Hammers
   hoverText: Hammers
   position:
@@ -690,13 +428,7 @@
     vertical:
       left: 0
       top: 0
-  logic:
-    - availability: available
-      rules:
-      - glitchless
-      - canLiftDarkRocks
-      - hammer
-      - canEnterNorthWestDarkWorld
+  logic: hammers
 - name: Library
   hoverText: Library
   position:
@@ -706,14 +438,7 @@
     vertical:
       left: 0
       top: 0
-  logic:
-    - availability: available
-      rules:
-      - glitchless
-      - boots
-    - availability: possible
-      rules:
-      - glitchless
+  logic: library
 - name: Mushroom
   hoverText: Mushroom
   position:
@@ -723,10 +448,7 @@
     vertical:
       left: 0
       top: 0
-  logic:
-    - availability: available
-      rules:
-      - glitchless
+  logic: mushroom
 - name: Spectacle Rock
   hoverText: Spectacle Rock
   position:
@@ -736,16 +458,7 @@
     vertical:
       left: 0
       top: 0
-  logic:
-    - availability: available
-      rules:
-      - glitchless
-      - canEnterWestDeathMountain
-      - mirror
-    - availability: possible
-      rules:
-      - glitchless
-      - canEnterWestDeathMountain
+  logic: spectacleRock
 - name: Floating Island
   hoverText: Floating Island
   position:
@@ -755,18 +468,7 @@
     vertical:
       left: 0
       top: 0
-  logic:
-    - availability: available
-      rules:
-      - glitchless
-      - canEnterEastDeathMountain
-      - mirror
-      - moonPearl
-      - canLiftDarkRocks
-    - availability: possible
-      rules:
-      - glitchless
-      - canEnterEastDeathMountain
+  logic: floatingIsland
 - name: Race Minigame
   hoverText: Race Minigame
   position:
@@ -776,10 +478,7 @@
     vertical:
       left: 0
       top: 0
-  logic:
-    - availability: available
-      rules:
-      - glitchless
+  logic: raceMinigame
 - name: Desert West Ledge
   hoverText: Desert West Ledge
   position:
@@ -789,14 +488,7 @@
     vertical:
       left: 0
       top: 0
-  logic:
-    - availability: available
-      rules:
-      - glitchless
-      - canEnterDesertPalace
-    - availability: possible
-      rules:
-      - glitchless
+  logic: desertWestLedge
 - name: Lake Hylia Island
   hoverText: Lake Hylia Island
   position:
@@ -806,24 +498,7 @@
     vertical:
       left: 0
       top: 0
-  logic:
-    - availability: available
-      rules:
-      - glitchless
-      - flippers
-      - moonPearl
-      - mirror
-      - canEnterSouthDarkWorld
-    - availability: available
-      rules:
-      - glitchless
-      - flippers
-      - moonPearl
-      - mirror
-      - canEnterNorthEastDarkWorld
-    - availability: possible
-      rules:
-      - glitchless
+  logic: lakeHyliaIsland
 - name: Bumper Cave
   hoverText: Bumper Cave
   position:
@@ -833,17 +508,7 @@
     vertical:
       left: 0
       top: 0
-  logic:
-    - availability: available
-      rules:
-      - glitchless
-      - canEnterNorthWestDarkWorld
-      - canLiftRocks
-      - cape
-    - availability: possible
-      rules:
-      - glitchless
-      - canEnterNorthWestDarkWorld
+  logic: bumperCave
 - name: Pyramid
   hoverText: Pyramid
   position:
@@ -853,11 +518,7 @@
     vertical:
       left: 0
       top: 0
-  logic:
-    - availability: available
-      rules:
-      - glitchless
-      - canEnterNorthEastDarkWorld
+  logic: pyramid
 - name: 'Dig Game: Pay 80 rupees'
   hoverText: 'Dig Game: Pay 80 rupees'
   position:
@@ -867,12 +528,7 @@
     vertical:
       left: 0
       top: 0
-  logic:
-    - availability: available
-      rules:
-      - glitchless
-      - canEnterSouthDarkWorld
-      - rupees80
+  logic: digGame
 - name: Zora River Ledge
   hoverText: Zora River Ledge
   position:
@@ -882,15 +538,7 @@
     vertical:
       left: 0
       top: 0
-  logic:
-    - availability: available
-      rules:
-      - glitchless
-      - flippers
-    - availability: possible
-      rules:
-      - glitchless
-      - canLiftRocks
+  logic: zoraRiverLedge
 - name: Buried Item
   hoverText: Buried Item
   position:
@@ -900,11 +548,7 @@
     vertical:
       left: 0
       top: 0
-  logic:
-    - availability: available
-      rules:
-      - glitchless
-      - shovel
+  logic: buriedItem
 - name: Escape Sewer
   hoverText: Escape Sewer
   position:
@@ -914,10 +558,7 @@
     vertical:
       left: 0
       top: 0
-  logic:
-    - availability: available
-      rules:
-      - glitchless
+  logic: escapeSewer
 - name: Castle Secret Entrance
   hoverText: Castle Secret Entrance
   position:
@@ -927,10 +568,7 @@
     vertical:
       left: 0
       top: 0
-  logic:
-    - availability: available
-      rules:
-      - glitchless
+  logic: castleSecretEntrance
 - name: Hyrule Castle
   hoverText: Hyrule Castle
   position:
@@ -940,10 +578,7 @@
     vertical:
       left: 0
       top: 0
-  logic:
-    - availability: available
-      rules:
-      - glitchless
+  logic: hyruleCastle
 - name: Sanctuary
   hoverText: Sanctuary
   position:
@@ -953,10 +588,7 @@
     vertical:
       left: 0
       top: 0
-  logic:
-    - availability: available
-      rules:
-      - glitchless
+  logic: sanctuary
 - name: Mad Batter
   hoverText: Mad Batter
   position:
@@ -966,17 +598,7 @@
     vertical:
       left: 0
       top: 0
-  logic:
-    - availability: available
-      rules:
-      - glitchless
-      - hammer
-    - availability: available
-      rules:
-      - glitchless
-      - moonPearl
-      - mirror
-      - canLiftDarkRocks
+  logic: madBatter
 - name: Take the frog home
   hoverText: Take the frog home
   position:
@@ -986,14 +608,9 @@
     vertical:
       left: 0
       top: 0
-  logic:
-    - availability: available
-      rules:
-      - glitchless
-      - canLiftDarkRocks
-      - canEnterNorthWestDarkWorld
-- name: "Fat Fairy: Buy OJ bomb from Dark Link's House"
-  hoverText: "Fat Fairy: Buy OJ bomb from Dark Link's House"
+  logic: takeTheFrogHome
+- name: "Bomb Fairy: Buy OJ bomb from Dark Link's House"
+  hoverText: "Bomb Fairy: Buy OJ bomb from Dark Link's House"
   position:
     horizontal:
       left: 73.5
@@ -1001,24 +618,9 @@
     vertical:
       left: 0
       top: 0
-  logic:
-    - availability: available
-      rules:
-      - glitchless
-      - bothRedCrystals
-      - moonPearl
-      - canEnterSouthDarkWorld
-      - hammer
-    - availability: available
-      rules:
-      - glitchless
-      - bothRedCrystals
-      - moonPearl
-      - canEnterSouthDarkWorld
-      - mirror
-      - beatAgahnim1
-- name: Master Sword Pedistal
-  hoverText: Master Sword Pedistal
+  logic: bombFairy
+- name: Master Sword Pedestal
+  hoverText: Master Sword Pedestal
   position:
     horizontal:
       left: 2.5
@@ -1026,17 +628,7 @@
     vertical:
       left: 0
       top: 0
-  logic:
-    - availability: available
-      rules:
-      - glitchless
-      - bluePendant
-      - greenPendant
-      - redPendant
-    - availability: possible
-      rules:
-      - glitchless
-      - book
+  logic: masterSwordPedestal
 - name: Waterfall of the Wishing
   hoverText: Waterfall of the Wishing
   position:
@@ -1046,8 +638,4 @@
     vertical:
       left: 0
       top: 0
-  logic:
-    - availability: available
-      rules:
-      - glitchless
-      - flippers
+  logic: waterfallOfTheWishing

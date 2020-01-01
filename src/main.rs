@@ -24,6 +24,7 @@ extern crate rocket;
 extern crate serde_derive;
 
 use crate::lttp::{
+    logic::RandoLogic,
     Dungeon,
     DungeonState,
     DungeonUpdate,
@@ -31,7 +32,6 @@ use crate::lttp::{
     Location,
     LocationState,
     LocationUpdate,
-    RandoLogic,
 };
 use bus::{
     Bus,
@@ -177,6 +177,13 @@ lazy_static! {
     static ref SERVER_CONFIG: Mutex<ServerConfig> = Mutex::new(ServerConfig::default());
 }
 
+#[derive(Debug, Copy, Clone)]
+enum Update {
+    Dungeons,
+    Items,
+    Locations,
+}
+
 fn update_tracker_serial_data(serial_port: &str) {
     let mut port = match serial::open(&serial_port) {
         Ok(p) => p,
@@ -238,7 +245,7 @@ fn update_tracker_serial_data(serial_port: &str) {
                 if should_update_bus {
                     let settings = SERVER_CONFIG.lock().unwrap().clone();
                     let mut location_state = LOCATION_STATE.lock().unwrap();
-                    location_state.update_availability(new_gs, settings);
+                    location_state.update_availability(new_gs, settings.logic);
 
                     UPDATE_BUS.lock().unwrap().broadcast(Update::Items);
                     UPDATE_BUS.lock().unwrap().broadcast(Update::Locations);
@@ -250,13 +257,6 @@ fn update_tracker_serial_data(serial_port: &str) {
             }
         };
     }
-}
-
-#[derive(Debug, Copy, Clone)]
-enum Update {
-    Dungeons,
-    Items,
-    Locations,
 }
 
 fn update_tracker_file_data(file_path: &str) {
@@ -287,7 +287,7 @@ fn update_tracker_file_data(file_path: &str) {
                 if should_update_bus {
                     let settings = SERVER_CONFIG.lock().unwrap().clone();
                     let mut location_state = LOCATION_STATE.lock().unwrap();
-                    location_state.update_availability(new_gs, settings);
+                    location_state.update_availability(new_gs, settings.logic);
 
                     UPDATE_BUS.lock().unwrap().broadcast(Update::Items);
                     UPDATE_BUS.lock().unwrap().broadcast(Update::Locations);
