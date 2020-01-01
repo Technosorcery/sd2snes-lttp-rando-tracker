@@ -88,10 +88,6 @@ pub enum Rule {
 
     Rupee,
 
-    KingsTombAvailable,
-    KingsTombAgahnim,
-    KingsTombAgahnumGlitch,
-
     BothRedCrystals,
 }
 
