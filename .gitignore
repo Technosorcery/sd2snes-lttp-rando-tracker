@@ -2,5 +2,7 @@
 /target
 **/*.rs.bk
 
+/.vscode/
+
 /raw_response.txt
 ALttP\ -\ VT*
