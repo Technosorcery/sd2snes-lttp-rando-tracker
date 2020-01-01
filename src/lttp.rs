@@ -395,23 +395,27 @@ pub struct DungeonBoss {
 #[serde(deny_unknown_fields, rename_all = "camelCase")]
 #[derive(Debug, Clone, Default, Serialize, Deserialize, PartialEq)]
 pub struct Dungeon {
-    pub name:          String,
-    pub dungeon_code:  String,
-    pub hover_text:    String,
-    pub total_chests:  u8,
-    pub cleared_image: String,
-    pub default_image: String,
-    pub has_reward:    bool,
-    pub position:      Option<LocationPosition>,
-    pub boss:          Option<DungeonBoss>,
+    pub name:                 String,
+    pub dungeon_code:         String,
+    pub hover_text:           String,
+    pub total_chests:         u8,
+    pub cleared_image:        String,
+    pub default_image:        String,
+    pub has_reward:           bool,
+    pub position:             Option<LocationPosition>,
+    pub boss:                 Option<DungeonBoss>,
     #[serde(skip_deserializing)]
-    pub found_chests:  u8,
+    pub found_chests:         u8,
     #[serde(skip_deserializing)]
-    pub reward:        DungeonReward,
+    pub reward:               DungeonReward,
     #[serde(skip_deserializing)]
-    pub medallion:     Medallion,
+    pub medallion:            Medallion,
     #[serde(skip_deserializing)]
-    pub cleared:       bool,
+    pub cleared:              bool,
+    #[serde(skip_deserializing)]
+    pub dungeon_availability: Availability,
+    #[serde(skip_deserializing)]
+    pub boss_availability:    Availability,
 }
 
 impl Dungeon {
