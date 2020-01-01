@@ -526,7 +526,6 @@ pub struct ServerConfig {
     pub api_port:                    u16,
     pub websocket_port:              u16,
     pub logic:                       RandoLogic,
-    pub allow_out_of_logic_glitches: bool,
 }
 
 #[options("/config")]
