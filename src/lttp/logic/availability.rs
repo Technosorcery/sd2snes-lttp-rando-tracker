@@ -11,5 +11,5 @@ pub enum Availability {
 }
 
 impl Default for Availability {
-    fn default() -> Availability { Availability::Possible }
+    fn default() -> Availability { Availability::Unavailable }
 }

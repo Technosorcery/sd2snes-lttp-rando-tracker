@@ -164,9 +164,9 @@ impl Rule {
                 Rule::MoonPearl.check(&state) || Rule::Bottle.check(&state)
             }
             // TODO (#420): Really need to be tracking if Agahnim 1 has already been beaten.
-            Rule::BeatAgahnim1 => true,
+            Rule::BeatAgahnim1 => false,
 
-            Rule::BothRedCrystals => true,
+            Rule::BothRedCrystals => false,
 
             x => {
                 println!("check has not been implemented for {:?}", x);
