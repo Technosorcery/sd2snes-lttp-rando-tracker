@@ -5,6 +5,7 @@ version = "1.0.1"
 authors = ["Jacob Helwig <jacob@technosorcery.net>"]
 build = "build.rs"
 include = ["ui/dist"]
+edition = "2018"
 
 [dependencies]
 bus = "2.2.2"

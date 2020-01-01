@@ -58,18 +58,16 @@ export default {
     dungeonAvailability() {
       if (this.dungeonCleared) {
         return 'opened'
-      } else if (!this.bossCleared && this.remainingChests === 1) {
-        return 'possible'
       }
 
-      return 'available'
+      return this.location.dungeonAvailability
     },
     bossAvailability() {
       if (this.location.cleared) {
         return 'opened'
       }
 
-      return 'available'
+      return this.location.bossAvailability
     }
   }
 }

@@ -33,7 +33,7 @@ new Vue({
     App
   },
   created() {
-    this.$store.commit('fetchServerConfig', process.env.API_PORT)
+    this.$store.commit('fetchServerConfig', this.$store.state.serverConfig.apiPort)
     this.startStreamingApi()
 
     setInterval(() => {

@@ -1,0 +1,10 @@
+enum_discrim_align_threshold = 32
+fn_single_line = true
+force_multiline_blocks = true
+imports_layout = "Vertical"
+merge_imports = true
+reorder_impl_items = true
+struct_field_align_threshold = 32
+use_field_init_shorthand = true
+use_small_heuristics = "Off"
+use_try_shorthand = true

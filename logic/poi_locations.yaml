@@ -8,6 +8,7 @@
     vertical:
       left: 0
       top: 0
+  logic: kingsTomb
 - name: Light World Swamp
   hoverText: Light World Swamp
   position:
@@ -17,6 +18,7 @@
     vertical:
       left: 0
       top: 0
+  logic: lightWorldSwamp
 - name: Link's House
   hoverText: Link's House
   position:
@@ -26,6 +28,7 @@
     vertical:
       left: 0
       top: 0
+  logic: linksHouse
 - name: Spiral Cave
   hoverText: Spiral Cave
   position:
@@ -35,6 +38,7 @@
     vertical:
       left: 0
       top: 0
+  logic: spiralCave
 - name: Mimic Cave
   hoverText: Mimic Cave
   position:
@@ -44,6 +48,7 @@
     vertical:
       left: 0
       top: 0
+  logic: mimicCave
 - name: Tavern
   hoverText: Tavern
   position:
@@ -53,6 +58,7 @@
     vertical:
       left: 0
       top: 0
+  logic: tavern
 - name: Chicken House
   hoverText: Chicken House
   position:
@@ -62,6 +68,7 @@
     vertical:
       left: 0
       top: 0
+  logic: chickenHouse
 - name: Bombable Hut
   hoverText: Bombable Hut
   position:
@@ -71,6 +78,7 @@
     vertical:
       left: 0
       top: 0
+  logic: bombableHut
 - name: C House
   hoverText: C House
   position:
@@ -80,6 +88,7 @@
     vertical:
       left: 0
       top: 0
+  logic: cHouse
 - name: Aginah's Cave
   hoverText: Aginah's Cave
   position:
@@ -89,6 +98,7 @@
     vertical:
       left: 0
       top: 0
+  logic: aginahsCave
 - name: West of Mire
   hoverText: West of Mire
   position:
@@ -98,6 +108,7 @@
     vertical:
       left: 0
       top: 0
+  logic: westOfMire
 - name: DW Death Mountain
   hoverText: DW Death Mountain
   position:
@@ -107,6 +118,7 @@
     vertical:
       left: 0
       top: 0
+  logic: darkWorldDeathMountain
 - name: Sahasrahla's Hut
   hoverText: Sahasrahla's Hut
   position:
@@ -116,6 +128,7 @@
     vertical:
       left: 0
       top: 0
+  logic: sahasrahlasHut
 - name: Byrna Spike Cave
   hoverText: Byrna Spike Cave
   position:
@@ -125,6 +138,7 @@
     vertical:
       left: 0
       top: 0
+  logic: byrnaSpikeCave
 - name: Kakariko Well
   hoverText: Kakariko Well
   position:
@@ -134,6 +148,7 @@
     vertical:
       left: 0
       top: 0
+  logic: kakarikoWell
 - name: Thieves' Hut
   hoverText: Thieves' Hut
   position:
@@ -143,6 +158,7 @@
     vertical:
       left: 0
       top: 0
+  logic: thievesHut
 - name: Hype Cave!
   hoverText: Hype Cave!
   position:
@@ -152,6 +168,7 @@
     vertical:
       left: 0
       top: 0
+  logic: hypeCave
 - name: Death Mountain East
   hoverText: Death Mountain East
   position:
@@ -161,6 +178,7 @@
     vertical:
       left: 0
       top: 0
+  logic: deathMountainEast
 - name: West of Sanctuary
   hoverText: West of Sanctuary
   position:
@@ -170,6 +188,7 @@
     vertical:
       left: 0
       top: 0
+  logic: westOfSanctuary
 - name: Minimoldorm Cave
   hoverText: Minimoldorm Cave
   position:
@@ -179,6 +198,7 @@
     vertical:
       left: 0
       top: 0
+  logic: minimoldormCave
 - name: Ice Rod Cave
   hoverText: Ice Rod Cave
   position:
@@ -188,6 +208,7 @@
     vertical:
       left: 0
       top: 0
+  logic: iceRodCave
 - name: Cave Under Rock (bottom chest)
   hoverText: Cave Under Rock (bottom chest)
   position:
@@ -197,6 +218,7 @@
     vertical:
       left: 0
       top: 0
+  logic: caveUnderRockBottomChest
 - name: Cave Under Rock (3 top chests)
   hoverText: Cave Under Rock (3 top chests)
   position:
@@ -206,6 +228,7 @@
     vertical:
       left: 0
       top: 0
+  logic: caveUnderRockThreeTopChests
 - name: 'Treasure Chest Minigame: Pay 30 rupees'
   hoverText: 'Treasure Chest Minigame: Pay 30 rupees'
   position:
@@ -215,6 +238,7 @@
     vertical:
       left: 0
       top: 0
+  logic: treasureChestMinigame
 - name: 'Bottle Vendor: Pay 100 rupees'
   hoverText: 'Bottle Vendor: Pay 100 rupees'
   position:
@@ -224,6 +248,7 @@
     vertical:
       left: 0
       top: 0
+  logic: bottleVendor
 - name: Sahasrahla
   hoverText: Sahasrahla
   position:
@@ -233,6 +258,7 @@
     vertical:
       left: 0
       top: 0
+  logic: sahasrahla
 - name: Stump Kid
   hoverText: Stump Kid
   position:
@@ -242,6 +268,7 @@
     vertical:
       left: 0
       top: 0
+  logic: stumpKid
 - name: Bug Kid
   hoverText: Bug Kid
   position:
@@ -251,6 +278,7 @@
     vertical:
       left: 0
       top: 0
+  logic: bugKid
 - name: Show the Purple Chest to Gary
   hoverText: Show the Purple Chest to Gary
   position:
@@ -260,6 +288,7 @@
     vertical:
       left: 0
       top: 0
+  logic: purpleChest
 - name: Fugitive under the bridge
   hoverText: Fugitive under the bridge
   position:
@@ -269,6 +298,7 @@
     vertical:
       left: 0
       top: 0
+  logic: fugitiveUnderTheBridge
 - name: Ether Tablet
   hoverText: Ether Tablet
   position:
@@ -278,6 +308,7 @@
     vertical:
       left: 0
       top: 0
+  logic: etherTablet
 - name: Bombos Tablet
   hoverText: Bombos Tablet
   position:
@@ -287,6 +318,7 @@
     vertical:
       left: 0
       top: 0
+  logic: bombosTablet
 - name: Catfish
   hoverText: Catfish
   position:
@@ -296,6 +328,7 @@
     vertical:
       left: 0
       top: 0
+  logic: catfish
 - name: 'King Zora: Pay 500 rupees'
   hoverText: 'King Zora: Pay 500 rupees'
   position:
@@ -305,6 +338,7 @@
     vertical:
       left: 0
       top: 0
+  logic: kingZora
 - name: Lost Old Man
   hoverText: Lost Old Man
   position:
@@ -314,6 +348,7 @@
     vertical:
       left: 0
       top: 0
+  logic: lostOldMan
 - name: Witch
   hoverText: Witch
   position:
@@ -323,6 +358,7 @@
     vertical:
       left: 0
       top: 0
+  logic: witch
 - name: Forest Hideout
   hoverText: Forest Hideout
   position:
@@ -332,6 +368,7 @@
     vertical:
       left: 0
       top: 0
+  logic: forestHideout
 - name: Lumberjack Tree
   hoverText: Lumberjack Tree
   position:
@@ -341,6 +378,7 @@
     vertical:
       left: 0
       top: 0
+  logic: lumberjackTree
 - name: Spectacle Rock Cave
   hoverText: Spectacle Rock Cave
   position:
@@ -350,6 +388,7 @@
     vertical:
       left: 0
       top: 0
+  logic: spectacleRockCave
 - name: South of Grove
   hoverText: South of Grove
   position:
@@ -359,6 +398,7 @@
     vertical:
       left: 0
       top: 0
+  logic: southOfGrove
 - name: Graveyard Cliff Cave
   hoverText: Graveyard Cliff Cave
   position:
@@ -368,6 +408,7 @@
     vertical:
       left: 0
       top: 0
+  logic: graveyardCliffCave
 - name: Checkerboard Cave
   hoverText: Checkerboard Cave
   position:
@@ -377,6 +418,7 @@
     vertical:
       left: 0
       top: 0
+  logic: checkerboardCave
 - name: Hammers
   hoverText: Hammers
   position:
@@ -386,6 +428,7 @@
     vertical:
       left: 0
       top: 0
+  logic: hammers
 - name: Library
   hoverText: Library
   position:
@@ -395,6 +438,7 @@
     vertical:
       left: 0
       top: 0
+  logic: library
 - name: Mushroom
   hoverText: Mushroom
   position:
@@ -404,6 +448,7 @@
     vertical:
       left: 0
       top: 0
+  logic: mushroom
 - name: Spectacle Rock
   hoverText: Spectacle Rock
   position:
@@ -413,6 +458,7 @@
     vertical:
       left: 0
       top: 0
+  logic: spectacleRock
 - name: Floating Island
   hoverText: Floating Island
   position:
@@ -422,6 +468,7 @@
     vertical:
       left: 0
       top: 0
+  logic: floatingIsland
 - name: Race Minigame
   hoverText: Race Minigame
   position:
@@ -431,6 +478,7 @@
     vertical:
       left: 0
       top: 0
+  logic: raceMinigame
 - name: Desert West Ledge
   hoverText: Desert West Ledge
   position:
@@ -440,6 +488,7 @@
     vertical:
       left: 0
       top: 0
+  logic: desertWestLedge
 - name: Lake Hylia Island
   hoverText: Lake Hylia Island
   position:
@@ -449,6 +498,7 @@
     vertical:
       left: 0
       top: 0
+  logic: lakeHyliaIsland
 - name: Bumper Cave
   hoverText: Bumper Cave
   position:
@@ -458,6 +508,7 @@
     vertical:
       left: 0
       top: 0
+  logic: bumperCave
 - name: Pyramid
   hoverText: Pyramid
   position:
@@ -467,6 +518,7 @@
     vertical:
       left: 0
       top: 0
+  logic: pyramid
 - name: 'Dig Game: Pay 80 rupees'
   hoverText: 'Dig Game: Pay 80 rupees'
   position:
@@ -476,6 +528,7 @@
     vertical:
       left: 0
       top: 0
+  logic: digGame
 - name: Zora River Ledge
   hoverText: Zora River Ledge
   position:
@@ -485,6 +538,7 @@
     vertical:
       left: 0
       top: 0
+  logic: zoraRiverLedge
 - name: Buried Item
   hoverText: Buried Item
   position:
@@ -494,6 +548,7 @@
     vertical:
       left: 0
       top: 0
+  logic: buriedItem
 - name: Escape Sewer
   hoverText: Escape Sewer
   position:
@@ -503,6 +558,7 @@
     vertical:
       left: 0
       top: 0
+  logic: escapeSewer
 - name: Castle Secret Entrance
   hoverText: Castle Secret Entrance
   position:
@@ -512,6 +568,7 @@
     vertical:
       left: 0
       top: 0
+  logic: castleSecretEntrance
 - name: Hyrule Castle
   hoverText: Hyrule Castle
   position:
@@ -521,6 +578,7 @@
     vertical:
       left: 0
       top: 0
+  logic: hyruleCastle
 - name: Sanctuary
   hoverText: Sanctuary
   position:
@@ -530,6 +588,7 @@
     vertical:
       left: 0
       top: 0
+  logic: sanctuary
 - name: Mad Batter
   hoverText: Mad Batter
   position:
@@ -539,6 +598,7 @@
     vertical:
       left: 0
       top: 0
+  logic: madBatter
 - name: Take the frog home
   hoverText: Take the frog home
   position:
@@ -548,8 +608,9 @@
     vertical:
       left: 0
       top: 0
-- name: "Fat Fairy: Buy OJ bomb from Dark Link's House"
-  hoverText: "Fat Fairy: Buy OJ bomb from Dark Link's House"
+  logic: takeTheFrogHome
+- name: "Bomb Fairy: Buy OJ bomb from Dark Link's House"
+  hoverText: "Bomb Fairy: Buy OJ bomb from Dark Link's House"
   position:
     horizontal:
       left: 73.5
@@ -557,8 +618,9 @@
     vertical:
       left: 0
       top: 0
-- name: Master Sword Pedistal
-  hoverText: Master Sword Pedistal
+  logic: bombFairy
+- name: Master Sword Pedestal
+  hoverText: Master Sword Pedestal
   position:
     horizontal:
       left: 2.5
@@ -566,6 +628,7 @@
     vertical:
       left: 0
       top: 0
+  logic: masterSwordPedestal
 - name: Waterfall of the Wishing
   hoverText: Waterfall of the Wishing
   position:
@@ -575,3 +638,4 @@
     vertical:
       left: 0
       top: 0
+  logic: waterfallOfTheWishing

@@ -1,42 +1,41 @@
 use failure;
-
 use std::convert::TryFrom;
 
 #[serde(rename_all = "camelCase")]
 #[derive(Debug, Default, Clone, Copy, PartialEq, Serialize, Deserialize)]
 pub struct BigKey {
     // Light world
-    pub eastern_palace: bool,
-    pub desert_palace: bool,
-    pub tower_of_hera: bool,
+    pub eastern_palace:     bool,
+    pub desert_palace:      bool,
+    pub tower_of_hera:      bool,
     // Dark world
     pub palace_of_darkness: bool,
-    pub swamp_palace: bool,
-    pub skull_woods: bool,
-    pub thieves_town: bool,
-    pub ice_palace: bool,
-    pub misery_mire: bool,
-    pub turtle_rock: bool,
-    pub gannons_tower: bool,
+    pub swamp_palace:       bool,
+    pub skull_woods:        bool,
+    pub thieves_town:       bool,
+    pub ice_palace:         bool,
+    pub misery_mire:        bool,
+    pub turtle_rock:        bool,
+    pub gannons_tower:      bool,
 }
 
 #[serde(rename_all = "camelCase")]
 #[derive(Debug, Default, Clone, Copy, PartialEq, Serialize, Deserialize)]
 pub struct Pendant {
-    pub red: bool,
-    pub blue: bool,
+    pub red:   bool,
+    pub blue:  bool,
     pub green: bool,
 }
 
 #[serde(rename_all = "camelCase")]
 #[derive(Debug, Default, Clone, Copy, PartialEq, Serialize, Deserialize)]
 pub struct Crystal {
-    pub one: bool,
-    pub two: bool,
+    pub one:   bool,
+    pub two:   bool,
     pub three: bool,
-    pub four: bool,
-    pub five: bool,
-    pub six: bool,
+    pub four:  bool,
+    pub five:  bool,
+    pub six:   bool,
     pub seven: bool,
 }
 
@@ -142,7 +141,7 @@ impl TryFrom<u8> for FluteShovel {
     }
 }
 
-#[derive(Debug, Copy, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Copy, Clone, PartialEq, PartialOrd, Serialize, Deserialize)]
 pub enum Gloves {
     None       = 0,
     PowerGlove = 1,
@@ -166,7 +165,7 @@ impl TryFrom<u8> for Gloves {
     }
 }
 
-#[derive(Debug, Copy, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Copy, Clone, PartialEq, PartialOrd, Serialize, Deserialize)]
 pub enum Sword {
     None          = 0,
     FightersSword = 1,
@@ -194,7 +193,7 @@ impl TryFrom<u8> for Sword {
     }
 }
 
-#[derive(Debug, Copy, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Copy, Clone, PartialEq, PartialOrd, Serialize, Deserialize)]
 pub enum Shield {
     None           = 0,
     FightersShield = 1,
@@ -220,7 +219,7 @@ impl TryFrom<u8> for Shield {
     }
 }
 
-#[derive(Debug, Copy, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Copy, Clone, PartialEq, PartialOrd, Serialize, Deserialize)]
 pub enum Armor {
     GreenMail = 0,
     BlueMail  = 1,
@@ -275,12 +274,12 @@ impl TryFrom<u8> for Bottle {
             0x06 => Ok(Bottle::Fairy),
             0x07 => Ok(Bottle::Bee),
             0x08 => Ok(Bottle::MagicBee),
-            _    => Err(format_err!("Unknown bottle flag: 0x{:X}", number)),
+            _ => Err(format_err!("Unknown bottle flag: 0x{:X}", number)),
         }
     }
 }
 
-#[derive(Debug, Copy, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Copy, Clone, PartialEq, PartialOrd, Serialize, Deserialize)]
 pub enum Magic {
     Normal  = 0,
     Half    = 1,

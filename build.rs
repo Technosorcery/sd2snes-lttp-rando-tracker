@@ -1,4 +1,4 @@
-extern crate includedir_codegen;
+use includedir_codegen;
 
 use includedir_codegen::Compression;
 use std::process::Command;
@@ -17,7 +17,7 @@ fn build_ui_files() {
         Ok(mut d) => {
             d.push("ui");
             d
-        },
+        }
         Err(e) => panic!("Could not get current directory: {}", e),
     };
 
