@@ -37,7 +37,7 @@ export default {
   methods: {
     dungeonStyle() {
       return (
-        'background-image: url("/static/image/poi.png"); left: ' +
+        'left: ' +
         this.locationLeft +
         '%; top: ' +
         this.locationTop +
@@ -84,6 +84,11 @@ export default {
   position: absolute;
   margin-left: -24px;
   margin-top: -24px;
+  background-image: url("/static/image/poi.png");
+}
+
+.dungeon:hover {
+  background-image: url("/static/image/highlighted.png");
 }
 
 .boss {
