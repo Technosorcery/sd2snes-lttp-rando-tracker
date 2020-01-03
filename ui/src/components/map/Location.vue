@@ -3,7 +3,9 @@
     class="mapspan chest"
     :class="locationAvailability()"
     :style="locationStyle()"
-    @click="toggleLocation"></span>
+    @click="toggleLocation"
+    @mouseover="updateCaption()"
+    @mouseleave="clearCaption()"></span>
 </template>
 
 <script>
@@ -51,6 +53,12 @@ export default {
       xhr.open('POST', 'http://' + host + '/location_state/' + this.location.name, true)
       xhr.setRequestHeader('Content-Type', 'application/json')
       xhr.send(JSON.stringify(data))
+    },
+    updateCaption() {
+      this.$store.dispatch("updateCaption", this.location.hoverText)
+    },
+    clearCaption() {
+      this.$store.dispatch("updateCaption", "&nbsp;")
     }
   }
 }
