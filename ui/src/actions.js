@@ -15,5 +15,8 @@ export default {
 
   updateLocationState({ commit }, data) {
     commit('updateLocationState', data)
+  },
+  updateCaption({ commit }, data) {
+    commit('updateCaption', data)
   }
 }

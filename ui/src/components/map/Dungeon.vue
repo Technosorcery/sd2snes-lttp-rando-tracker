@@ -3,11 +3,15 @@
     <span
       class="mapspan dungeon"
       :class="dungeonAvailability()"
-      :style="dungeonStyle()"></span>
+      :style="dungeonStyle()"
+      @mouseover="updateCaption()"
+      @mouseleave="clearCaption()"></span>
     <span
       class="mapspan boss"
       :class="bossAvailability()"
-      :style="bossStyle()"></span>
+      :style="bossStyle()"
+      @mouseover="updateBossCaption()"
+      @mouseleave="clearCaption()"></span>
   </span>
 </template>
 
@@ -68,7 +72,16 @@ export default {
       }
 
       return this.location.bossAvailability
-    }
+    },
+    updateCaption() {
+      this.$store.dispatch("updateCaption", this.location.hoverText)
+    },
+    clearCaption() {
+      this.$store.dispatch("updateCaption", "&nbsp;")
+    },
+    updateBossCaption() {
+      this.$store.dispatch("updateCaption", this.location.boss.hoverText)
+    },
   }
 }
 </script>

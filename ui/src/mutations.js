@@ -15,6 +15,10 @@ export default {
     state.locations = locationData
   },
 
+  updateCaption(state, data) {
+    state.caption = data
+  },
+
   async fetchServerConfig(state, apiPort) {
     let host =
       typeof apiPort === 'undefined'

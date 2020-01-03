@@ -24,7 +24,8 @@ const store = new Vuex.Store({
     serverConfig: {
       apiPort: 8000,
       websocketPort: 8001
-    }
+    },
+  caption: "&nbsp;"
   }
 })
 

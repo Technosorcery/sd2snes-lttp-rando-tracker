@@ -10,6 +10,9 @@
         :key="dungeon.name"
         :location="dungeon"></Dungeon>
     </div>
+    <div id="caption">
+      <span v-html="caption"></span>
+    </div>
   </div>
 </template>
 
@@ -24,10 +27,16 @@ export default {
     Location,
     Dungeon
   },
-  computed: mapGetters({
-    locations: 'mappableLocations',
-    dungeons: 'mappableDungeons'
-  })
+  computed: {
+    caption() {
+      return this.$store.state.caption
+    },
+    ...mapGetters({
+      locations: 'mappableLocations',
+      dungeons: 'mappableDungeons',
+    }
+    )
+  }
 }
 </script>
 
