@@ -10,19 +10,6 @@ deny(
 
 mod lttp;
 
-#[macro_use]
-extern crate clap;
-#[macro_use]
-extern crate failure;
-#[macro_use]
-extern crate lazy_panic;
-#[macro_use]
-extern crate lazy_static;
-#[macro_use]
-extern crate rocket;
-#[macro_use]
-extern crate serde_derive;
-
 use crate::lttp::{
     logic::RandoLogic,
     Dungeon,
@@ -38,6 +25,9 @@ use bus::{
     BusReader,
 };
 use clap::{
+    crate_authors,
+    crate_description,
+    crate_version,
     App,
     Arg,
     ArgGroup,
@@ -51,11 +41,15 @@ use futures::{
     },
     task,
 };
+use lazy_panic::set_panic_message;
+use lazy_static::lazy_static;
 use rocket::{
+    self,
     config::{
         Config,
         Environment,
     },
+    get,
     http::{
         hyper::{
             header::{
@@ -68,9 +62,13 @@ use rocket::{
         ContentType,
         Status,
     },
+    options,
+    post,
+    routes,
     Response,
 };
 use rocket_contrib::json::Json;
+use serde_derive::Serialize;
 use serde_json;
 use serde_yaml;
 use serial::{
@@ -523,9 +521,9 @@ fn root<'r>() -> Option<Response<'r>> { files(PathBuf::from("")) }
 #[serde(rename_all = "camelCase")]
 #[derive(Debug, Clone, Copy, Default, Serialize)]
 pub struct ServerConfig {
-    pub api_port:                    u16,
-    pub websocket_port:              u16,
-    pub logic:                       RandoLogic,
+    pub api_port:       u16,
+    pub websocket_port: u16,
+    pub logic:          RandoLogic,
 }
 
 #[options("/config")]

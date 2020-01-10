@@ -1,4 +1,11 @@
-use failure;
+use failure::{
+    self,
+    format_err,
+};
+use serde_derive::{
+    Deserialize,
+    Serialize,
+};
 use std::convert::TryFrom;
 
 #[serde(rename_all = "camelCase")]

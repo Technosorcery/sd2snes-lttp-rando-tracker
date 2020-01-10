@@ -11,6 +11,9 @@ use crate::{
     },
     GameState,
 };
+use serde_derive::{
+    Deserialize,
+};
 use std::convert::TryInto;
 
 #[serde(rename_all = "camelCase")]

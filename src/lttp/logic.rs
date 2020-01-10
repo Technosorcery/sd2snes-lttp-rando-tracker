@@ -9,6 +9,10 @@ pub use crate::lttp::logic::{
     location_availability::LocationAvailability,
     rule::Rule,
 };
+use serde_derive::{
+    Deserialize,
+    Serialize,
+};
 
 #[serde(rename_all = "camelCase")]
 #[derive(Debug, Clone, Copy, PartialEq, PartialOrd, Ord, Eq, Deserialize, Serialize)]
