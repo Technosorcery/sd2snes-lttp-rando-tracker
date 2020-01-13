@@ -61,7 +61,7 @@
     vertical:
       left: 0
       top: 0
-  hoverText: Palace of Darkness
+  hoverText: Palace of Darkness <img src='/static/image/lantern.png' class='mini'>
   totalChests: 5
   hasReward: true
   dungeonCode: PoD
@@ -79,7 +79,7 @@
     vertical:
       left: 0
       top: 0
-  hoverText: Swamp Palace
+  hoverText: Swamp Palace <img src='/static/image/mirror.png' class='mini'>
   totalChests: 6
   hasReward: true
   dungeonCode: SP
@@ -151,7 +151,7 @@
     vertical:
       left: 0
       top: 0
-  hoverText: Misery Mire
+  hoverText: Misery Mire <img src='/static/image/medallion0.png' class='mini'><img src='/static/image/lantern.png' class='mini'>
   totalChests: 2
   hasReward: true
   dungeonCode: MM
@@ -169,7 +169,7 @@
     vertical:
       left: 0
       top: 0
-  hoverText: Turtle Rock
+  hoverText: Turtle Rock <img src='/static/image/medallion0.png' class='mini'><img src='/static/image/lantern.png' class='mini'>
   totalChests: 5
   hasReward: true
   dungeonCode: TR
