@@ -7,6 +7,10 @@ use crate::lttp::{
     },
     GameState,
 };
+use serde_derive::{
+    Deserialize,
+    Serialize,
+};
 
 #[serde(rename_all = "camelCase")]
 #[derive(Debug, Copy, Clone, Serialize, Deserialize, PartialEq)]

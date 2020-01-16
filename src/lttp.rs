@@ -24,6 +24,10 @@ use crate::lttp::{
     },
 };
 use failure;
+use serde_derive::{
+    Deserialize,
+    Serialize,
+};
 use std::convert::TryFrom;
 
 #[serde(rename_all = "camelCase")]
