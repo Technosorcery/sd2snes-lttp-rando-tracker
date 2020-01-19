@@ -243,10 +243,17 @@ fn update_tracker_serial_data(serial_port: &str) {
                 if should_update_bus {
                     let settings = SERVER_CONFIG.lock().unwrap().clone();
                     let mut location_state = LOCATION_STATE.lock().unwrap();
-                    location_state.update_availability(new_gs, settings.logic);
+                    let mut dungeon_state = DUNGEON_STATE.lock().unwrap();
+                    location_state.update_availability(
+                        new_gs,
+                        dungeon_state.clone(),
+                        settings.logic,
+                    );
+                    dungeon_state.update_availability(new_gs, settings.logic);
 
                     UPDATE_BUS.lock().unwrap().broadcast(Update::Items);
                     UPDATE_BUS.lock().unwrap().broadcast(Update::Locations);
+                    UPDATE_BUS.lock().unwrap().broadcast(Update::Dungeons);
                 }
             }
             Err(e) => {
@@ -285,10 +292,17 @@ fn update_tracker_file_data(file_path: &str) {
                 if should_update_bus {
                     let settings = SERVER_CONFIG.lock().unwrap().clone();
                     let mut location_state = LOCATION_STATE.lock().unwrap();
-                    location_state.update_availability(new_gs, settings.logic);
+                    let mut dungeon_state = DUNGEON_STATE.lock().unwrap();
+                    location_state.update_availability(
+                        new_gs,
+                        dungeon_state.clone(),
+                        settings.logic,
+                    );
+                    dungeon_state.update_availability(new_gs, settings.logic);
 
                     UPDATE_BUS.lock().unwrap().broadcast(Update::Items);
                     UPDATE_BUS.lock().unwrap().broadcast(Update::Locations);
+                    UPDATE_BUS.lock().unwrap().broadcast(Update::Dungeons);
                 }
             }
             Err(e) => {
@@ -454,8 +468,11 @@ fn set_dungeon_state<'r>(dungeon: String, state: Json<DungeonUpdate>) -> Option<
     let dungeon_update = state.into_inner();
     let state;
     {
+        let settings = SERVER_CONFIG.lock().unwrap().clone();
+        let game_state = GAME_STATE.lock().unwrap().clone();
         let mut dungeon_state = DUNGEON_STATE.lock().unwrap();
         dungeon_state.update(&dungeon, dungeon_update);
+        dungeon_state.update_availability(game_state, settings.logic);
         state = dungeon_state.get(&dungeon).clone();
         UPDATE_BUS.lock().unwrap().broadcast(Update::Dungeons);
     }

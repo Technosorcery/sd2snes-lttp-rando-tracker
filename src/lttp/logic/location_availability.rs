@@ -5,6 +5,7 @@ use crate::lttp::{
         RandoLogic,
         Rule,
     },
+    DungeonState,
     GameState,
 };
 use serde_derive::{
@@ -82,7 +83,12 @@ pub enum LocationAvailability {
 }
 
 impl LocationAvailability {
-    pub fn check(&self, state: &GameState, logic: &RandoLogic) -> Availability {
+    pub fn check(
+        &self,
+        state: &GameState,
+        dungeons: &DungeonState,
+        logic: &RandoLogic,
+    ) -> Availability {
         match self {
             LocationAvailability::AginahsCave => {
                 if Rule::Bomb.check(&state) {
@@ -1127,6 +1133,7 @@ impl LocationAvailability {
             LocationAvailability::DesertWestLedge => {
                 if DungeonAvailability::DesertPalace.can_enter(
                     &state,
+                    &dungeons,
                     &RandoLogic::Glitchless,
                     false,
                     false,
@@ -1139,6 +1146,7 @@ impl LocationAvailability {
                 }
                 if DungeonAvailability::DesertPalace.can_enter(
                     &state,
+                    &dungeons,
                     &RandoLogic::OverWorldGlitches,
                     false,
                     false,
@@ -1146,6 +1154,7 @@ impl LocationAvailability {
                     return Availability::Available;
                 } else if DungeonAvailability::DesertPalace.can_enter(
                     &state,
+                    &dungeons,
                     &RandoLogic::OverWorldGlitches,
                     true,
                     false,
@@ -1153,6 +1162,7 @@ impl LocationAvailability {
                     return Availability::Agahnim;
                 } else if DungeonAvailability::DesertPalace.can_enter(
                     &state,
+                    &dungeons,
                     &RandoLogic::OverWorldGlitches,
                     true,
                     true,
@@ -1165,6 +1175,7 @@ impl LocationAvailability {
                 }
                 if DungeonAvailability::DesertPalace.can_enter(
                     &state,
+                    &dungeons,
                     &RandoLogic::MajorGlitches,
                     false,
                     false,
@@ -1172,6 +1183,7 @@ impl LocationAvailability {
                     return Availability::Available;
                 } else if DungeonAvailability::DesertPalace.can_enter(
                     &state,
+                    &dungeons,
                     &RandoLogic::MajorGlitches,
                     true,
                     false,
@@ -1179,6 +1191,7 @@ impl LocationAvailability {
                     return Availability::Agahnim;
                 } else if DungeonAvailability::DesertPalace.can_enter(
                     &state,
+                    &dungeons,
                     &RandoLogic::MajorGlitches,
                     true,
                     true,
@@ -1314,6 +1327,7 @@ impl LocationAvailability {
                         false,
                     ) && DungeonAvailability::TowerOfHera.can_enter(
                         &state,
+                        &dungeons,
                         &RandoLogic::OverWorldGlitches,
                         false,
                         false,
@@ -1330,6 +1344,7 @@ impl LocationAvailability {
                         true,
                     ) && DungeonAvailability::TowerOfHera.can_enter(
                         &state,
+                        &dungeons,
                         &RandoLogic::OverWorldGlitches,
                         false,
                         true,
@@ -1353,6 +1368,7 @@ impl LocationAvailability {
                         false,
                     ) && DungeonAvailability::TowerOfHera.can_enter(
                         &state,
+                        &dungeons,
                         &RandoLogic::MajorGlitches,
                         false,
                         false,
@@ -1369,6 +1385,7 @@ impl LocationAvailability {
                         false,
                     ) && DungeonAvailability::TowerOfHera.may_enter(
                         &state,
+                        &dungeons,
                         &RandoLogic::MajorGlitches,
                         false,
                         false,
@@ -1381,6 +1398,7 @@ impl LocationAvailability {
                         true,
                     ) && DungeonAvailability::TowerOfHera.can_enter(
                         &state,
+                        &dungeons,
                         &RandoLogic::MajorGlitches,
                         false,
                         true,
@@ -1397,6 +1415,7 @@ impl LocationAvailability {
                         true,
                     ) && DungeonAvailability::TowerOfHera.may_enter(
                         &state,
+                        &dungeons,
                         &RandoLogic::MajorGlitches,
                         false,
                         true,
@@ -1409,6 +1428,7 @@ impl LocationAvailability {
                         false,
                     ) && DungeonAvailability::TowerOfHera.may_enter(
                         &state,
+                        &dungeons,
                         &RandoLogic::MajorGlitches,
                         true,
                         false,
@@ -1422,6 +1442,7 @@ impl LocationAvailability {
                         true,
                     ) && DungeonAvailability::TowerOfHera.may_enter(
                         &state,
+                        &dungeons,
                         &RandoLogic::MajorGlitches,
                         true,
                         true,
@@ -2290,9 +2311,11 @@ impl LocationAvailability {
                         &RandoLogic::OverWorldGlitches,
                         false,
                         false,
-                    ) && LocationAvailability::TakeTheFrogHome
-                        .check(&state, &RandoLogic::OverWorldGlitches)
-                        == Availability::Available
+                    ) && LocationAvailability::TakeTheFrogHome.check(
+                        &state,
+                        &dungeons,
+                        &RandoLogic::OverWorldGlitches,
+                    ) == Availability::Available
                         && (Rule::CanLiftDarkRocks.check(&state)
                             || (Rule::Boots.check(&state)
                                 && Rule::CanEnterNorthEastDarkWorld.check_with_options(
@@ -2308,12 +2331,16 @@ impl LocationAvailability {
                         &RandoLogic::OverWorldGlitches,
                         true,
                         false,
-                    ) && (LocationAvailability::TakeTheFrogHome
-                        .check(&state, &RandoLogic::OverWorldGlitches)
-                        == Availability::Available
-                        || LocationAvailability::TakeTheFrogHome
-                            .check(&state, &RandoLogic::OverWorldGlitches)
-                            == Availability::Agahnim)
+                    ) && (LocationAvailability::TakeTheFrogHome.check(
+                        &state,
+                        &dungeons,
+                        &RandoLogic::OverWorldGlitches,
+                    ) == Availability::Available
+                        || LocationAvailability::TakeTheFrogHome.check(
+                            &state,
+                            &dungeons,
+                            &RandoLogic::OverWorldGlitches,
+                        ) == Availability::Agahnim)
                         && (Rule::CanLiftDarkRocks.check(&state)
                             || (Rule::Boots.check(&state)
                                 && Rule::CanEnterNorthEastDarkWorld.check_with_options(
@@ -2329,15 +2356,21 @@ impl LocationAvailability {
                         &RandoLogic::OverWorldGlitches,
                         true,
                         true,
-                    ) && (LocationAvailability::TakeTheFrogHome
-                        .check(&state, &RandoLogic::OverWorldGlitches)
-                        == Availability::Available
-                        || LocationAvailability::TakeTheFrogHome
-                            .check(&state, &RandoLogic::OverWorldGlitches)
-                            == Availability::Agahnim
-                        || LocationAvailability::TakeTheFrogHome
-                            .check(&state, &RandoLogic::OverWorldGlitches)
-                            == Availability::GlitchAgahnim)
+                    ) && (LocationAvailability::TakeTheFrogHome.check(
+                        &state,
+                        &dungeons,
+                        &RandoLogic::OverWorldGlitches,
+                    ) == Availability::Available
+                        || LocationAvailability::TakeTheFrogHome.check(
+                            &state,
+                            &dungeons,
+                            &RandoLogic::OverWorldGlitches,
+                        ) == Availability::Agahnim
+                        || LocationAvailability::TakeTheFrogHome.check(
+                            &state,
+                            &dungeons,
+                            &RandoLogic::OverWorldGlitches,
+                        ) == Availability::GlitchAgahnim)
                         && (Rule::CanLiftDarkRocks.check(&state)
                             || (Rule::Boots.check(&state)
                                 && Rule::CanEnterNorthEastDarkWorld.check_with_options(
@@ -2359,9 +2392,11 @@ impl LocationAvailability {
                     &RandoLogic::MajorGlitches,
                     false,
                     false,
-                ) && LocationAvailability::TakeTheFrogHome
-                    .check(&state, &RandoLogic::MajorGlitches)
-                    == Availability::Available
+                ) && LocationAvailability::TakeTheFrogHome.check(
+                    &state,
+                    &dungeons,
+                    &RandoLogic::MajorGlitches,
+                ) == Availability::Available
                     && (Rule::Mirror.check(&state)
                         || (Rule::GlitchedLinkInDarkWorld.check(&state)
                             && Rule::CanLiftDarkRocks.check(&state))
@@ -2380,12 +2415,16 @@ impl LocationAvailability {
                     &RandoLogic::MajorGlitches,
                     true,
                     false,
-                ) && (LocationAvailability::TakeTheFrogHome
-                    .check(&state, &RandoLogic::MajorGlitches)
-                    == Availability::Available
-                    || LocationAvailability::TakeTheFrogHome
-                        .check(&state, &RandoLogic::MajorGlitches)
-                        == Availability::Agahnim)
+                ) && (LocationAvailability::TakeTheFrogHome.check(
+                    &state,
+                    &dungeons,
+                    &RandoLogic::MajorGlitches,
+                ) == Availability::Available
+                    || LocationAvailability::TakeTheFrogHome.check(
+                        &state,
+                        &dungeons,
+                        &RandoLogic::MajorGlitches,
+                    ) == Availability::Agahnim)
                     && (Rule::Mirror.check(&state)
                         || (Rule::GlitchedLinkInDarkWorld.check(&state)
                             && Rule::CanLiftDarkRocks.check(&state))
@@ -2404,15 +2443,21 @@ impl LocationAvailability {
                     &RandoLogic::MajorGlitches,
                     true,
                     true,
-                ) && (LocationAvailability::TakeTheFrogHome
-                    .check(&state, &RandoLogic::MajorGlitches)
-                    == Availability::Available
-                    || LocationAvailability::TakeTheFrogHome
-                        .check(&state, &RandoLogic::MajorGlitches)
-                        == Availability::Agahnim
-                    || LocationAvailability::TakeTheFrogHome
-                        .check(&state, &RandoLogic::MajorGlitches)
-                        == Availability::GlitchAgahnim)
+                ) && (LocationAvailability::TakeTheFrogHome.check(
+                    &state,
+                    &dungeons,
+                    &RandoLogic::MajorGlitches,
+                ) == Availability::Available
+                    || LocationAvailability::TakeTheFrogHome.check(
+                        &state,
+                        &dungeons,
+                        &RandoLogic::MajorGlitches,
+                    ) == Availability::Agahnim
+                    || LocationAvailability::TakeTheFrogHome.check(
+                        &state,
+                        &dungeons,
+                        &RandoLogic::MajorGlitches,
+                    ) == Availability::GlitchAgahnim)
                     && (Rule::Mirror.check(&state)
                         || (Rule::GlitchedLinkInDarkWorld.check(&state)
                             && Rule::CanLiftDarkRocks.check(&state))
