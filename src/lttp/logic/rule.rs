@@ -11,9 +11,7 @@ use crate::{
     },
     GameState,
 };
-use serde_derive::{
-    Deserialize,
-};
+use serde_derive::Deserialize;
 use std::convert::TryInto;
 
 #[serde(rename_all = "camelCase")]
@@ -91,6 +89,7 @@ pub enum Rule {
 
     Rupee,
 
+    AllSevenCrystals,
     BothRedCrystals,
 }
 
@@ -165,6 +164,15 @@ impl Rule {
             // TODO (#420): Really need to be tracking if Agahnim 1 has already been beaten.
             Rule::BeatAgahnim1 => false,
 
+            Rule::AllSevenCrystals => {
+                state.crystal.one
+                    && state.crystal.two
+                    && state.crystal.three
+                    && state.crystal.four
+                    && state.crystal.five
+                    && state.crystal.six
+                    && state.crystal.seven
+            }
             Rule::BothRedCrystals => false,
 
             x => {

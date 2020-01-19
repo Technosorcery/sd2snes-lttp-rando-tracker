@@ -2,10 +2,10 @@ name: Build and test
 on:
   push:
     branches:
-    - master
+      - master
   pull_request:
     branches:
-    - master
+      - master
 jobs:
   web-ui:
     name: Vue.js app
@@ -13,106 +13,142 @@ jobs:
     strategy:
       matrix:
         node-version:
-        - 13.x
+          - 13.x
 
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v1
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v1
-      with:
-        node-version: ${{ matrix.node-version }}
-    - name: Get yarn cache
-      id: yarn-cache
-      run: echo "::set-output name=dir::$(cd ui && yarn cache dir)"
+      - uses: actions/checkout@v1
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: Get yarn cache
+        id: yarn-cache
+        run: echo "::set-output name=dir::$(cd ui && yarn cache dir)"
 
-    - uses: actions/cache@v1.1.0
-      with:
-        path: ${{ steps.yarn-cache.outputs.dir }}
-        key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-        restore-keys: |
-          ${{ runner.os }}-yarn-
-    - name: Install
-      run: |
-        cd ui
-        yarn install
-    - name: Lint
-      run: |
-        cd ui
-        yarn lint
-    - name: Build
-      run: |
-        cd ui
-        yarn build
-    - uses: actions/upload-artifact@master
-      with:
-        name: ui-dist
-        path: ui/dist
+      - uses: actions/cache@v1.1.0
+        with:
+          path: ${{ steps.yarn-cache.outputs.dir }}
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+      - name: Install
+        run: |
+          cd ui
+          yarn install
+      - name: Lint
+        run: |
+          cd ui
+          yarn lint
+      - name: Build
+        run: |
+          cd ui
+          yarn build
+      - uses: actions/upload-artifact@master
+        with:
+          name: ui-dist
+          path: ui/dist
 
   rust-app:
     name: Rust app
     needs:
-    - web-ui
+      - web-ui
 
     strategy:
       matrix:
         os:
-        - ubuntu-latest
-        - windows-latest
-        - macOS-latest
+          - ubuntu-latest
+          - windows-latest
+          - macOS-latest
 
     runs-on: ${{ matrix.os }}
 
     steps:
-    - uses: actions/checkout@v1
-    - uses: actions/download-artifact@master
-      with:
-        name: ui-dist
-        path: ui/dist
-    - name: Install nightly
-      uses: actions-rs/toolchain@v1
-      with:
-        toolchain: nightly
-        override: true
-    - name: Cache cargo registry
-      uses: actions/cache@v1.1.0
-      with:
-        path: ~/.cargo/registry
-        key: ${{ runner.os }}-cargo-registry-${{ hashFiles('**/Cargo.lock') }}
-    - name: Cache cargo index
-      uses: actions/cache@v1.1.0
-      with:
-        path: ~/.cargo/git
-        key: ${{ runner.os }}-cargo-index-${{ hashFiles('**/Cargo.lock') }}
-    - name: Cache cargo build
-      uses: actions/cache@v1.1.0
-      with:
-        path: target
-        key: ${{ runner.os }}-cargo-build-target-${{ hashFiles('**/Cargo.lock') }}
-    - name: Build
-      uses: actions-rs/cargo@v1
-      with:
-        command: build
-        args: --verbose
-      env:
-        SKIP_UI_BUILD: true
-    - name: Test
-      uses: actions-rs/cargo@v1
-      env:
-        SKIP_UI_BUILD: true
-      with:
-        command: test
-        args: --verbose
-    - name: Upload debug artifact (Windows)
-      if: matrix.os == 'windows-latest'
-      uses: actions/upload-artifact@master
-      with:
-        name: debug_${{ matrix.os }}
-        path: target/debug/sd2snes-lttp-rando-tracker.exe
-    - name: Upload debug artifact
-      if: matrix.os != 'windows-latest'
-      uses: actions/upload-artifact@master
-      with:
-        name: debug_${{ matrix.os }}
-        path: target/debug/sd2snes-lttp-rando-tracker
+      - uses: actions/checkout@v1
+      - uses: actions/download-artifact@master
+        with:
+          name: ui-dist
+          path: ui/dist
+      - name: Install nightly
+        uses: actions-rs/toolchain@v1.0.3
+        with:
+          profile: minimal
+          toolchain: nightly
+          override: true
+      - name: Cache cargo registry
+        uses: actions/cache@v1.1.0
+        with:
+          path: ~/.cargo/registry
+          key: ${{ runner.os }}-cargo-registry-${{ hashFiles('**/Cargo.lock') }}
+      - name: Cache cargo index
+        uses: actions/cache@v1.1.0
+        with:
+          path: ~/.cargo/git
+          key: ${{ runner.os }}-cargo-index-${{ hashFiles('**/Cargo.lock') }}
+      - name: Cache cargo build
+        uses: actions/cache@v1.1.0
+        with:
+          path: target
+          key: ${{ runner.os }}-cargo-build-target-${{ hashFiles('**/Cargo.lock') }}
+      - name: Build
+        uses: actions-rs/cargo@v1
+        with:
+          command: build
+          args: --verbose
+        env:
+          SKIP_UI_BUILD: true
+      - name: Test
+        uses: actions-rs/cargo@v1
+        env:
+          SKIP_UI_BUILD: true
+        with:
+          command: test
+          args: --verbose
+      - name: Upload debug artifact (Windows)
+        if: matrix.os == 'windows-latest'
+        uses: actions/upload-artifact@master
+        with:
+          name: debug_${{ matrix.os }}
+          path: target/debug/sd2snes-lttp-rando-tracker.exe
+      - name: Upload debug artifact
+        if: matrix.os != 'windows-latest'
+        uses: actions/upload-artifact@master
+        with:
+          name: debug_${{ matrix.os }}
+          path: target/debug/sd2snes-lttp-rando-tracker
+
+  rustfmt-check:
+    name: Check rustfmt
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - name: Install Rust nightly
+        uses: actions-rs/toolchain@v1.0.3
+        with:
+          profile: minimal
+          components: rustfmt
+          toolchain: nightly
+          override: true
+      - name: Cache cargo registry
+        uses: actions/cache@v1.1.0
+        with:
+          path: ~/.cargo/registry
+          key: ${{ runner.os }}-cargo-registry-${{ hashFiles('**/Cargo.lock') }}
+      - name: Cache cargo index
+        uses: actions/cache@v1.1.0
+        with:
+          path: ~/.cargo/git
+          key: ${{ runner.os }}-cargo-index-${{ hashFiles('**/Cargo.lock') }}
+      - name: Cache cargo build
+        uses: actions/cache@v1.1.0
+        with:
+          path: target
+          key: ${{ runner.os }}-cargo-build-target-${{ hashFiles('**/Cargo.lock') }}
+      - name: Check rustfmt
+        uses: actions-rs/cargo@v1
+        with:
+          command: fmt
+          args: -- --check
+        env:
+          SKIP_UI_BUILD: true

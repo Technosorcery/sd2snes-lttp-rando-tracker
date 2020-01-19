@@ -19,6 +19,7 @@ use crate::lttp::{
     },
     logic::{
         Availability,
+        DungeonAvailability,
         LocationAvailability,
         RandoLogic,
     },
@@ -352,8 +353,13 @@ impl Location {
         }
     }
 
-    pub fn calculate_availability(&mut self, state: &GameState, logic: &RandoLogic) {
-        self.availability = self.logic.check(&state, &logic);
+    pub fn calculate_availability(
+        &mut self,
+        state: &GameState,
+        dungeons: &DungeonState,
+        logic: &RandoLogic,
+    ) {
+        self.availability = self.logic.check(&state, &dungeons, &logic);
     }
 }
 
@@ -383,8 +389,15 @@ impl LocationState {
         }
     }
 
-    pub fn update_availability(&mut self, game_state: GameState, logic: RandoLogic) {
-        self.locations.iter_mut().for_each(|loc| loc.calculate_availability(&game_state, &logic));
+    pub fn update_availability(
+        &mut self,
+        game_state: GameState,
+        dungeon_state: DungeonState,
+        logic: RandoLogic,
+    ) {
+        self.locations
+            .iter_mut()
+            .for_each(|loc| loc.calculate_availability(&game_state, &dungeon_state, &logic));
     }
 }
 
@@ -420,6 +433,8 @@ pub struct Dungeon {
     pub dungeon_availability: Availability,
     #[serde(skip_deserializing)]
     pub boss_availability:    Availability,
+    #[serde(skip_serializing)]
+    pub logic:                Option<DungeonAvailability>,
 }
 
 impl Dungeon {
@@ -435,6 +450,20 @@ impl Dungeon {
         }
         if let Some(cleared) = update.cleared {
             self.cleared = cleared
+        }
+    }
+
+    pub fn remaining_chests(&self) -> u8 { self.total_chests - self.found_chests }
+
+    pub fn calculate_availability(
+        &mut self,
+        state: &GameState,
+        dungeons: &DungeonState,
+        logic: &RandoLogic,
+    ) {
+        if let Some(dungeon_logic) = self.logic {
+            self.dungeon_availability = dungeon_logic.can_get_chest(&state, &dungeons, &logic);
+            self.boss_availability = dungeon_logic.is_beatable(&state, &dungeons, &logic);
         }
     }
 }
@@ -491,5 +520,12 @@ impl DungeonState {
         if let Some(i) = self.dungeons.iter().position(|d| d.dungeon_code == dungeon_code) {
             self.dungeons[i].update(update);
         }
+    }
+
+    pub fn update_availability(&mut self, game_state: GameState, logic: RandoLogic) {
+        let dungeon_state = self.clone();
+        self.dungeons.iter_mut().for_each(|dungeon| {
+            dungeon.calculate_availability(&game_state, &dungeon_state, &logic)
+        });
     }
 }
