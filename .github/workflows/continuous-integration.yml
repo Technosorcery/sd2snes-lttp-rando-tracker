@@ -71,8 +71,9 @@ jobs:
           name: ui-dist
           path: ui/dist
       - name: Install nightly
-        uses: actions-rs/toolchain@v1
+        uses: actions-rs/toolchain@v1.0.3
         with:
+          profile: minimal
           toolchain: nightly
           override: true
       - name: Cache cargo registry
