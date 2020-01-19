@@ -16,7 +16,7 @@
   boss:
     name: Armos Knights
     hoverText: Armos Knights
-    imageNumber: '02'
+    imageNumber: "02"
 - name: Desert Palace
   position:
     horizontal:
@@ -34,7 +34,7 @@
   boss:
     name: Lanmolas
     hoverText: Lanmolas
-    imageNumber: '12'
+    imageNumber: "12"
 - name: Tower of Hera
   position:
     horizontal:
@@ -52,7 +52,7 @@
   boss:
     name: Moldorm
     hoverText: Moldorm
-    imageNumber: '22'
+    imageNumber: "22"
 - name: Palace of Darkness
   position:
     horizontal:
@@ -70,7 +70,7 @@
   boss:
     name: Helmasaur King
     hoverText: Helmasaur King
-    imageNumber: '32'
+    imageNumber: "32"
 - name: Swamp Palace
   position:
     horizontal:
@@ -88,7 +88,7 @@
   boss:
     name: Arrghus
     hoverText: Arrghus
-    imageNumber: '42'
+    imageNumber: "42"
 - name: Skull Woods
   position:
     horizontal:
@@ -106,7 +106,7 @@
   boss:
     name: Mothula
     hoverText: Mothula
-    imageNumber: '52'
+    imageNumber: "52"
 - name: Thieves' Town
   position:
     horizontal:
@@ -124,7 +124,7 @@
   boss:
     name: Blind the Thief
     hoverText: Blind the Thief
-    imageNumber: '62'
+    imageNumber: "62"
 - name: Ice Palace
   position:
     horizontal:
@@ -142,7 +142,7 @@
   boss:
     name: Kholdstare
     hoverText: Kholdstare
-    imageNumber: '72'
+    imageNumber: "72"
 - name: Misery Mire
   position:
     horizontal:
@@ -160,7 +160,7 @@
   boss:
     name: Vitreous
     hoverText: Vitreous
-    imageNumber: '82'
+    imageNumber: "82"
 - name: Turtle Rock
   position:
     horizontal:
@@ -178,7 +178,7 @@
   boss:
     name: Trinexx
     hoverText: Trinexx
-    imageNumber: '92'
+    imageNumber: "92"
 - name: Ganon's Tower
   position:
     horizontal:
@@ -196,7 +196,7 @@
   boss:
     name: Agahnim
     hoverText: Agahnim
-    imageNumber: '102'
+    imageNumber: "102"
 - name: Agahnim
   hoverText: Agahnim
   totalChests: 0
