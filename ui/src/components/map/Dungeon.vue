@@ -5,48 +5,46 @@
       :class="dungeonAvailability()"
       :style="dungeonStyle()"
       @mouseover="updateCaption()"
-      @mouseleave="clearCaption()"></span>
+      @mouseleave="clearCaption()"
+    ></span>
     <span
       class="mapspan boss"
       :class="bossAvailability()"
       :style="bossStyle()"
       @mouseover="updateBossCaption()"
-      @mouseleave="clearCaption()"></span>
+      @mouseleave="clearCaption()"
+    ></span>
   </span>
 </template>
 
 <script>
 export default {
-  name: 'Dungeon',
+  name: "Dungeon",
   props: {
     location: Object
   },
   computed: {
     dungeonCleared() {
-      return this.remainingChests === 0
+      return this.remainingChests === 0;
     },
     bossCleared() {
-      return this.location.cleared
+      return this.location.cleared;
     },
     remainingChests() {
-      return this.location.totalChests - this.location.foundChests
+      return this.location.totalChests - this.location.foundChests;
     },
     locationLeft() {
-      return this.location.position.horizontal.left
+      return this.location.position.horizontal.left;
     },
     locationTop() {
-      return this.location.position.horizontal.top
+      return this.location.position.horizontal.top;
     }
   },
   methods: {
     dungeonStyle() {
       return (
-        'left: ' +
-        this.locationLeft +
-        '%; top: ' +
-        this.locationTop +
-        '%;'
-      )
+        "left: " + this.locationLeft + "%; top: " + this.locationTop + "%;"
+      );
     },
     bossStyle() {
       return (
@@ -54,36 +52,36 @@ export default {
         this.location.boss.imageNumber +
         '.png"); left: ' +
         this.locationLeft +
-        '%; top: ' +
+        "%; top: " +
         this.locationTop +
-        '%;'
-      )
+        "%;"
+      );
     },
     dungeonAvailability() {
       if (this.dungeonCleared) {
-        return 'opened'
+        return "opened";
       }
 
-      return this.location.dungeonAvailability
+      return this.location.dungeonAvailability;
     },
     bossAvailability() {
       if (this.location.cleared) {
-        return 'opened'
+        return "opened";
       }
 
-      return this.location.bossAvailability
+      return this.location.bossAvailability;
     },
     updateCaption() {
-      this.$store.dispatch("updateCaption", this.location.hoverText)
+      this.$store.dispatch("updateCaption", this.location.hoverText);
     },
     clearCaption() {
-      this.$store.dispatch("updateCaption", "&nbsp;")
+      this.$store.dispatch("updateCaption", "&nbsp;");
     },
     updateBossCaption() {
-      this.$store.dispatch("updateCaption", this.location.boss.hoverText)
-    },
+      this.$store.dispatch("updateCaption", this.location.boss.hoverText);
+    }
   }
-}
+};
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
