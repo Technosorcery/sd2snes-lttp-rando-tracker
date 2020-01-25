@@ -415,7 +415,7 @@ impl Rule {
                         Rule::CanFly.check(&state) && Rule::CanLiftDarkRocks.check(&state)
                     }
                     RandoLogic::OverWorldGlitches => {
-                        (Rule::CanLiftDarkRocks.check(&state)
+                        Rule::CanLiftDarkRocks.check(&state)
                             && (Rule::CanFly.check(&state) || Rule::Boots.check(&state))
                             || (Rule::MoonPearl.check(&state)
                                 && Rule::Boots.check(&state)
@@ -424,7 +424,7 @@ impl Rule {
                                     &logic,
                                     agahnim_check,
                                     allow_out_of_logic_glitches,
-                                )))
+                                ))
                     }
                     RandoLogic::MajorGlitches => {
                         (Rule::Bottle.check(&state)
