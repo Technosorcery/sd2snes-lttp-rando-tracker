@@ -1,0 +1,9 @@
+status = [
+  "Rust app %"
+]
+block_labels = [
+  "wip"
+]
+required_approvals = 0
+use_codeowners = false
+delete_merged_branches = true
