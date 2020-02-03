@@ -1,0 +1,12 @@
+status = [
+  "Rust app %"
+]
+pr_status = [
+  "Rust app %"
+]
+block_labels = [
+  "wip"
+]
+required_approvals = 1
+use_codeowners = true
+delete_merged_branches = true
