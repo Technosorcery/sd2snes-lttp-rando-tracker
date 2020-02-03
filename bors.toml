@@ -1,5 +1,7 @@
 status = [
-  "Rust app %"
+  "Rust app (macOS-latest)",
+  "Rust app (ubuntu-latest)",
+  "Rust app (windows-latest)"
 ]
 block_labels = [
   "wip"
