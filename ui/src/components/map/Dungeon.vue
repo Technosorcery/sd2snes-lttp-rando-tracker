@@ -2,17 +2,20 @@
   <span>
     <span
       class="mapspan dungeon"
-      :class="dungeonAvailability()"
+      :class="[
+        dungeonAvailability(),
+        activeClass()
+      ]"
       :style="dungeonStyle()"
-      @mouseover="updateCaption()"
-      @mouseleave="clearCaption()"
+      @mouseover="updateCaption(); hover = true"
+      @mouseleave="clearCaption(); hover = false"
     ></span>
     <span
       class="mapspan boss"
       :class="bossAvailability()"
       :style="bossStyle()"
-      @mouseover="updateBossCaption()"
-      @mouseleave="clearCaption()"
+      @mouseover="updateBossCaption(); hover = true"
+      @mouseleave="clearCaption(); hover = false"
     ></span>
   </span>
 </template>
@@ -22,6 +25,11 @@ export default {
   name: "Dungeon",
   props: {
     location: Object
+  },
+  data() {
+    return {
+      hover: false
+    };
   },
   computed: {
     dungeonCleared() {
@@ -79,6 +87,9 @@ export default {
     },
     updateBossCaption() {
       this.$store.dispatch("updateCaption", this.location.boss.hoverText);
+    },
+    activeClass() {
+      return this.hover ? "active" : "inactive";
     }
   }
 };
@@ -96,7 +107,11 @@ export default {
   background-image: url("/static/image/poi.png");
 }
 
-.dungeon:hover {
+.inactive {
+  background-image: url("/static/image/poi.png");
+}
+
+.active {
   background-image: url("/static/image/highlighted.png");
 }
 
