@@ -548,7 +548,7 @@ fn get_config_options<'r>() -> Response<'r> { state_response() }
 
 #[get("/config", format = "application/json")]
 fn get_config<'r>() -> Option<Response<'r>> {
-    let server_config = { *SERVER_CONFIG.lock().unwrap() };
+    let server_config = *SERVER_CONFIG.lock().unwrap();
     let mut response = state_response();
     let json = match serde_json::to_string(&server_config) {
         Ok(j) => j,
