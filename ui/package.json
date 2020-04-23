@@ -9,7 +9,7 @@
   },
   "dependencies": {
     "core-js": "^3.6.5",
-    "node-sass": "^4.13.1",
+    "node-sass": "^4.14.0",
     "reconnecting-websocket": "^4.4.0",
     "sass-loader": "^8.0.2",
     "vue": "^2.6.11",
