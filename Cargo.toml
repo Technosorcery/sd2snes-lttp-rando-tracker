@@ -33,7 +33,7 @@ version = "1.0.0"
 features = ['backtrace-on']
 
 [dependencies.tokio]
-version = "0.2.18"
+version = "0.2.19"
 features = ['full']
 
 [build-dependencies]
