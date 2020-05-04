@@ -10,7 +10,7 @@ edition = "2018"
 [dependencies]
 bus = "2.2.3"
 clap = "2.33.0"
-failure = "0.1.7"
+failure = "0.1.8"
 futures = "0.1.29"
 hyper = "0.13.5"
 includedir = "0.5.0"
