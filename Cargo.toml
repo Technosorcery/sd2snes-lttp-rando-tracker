@@ -9,7 +9,7 @@ edition = "2018"
 
 [dependencies]
 bus = "2.2.3"
-clap = "2.33.1"
+clap = "2.33.3"
 failure = "0.1.8"
 futures = "0.1.29"
 hyper = "0.13.6"
