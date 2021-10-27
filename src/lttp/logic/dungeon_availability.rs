@@ -18,8 +18,8 @@ use std::cmp::{
     min,
 };
 
-#[serde(rename_all = "camelCase")]
 #[derive(Debug, Copy, Clone, Serialize, Deserialize, PartialEq)]
+#[serde(rename_all = "camelCase")]
 pub enum DungeonAvailability {
     DesertPalace,
     EasternPalace,

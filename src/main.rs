@@ -535,8 +535,8 @@ fn files<'r>(file: PathBuf) -> Option<Response<'r>> {
 #[get("/")]
 fn root<'r>() -> Option<Response<'r>> { files(PathBuf::from("")) }
 
-#[serde(rename_all = "camelCase")]
 #[derive(Debug, Clone, Copy, Default, Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct ServerConfig {
     pub api_port:       u16,
     pub websocket_port: u16,
@@ -747,8 +747,8 @@ fn main() {
         .launch();
 }
 
-#[serde(rename_all = "camelCase", tag = "type", content = "data")]
 #[derive(Debug, Clone, Serialize)]
+#[serde(rename_all = "camelCase", tag = "type", content = "data")]
 enum WebSocketPayload {
     Item(GameState),
     Dungeon(Vec<Dungeon>),

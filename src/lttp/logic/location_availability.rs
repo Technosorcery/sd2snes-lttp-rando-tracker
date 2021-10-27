@@ -13,8 +13,8 @@ use serde_derive::{
     Serialize,
 };
 
-#[serde(rename_all = "camelCase")]
 #[derive(Debug, Copy, Clone, Serialize, Deserialize, PartialEq)]
+#[serde(rename_all = "camelCase")]
 pub enum LocationAvailability {
     AginahsCave,
     BombableHut,

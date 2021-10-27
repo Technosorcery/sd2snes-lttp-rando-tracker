@@ -8,8 +8,8 @@ use serde_derive::{
 };
 use std::convert::TryFrom;
 
-#[serde(rename_all = "camelCase")]
 #[derive(Debug, Default, Clone, Copy, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct BigKey {
     // Light world
     pub eastern_palace:     bool,
@@ -26,16 +26,16 @@ pub struct BigKey {
     pub gannons_tower:      bool,
 }
 
-#[serde(rename_all = "camelCase")]
 #[derive(Debug, Default, Clone, Copy, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct Pendant {
     pub red:   bool,
     pub blue:  bool,
     pub green: bool,
 }
 
-#[serde(rename_all = "camelCase")]
 #[derive(Debug, Default, Clone, Copy, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct Crystal {
     pub one:   bool,
     pub two:   bool,
