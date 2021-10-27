@@ -14,8 +14,8 @@ use crate::{
 use serde_derive::Deserialize;
 use std::convert::TryInto;
 
-#[serde(rename_all = "camelCase")]
 #[derive(Debug, Clone, Copy, Deserialize, PartialEq)]
+#[serde(rename_all = "camelCase")]
 pub enum Rule {
     BlueBoomerang,
     Bomb,

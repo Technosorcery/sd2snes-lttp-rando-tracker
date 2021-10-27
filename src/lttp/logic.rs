@@ -14,8 +14,8 @@ use serde_derive::{
     Serialize,
 };
 
-#[serde(rename_all = "camelCase")]
 #[derive(Debug, Clone, Copy, PartialEq, PartialOrd, Ord, Eq, Deserialize, Serialize)]
+#[serde(rename_all = "camelCase")]
 pub enum RandoLogic {
     Glitchless,
     OverWorldGlitches,

@@ -31,8 +31,8 @@ use serde_derive::{
 };
 use std::convert::TryFrom;
 
-#[serde(rename_all = "camelCase")]
 #[derive(Debug, Default, Copy, Clone, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct GameState {
     // Items
     pub bow:              bool,
@@ -318,22 +318,22 @@ impl GameState {
     }
 }
 
-#[serde(deny_unknown_fields, rename_all = "camelCase")]
 #[derive(Debug, Clone, Copy, Default, Serialize, Deserialize, PartialEq)]
+#[serde(deny_unknown_fields, rename_all = "camelCase")]
 pub struct LocationPosition {
     pub horizontal: LocationCoordinates,
     pub vertical:   LocationCoordinates,
 }
 
-#[serde(deny_unknown_fields, rename_all = "camelCase")]
 #[derive(Debug, Clone, Copy, Default, Serialize, Deserialize, PartialEq)]
+#[serde(deny_unknown_fields, rename_all = "camelCase")]
 pub struct LocationCoordinates {
     pub left: f32,
     pub top:  f32,
 }
 
-#[serde(deny_unknown_fields, rename_all = "camelCase")]
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+#[serde(deny_unknown_fields, rename_all = "camelCase")]
 pub struct Location {
     pub name:         String,
     pub hover_text:   String,
@@ -363,14 +363,14 @@ impl Location {
     }
 }
 
-#[serde(deny_unknown_fields, rename_all = "camelCase")]
 #[derive(Debug, Clone, Copy, Deserialize)]
+#[serde(deny_unknown_fields, rename_all = "camelCase")]
 pub struct LocationUpdate {
     pub cleared: Option<bool>,
 }
 
-#[serde(rename_all = "camelCase")]
 #[derive(Debug, Clone, Default, Serialize, Deserialize, PartialEq)]
+#[serde(rename_all = "camelCase")]
 pub struct LocationState {
     pub locations: Vec<Location>,
 }
@@ -401,16 +401,16 @@ impl LocationState {
     }
 }
 
-#[serde(deny_unknown_fields, rename_all = "camelCase")]
 #[derive(Debug, Clone, Default, Serialize, Deserialize, PartialEq)]
+#[serde(deny_unknown_fields, rename_all = "camelCase")]
 pub struct DungeonBoss {
     pub name:         String,
     pub hover_text:   String,
     pub image_number: String,
 }
 
-#[serde(deny_unknown_fields, rename_all = "camelCase")]
 #[derive(Debug, Clone, Default, Serialize, Deserialize, PartialEq)]
+#[serde(deny_unknown_fields, rename_all = "camelCase")]
 pub struct Dungeon {
     pub name:                 String,
     pub dungeon_code:         String,
@@ -493,8 +493,8 @@ impl Default for Medallion {
     fn default() -> Medallion { Medallion::Unknown }
 }
 
-#[serde(deny_unknown_fields, rename_all = "camelCase")]
 #[derive(Debug, Clone, Copy, Deserialize)]
+#[serde(deny_unknown_fields, rename_all = "camelCase")]
 pub struct DungeonUpdate {
     pub found_chests: Option<u8>,
     pub reward:       Option<DungeonReward>,
@@ -502,8 +502,8 @@ pub struct DungeonUpdate {
     pub cleared:      Option<bool>,
 }
 
-#[serde(deny_unknown_fields, rename_all = "camelCase")]
 #[derive(Debug, Clone, Default, Serialize, PartialEq)]
+#[serde(deny_unknown_fields, rename_all = "camelCase")]
 pub struct DungeonState {
     pub dungeons: Vec<Dungeon>,
 }

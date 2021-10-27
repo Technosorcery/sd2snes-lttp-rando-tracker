@@ -3,8 +3,8 @@ use serde_derive::{
     Serialize,
 };
 
-#[serde(rename_all = "camelCase")]
 #[derive(Debug, Clone, Copy, Deserialize, Serialize, PartialEq)]
+#[serde(rename_all = "camelCase")]
 pub enum Availability {
     Unavailable,
     GlitchPossible,
