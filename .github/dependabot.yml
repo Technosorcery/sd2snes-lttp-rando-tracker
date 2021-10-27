@@ -1,0 +1,79 @@
+version: 2
+updates:
+- package-ecosystem: cargo
+  directory: "/"
+  schedule:
+    interval: daily
+    timezone: America/Los_Angeles
+  open-pull-requests-limit: 10
+  reviewers:
+  - jhelwig
+  assignees:
+  - jhelwig
+  ignore:
+  - dependency-name: hyper
+    versions:
+    - 0.14.2
+    - 0.14.4
+    - 0.14.5
+    - 0.14.6
+  - dependency-name: serde
+    versions:
+    - 1.0.123
+    - 1.0.124
+  - dependency-name: serde_derive
+    versions:
+    - 1.0.123
+    - 1.0.124
+  - dependency-name: serde_json
+    versions:
+    - 1.0.61
+    - 1.0.62
+    - 1.0.63
+  - dependency-name: serde_yaml
+    versions:
+    - 0.8.15
+    - 0.8.16
+  - dependency-name: rocket_codegen
+    versions:
+    - 0.4.6
+  - dependency-name: rocket
+    versions:
+    - 0.4.6
+- package-ecosystem: npm
+  directory: "/ui"
+  schedule:
+    interval: daily
+    timezone: America/Los_Angeles
+  open-pull-requests-limit: 10
+  reviewers:
+  - jhelwig
+  assignees:
+  - jhelwig
+  ignore:
+  - dependency-name: y18n
+    versions:
+    - 4.0.1
+    - 4.0.2
+  - dependency-name: eslint-plugin-vue
+    versions:
+    - 7.5.0
+    - 7.6.0
+    - 7.7.0
+    - 7.8.0
+  - dependency-name: sass-loader
+    versions:
+    - 10.1.1
+    - 11.0.0
+  - dependency-name: "@vue/cli-service"
+    versions:
+    - 4.5.11
+  - dependency-name: "@vue/cli-plugin-eslint"
+    versions:
+    - 4.5.11
+  - dependency-name: "@vue/cli-plugin-babel"
+    versions:
+    - 4.5.11
+  - dependency-name: lodash
+    versions:
+    - 4.17.20
