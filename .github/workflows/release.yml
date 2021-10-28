@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Download Linux binary
-      uses: actions/download-artifact@master
+      uses: actions/download-artifact@v2
       with:
         name: app_ubuntu-latest
         path: app/ubuntu
@@ -19,7 +19,7 @@ jobs:
       run: |
         tar -czvf sd2snes-lttp-rando-tracker-linux-release.tar.gz -C app/ubuntu .
     - name: Download Windows binary
-      uses: actions/download-artifact@master
+      uses: actions/download-artifact@v2
       with:
         name: app_windows-latest
         path: app/windows
@@ -27,7 +27,7 @@ jobs:
       run: |
         zip --junk-paths sd2snes-lttp-rando-tracker-windows-release.zip app/windows/sd2snes-*
     - name: Download macOS binary
-      uses: actions/download-artifact@master
+      uses: actions/download-artifact@v2
       with:
         name: app_macOS-latest
         path: app/macos
@@ -80,18 +80,19 @@ jobs:
         - 13.x
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v2
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v1
       with:
         node-version: ${{ matrix.node-version }}
-    - name: Get yarn cache
-      id: yarn-cache
+    - name: Get yarn cache dir path
+      id: yarn-cache-dir-path
       run: echo "::set-output name=dir::$(cd ui && yarn cache dir)"
-
-    - uses: actions/cache@v1.1.0
+    - uses: actions/cache@v2
+      id: yarn-cache
+      name: Cache yarn
       with:
-        path: ${{ steps.yarn-cache.outputs.dir }}
+        path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
         key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
         restore-keys: |
           ${{ runner.os }}-yarn-
@@ -107,7 +108,7 @@ jobs:
       run: |
         cd ui
         yarn build
-    - uses: actions/upload-artifact@master
+    - uses: actions/upload-artifact@v2
       with:
         name: ui-dist
         path: ui/dist
@@ -124,40 +125,35 @@ jobs:
         - macOS-latest
     runs-on: ${{ matrix.os }}
     steps:
-    - uses: actions/checkout@v1
-    - uses: actions/download-artifact@master
+    - uses: actions/checkout@v2
+    - uses: actions/download-artifact@v2
       with:
         name: ui-dist
         path: ui/dist
     - name: Install nightly
-      uses: actions-rs/toolchain@v1
+      uses: actions-rs/toolchain@v1.0.6
       with:
         toolchain: nightly
         override: true
-    - name: Cache cargo registry
-      uses: actions/cache@v1.1.0
+    - uses: actions/cache@v2
+      name: Cache cargo
       with:
-        path: ~/.cargo/registry
-        key: ${{ runner.os }}-cargo-registry-${{ hashFiles('**/Cargo.lock') }}
-    - name: Cache cargo index
-      uses: actions/cache@v1.1.0
-      with:
-        path: ~/.cargo/git
-        key: ${{ runner.os }}-cargo-index-${{ hashFiles('**/Cargo.lock') }}
-    - name: Cache cargo build
-      uses: actions/cache@v1.1.0
-      with:
-        path: target
-        key: ${{ runner.os }}-cargo-build-target-${{ hashFiles('**/Cargo.lock') }}
+        path: |
+          ~/.cargo/bin/
+          ~/.cargo/registry/index/
+          ~/.cargo/registry/cache/
+          ~/.cargo/git/db/
+          target/
+        key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
     - name: Test
-      uses: actions-rs/cargo@v1
+      uses: actions-rs/cargo@v1.0.1
       env:
         SKIP_UI_BUILD: true
       with:
         command: test
         args: --verbose
     - name: Build
-      uses: actions-rs/cargo@v1
+      uses: actions-rs/cargo@v1.0.1
       with:
         command: build
         args: --verbose --release
@@ -165,13 +161,13 @@ jobs:
         SKIP_UI_BUILD: true
     - name: Upload release artifact (Windows)
       if: matrix.os == 'windows-latest'
-      uses: actions/upload-artifact@master
+      uses: actions/upload-artifact@v2
       with:
         name: app_${{ matrix.os }}
         path: target/release/sd2snes-lttp-rando-tracker.exe
     - name: Upload release artifact
       if: matrix.os != 'windows-latest'
-      uses: actions/upload-artifact@master
+      uses: actions/upload-artifact@v2
       with:
         name: app_${{ matrix.os }}
         path: target/release/sd2snes-lttp-rando-tracker
