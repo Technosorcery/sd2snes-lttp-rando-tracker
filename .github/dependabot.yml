@@ -17,6 +17,7 @@ updates:
     - 0.14.4
     - 0.14.5
     - 0.14.6
+  - dependency-name: phf
   - dependency-name: rocket_codegen
     versions:
     - 0.4.6
