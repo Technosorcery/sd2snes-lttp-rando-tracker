@@ -17,6 +17,13 @@ updates:
     - 0.14.4
     - 0.14.5
     - 0.14.6
+  - dependency-name: phf
+  - dependency-name: rocket_codegen
+    versions:
+    - 0.4.6
+  - dependency-name: rocket
+    versions:
+    - 0.4.6
   - dependency-name: serde
     versions:
     - 1.0.123
@@ -34,12 +41,6 @@ updates:
     versions:
     - 0.8.15
     - 0.8.16
-  - dependency-name: rocket_codegen
-    versions:
-    - 0.4.6
-  - dependency-name: rocket
-    versions:
-    - 0.4.6
 - package-ecosystem: npm
   directory: "/ui"
   schedule:
