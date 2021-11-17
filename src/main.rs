@@ -927,6 +927,9 @@ fn websocket_server(bind_addr: std::net::SocketAddr) {
         })
         .map_err(|_| {});
 
-    core.run(f).unwrap();
+    match core.run(f) {
+        Ok(_) => println!("Websocket server running!"),
+        Err(e) => println!("Error starting websocket server: {:#?}", e),
+    }
     println!("Websocket server closed");
 }
