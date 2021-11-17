@@ -706,7 +706,7 @@ dependencies = [
  "time",
  "traitobject",
  "typeable",
- "unicase",
+ "unicase 1.4.2",
  "url",
 ]
 
@@ -1673,7 +1673,7 @@ dependencies = [
  "serial",
  "tokio 1.14.0",
  "tokio-core",
- "unicase",
+ "unicase 2.6.0",
  "websocket",
 ]
 
@@ -2273,6 +2273,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "unicase"
+version = "2.6.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "50f37be617794602aabbeee0be4f259dc1778fabe05e2d67ee8f79326d5cb4f6"
+dependencies = [
+ "version_check 0.9.3",
+]
+
+[[package]]
 name = "unicode-bidi"
 version = "0.3.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2401,7 +2410,7 @@ dependencies = [
  "tokio-core",
  "tokio-io",
  "tokio-tls",
- "unicase",
+ "unicase 1.4.2",
  "url",
 ]
 
