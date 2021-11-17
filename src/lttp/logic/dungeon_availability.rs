@@ -1682,7 +1682,7 @@ impl DungeonAvailability {
                 let mut big_key_guaranteed = false;
                 // Hope Room x2
                 let mut min_available_chests: u8 = 2;
-                let mut max_available_chests = 2;
+                let mut max_available_chests: u8 = 2;
                 // Bob's Torch
                 if Rule::Boots.check(&state) {
                     min_available_chests += 1;
@@ -1745,8 +1745,12 @@ impl DungeonAvailability {
                     small_keys_needed = max(4, small_keys_needed);
                     big_key_needed = 1;
                 }
-                let max_items_available =
-                    min(20, max_available_chests - small_keys_needed - big_key_needed);
+                let max_items_available = min(
+                    20,
+                    max_available_chests
+                        .saturating_sub(small_keys_needed)
+                        .saturating_sub(big_key_needed),
+                );
                 // 4 keys + big key + map + compass
                 let min_items_available = min_available_chests.checked_sub(7).unwrap_or(0);
 
