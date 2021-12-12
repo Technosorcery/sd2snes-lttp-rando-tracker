@@ -9,11 +9,12 @@ pub use crate::lttp::logic::{
     location_availability::LocationAvailability,
     rule::Rule,
 };
-use serde_derive::{
+use serde::{
     Deserialize,
     Serialize,
 };
 
+#[allow(clippy::module_name_repetitions)]
 #[derive(Debug, Clone, Copy, PartialEq, PartialOrd, Ord, Eq, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub enum RandoLogic {

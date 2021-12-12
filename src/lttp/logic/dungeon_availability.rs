@@ -9,7 +9,7 @@ use crate::lttp::{
     GameState,
     Medallion,
 };
-use serde_derive::{
+use serde::{
     Deserialize,
     Serialize,
 };
@@ -17,6 +17,7 @@ use std::cmp::{
     max,
     min,
 };
+use tracing::error;
 
 #[derive(Debug, Copy, Clone, Serialize, Deserialize, PartialEq)]
 #[serde(rename_all = "camelCase")]
@@ -35,6 +36,7 @@ pub enum DungeonAvailability {
 }
 
 impl DungeonAvailability {
+    #[allow(clippy::too_many_lines)]
     pub fn can_enter(
         &self,
         state: &GameState,
@@ -43,32 +45,33 @@ impl DungeonAvailability {
         agahnim_check: bool,
         allow_out_of_logic_glitches: bool,
     ) -> bool {
+        #[allow(clippy::match_same_arms)]
         match self {
             DungeonAvailability::DesertPalace => {
                 return match *logic {
                     RandoLogic::Glitchless => {
-                        Rule::Book.check(&state)
-                            || (Rule::Mirror.check(&state)
-                                && Rule::CanLiftDarkRocks.check(&state)
-                                && Rule::CanFly.check(&state))
+                        Rule::Book.check(state)
+                            || (Rule::Mirror.check(state)
+                                && Rule::CanLiftDarkRocks.check(state)
+                                && Rule::CanFly.check(state))
                     }
                     RandoLogic::OverWorldGlitches => {
-                        Rule::Book.check(&state)
-                            || Rule::Boots.check(&state)
-                            || (Rule::Mirror.check(&state)
+                        Rule::Book.check(state)
+                            || Rule::Boots.check(state)
+                            || (Rule::Mirror.check(state)
                                 && Rule::CanEnterMireArea.check_with_options(
-                                    &state,
+                                    state,
                                     &RandoLogic::OverWorldGlitches,
                                     agahnim_check,
                                     allow_out_of_logic_glitches,
                                 ))
                     }
                     RandoLogic::MajorGlitches => {
-                        Rule::Book.check(&state)
-                            || Rule::Boots.check(&state)
-                            || (Rule::Mirror.check(&state)
+                        Rule::Book.check(state)
+                            || Rule::Boots.check(state)
+                            || (Rule::Mirror.check(state)
                                 && Rule::CanEnterMireArea.check_with_options(
-                                    &state,
+                                    state,
                                     &RandoLogic::MajorGlitches,
                                     agahnim_check,
                                     allow_out_of_logic_glitches,
@@ -79,21 +82,21 @@ impl DungeonAvailability {
             DungeonAvailability::GanonsTower => {
                 return match *logic {
                     RandoLogic::Glitchless => {
-                        Rule::AllSevenCrystals.check(&state)
-                            && Rule::MoonPearl.check(&state)
+                        Rule::AllSevenCrystals.check(state)
+                            && Rule::MoonPearl.check(state)
                             && Rule::CanEnterEastDarkWorldDeathMountain.check_with_options(
-                                &state,
+                                state,
                                 &RandoLogic::Glitchless,
                                 false,
                                 allow_out_of_logic_glitches,
                             )
                     }
                     RandoLogic::OverWorldGlitches => {
-                        Rule::Boots.check(&state) && Rule::MoonPearl.check(&state)
+                        Rule::Boots.check(state) && Rule::MoonPearl.check(state)
                     }
                     RandoLogic::MajorGlitches => {
                         Rule::CanEnterWestDeathMountain.check_with_options(
-                            &state,
+                            state,
                             &RandoLogic::MajorGlitches,
                             false,
                             allow_out_of_logic_glitches,
@@ -104,20 +107,20 @@ impl DungeonAvailability {
             DungeonAvailability::IcePalace => {
                 return match *logic {
                     RandoLogic::Glitchless => {
-                        Rule::CanLiftDarkRocks.check(&state)
-                            && Rule::CanMeltThings.check(&state)
+                        Rule::CanLiftDarkRocks.check(state)
+                            && Rule::CanMeltThings.check(state)
                             && (allow_out_of_logic_glitches
-                                || (Rule::MoonPearl.check(&state) && Rule::Flippers.check(&state)))
+                                || (Rule::MoonPearl.check(state) && Rule::Flippers.check(state)))
                     }
                     RandoLogic::OverWorldGlitches => {
-                        Rule::CanLiftDarkRocks.check(&state) && Rule::CanMeltThings.check(&state)
+                        Rule::CanLiftDarkRocks.check(state) && Rule::CanMeltThings.check(state)
                     }
                     RandoLogic::MajorGlitches => {
-                        Rule::CanLiftDarkRocks.check(&state)
-                            || (Rule::Mirror.check(&state)
-                                && Rule::GlitchedLinkInDarkWorld.check(&state)
+                        Rule::CanLiftDarkRocks.check(state)
+                            || (Rule::Mirror.check(state)
+                                && Rule::GlitchedLinkInDarkWorld.check(state)
                                 && Rule::CanEnterSouthDarkWorld.check_with_options(
-                                    &state,
+                                    state,
                                     &RandoLogic::MajorGlitches,
                                     agahnim_check,
                                     allow_out_of_logic_glitches,
@@ -128,37 +131,37 @@ impl DungeonAvailability {
             DungeonAvailability::MiseryMire => {
                 return match *logic {
                     RandoLogic::Glitchless => {
-                        self.has_medallion(&state, &dungeons)
-                            && Rule::Sword1.check(&state)
-                            && Rule::MoonPearl.check(&state)
-                            && (Rule::Boots.check(&state) || Rule::HookShot.check(&state))
+                        self.has_medallion(state, dungeons)
+                            && Rule::Sword1.check(state)
+                            && Rule::MoonPearl.check(state)
+                            && (Rule::Boots.check(state) || Rule::HookShot.check(state))
                             && Rule::CanEnterMireArea.check_with_options(
-                                &state,
+                                state,
                                 &RandoLogic::Glitchless,
                                 agahnim_check,
                                 allow_out_of_logic_glitches,
                             )
                     }
                     RandoLogic::OverWorldGlitches => {
-                        self.has_medallion(&state, &dungeons)
-                            && Rule::Sword1.check(&state)
-                            && Rule::MoonPearl.check(&state)
-                            && (Rule::Boots.check(&state) || Rule::HookShot.check(&state))
+                        self.has_medallion(state, dungeons)
+                            && Rule::Sword1.check(state)
+                            && Rule::MoonPearl.check(state)
+                            && (Rule::Boots.check(state) || Rule::HookShot.check(state))
                             && Rule::CanEnterMireArea.check_with_options(
-                                &state,
+                                state,
                                 &RandoLogic::OverWorldGlitches,
                                 agahnim_check,
                                 allow_out_of_logic_glitches,
                             )
                     }
                     RandoLogic::MajorGlitches => {
-                        self.has_medallion(&state, &dungeons)
-                            && Rule::Sword1.check(&state)
-                            && (Rule::MoonPearl.check(&state)
-                                || (Rule::Bottle.check(&state) && Rule::Boots.check(&state)))
-                            && (Rule::Boots.check(&state) || Rule::HookShot.check(&state))
+                        self.has_medallion(state, dungeons)
+                            && Rule::Sword1.check(state)
+                            && (Rule::MoonPearl.check(state)
+                                || (Rule::Bottle.check(state) && Rule::Boots.check(state)))
+                            && (Rule::Boots.check(state) || Rule::HookShot.check(state))
                             && Rule::CanEnterMireArea.check_with_options(
-                                &state,
+                                state,
                                 &RandoLogic::MajorGlitches,
                                 agahnim_check,
                                 allow_out_of_logic_glitches,
@@ -169,87 +172,87 @@ impl DungeonAvailability {
             DungeonAvailability::PalaceOfDarkness => {
                 if *logic < RandoLogic::MajorGlitches {
                     return Rule::CanEnterNorthEastDarkWorld.check_with_options(
-                        &state,
+                        state,
                         logic,
                         agahnim_check,
                         allow_out_of_logic_glitches,
-                    ) && Rule::MoonPearl.check(&state);
-                } else {
-                    return (Rule::GlitchedLinkInDarkWorld.check(&state)
-                        && Rule::CanEnterNorthEastDarkWorld.check_with_options(
-                            &state,
-                            &RandoLogic::MajorGlitches,
-                            agahnim_check,
-                            allow_out_of_logic_glitches,
-                        ))
-                        || Rule::CanEnterWestDeathMountain.check_with_options(
-                            &state,
-                            &RandoLogic::MajorGlitches,
-                            agahnim_check,
-                            allow_out_of_logic_glitches,
-                        );
+                    ) && Rule::MoonPearl.check(state);
                 }
+
+                return (Rule::GlitchedLinkInDarkWorld.check(state)
+                    && Rule::CanEnterNorthEastDarkWorld.check_with_options(
+                        state,
+                        &RandoLogic::MajorGlitches,
+                        agahnim_check,
+                        allow_out_of_logic_glitches,
+                    ))
+                    || Rule::CanEnterWestDeathMountain.check_with_options(
+                        state,
+                        &RandoLogic::MajorGlitches,
+                        agahnim_check,
+                        allow_out_of_logic_glitches,
+                    );
             }
             DungeonAvailability::SkullWoods => {
                 if *logic == RandoLogic::Glitchless {
-                    return Rule::MoonPearl.check(&state)
+                    return Rule::MoonPearl.check(state)
                         && Rule::CanEnterNorthWestDarkWorld.check_with_options(
-                            &state,
+                            state,
                             &RandoLogic::Glitchless,
                             agahnim_check,
                             allow_out_of_logic_glitches,
                         );
-                } else {
-                    return Rule::CanEnterNorthWestDarkWorld.check_with_options(
-                        &state,
-                        logic,
-                        agahnim_check,
-                        allow_out_of_logic_glitches,
-                    );
                 }
+
+                return Rule::CanEnterNorthWestDarkWorld.check_with_options(
+                    state,
+                    logic,
+                    agahnim_check,
+                    allow_out_of_logic_glitches,
+                );
             }
             DungeonAvailability::SwampPalace => {
                 if *logic < RandoLogic::MajorGlitches {
-                    return Rule::MoonPearl.check(&state)
-                        && Rule::Mirror.check(&state)
-                        && Rule::Flippers.check(&state)
+                    return Rule::MoonPearl.check(state)
+                        && Rule::Mirror.check(state)
+                        && Rule::Flippers.check(state)
                         && Rule::CanEnterSouthDarkWorld.check_with_options(
-                            &state,
+                            state,
                             logic,
                             agahnim_check,
                             allow_out_of_logic_glitches,
                         );
-                } else {
-                    return DungeonAvailability::MiseryMire.can_enter(
-                        &state,
-                        &dungeons,
+                }
+
+                return DungeonAvailability::MiseryMire.can_enter(
+                    state,
+                    dungeons,
+                    &RandoLogic::MajorGlitches,
+                    agahnim_check,
+                    allow_out_of_logic_glitches,
+                ) || (Rule::MoonPearl.check(state)
+                    && Rule::Mirror.check(state)
+                    && Rule::Flippers.check(state)
+                    && Rule::CanEnterSouthDarkWorld.check_with_options(
+                        state,
                         &RandoLogic::MajorGlitches,
                         agahnim_check,
                         allow_out_of_logic_glitches,
-                    ) || (Rule::MoonPearl.check(&state)
-                        && Rule::Mirror.check(&state)
-                        && Rule::Flippers.check(&state)
-                        && Rule::CanEnterSouthDarkWorld.check_with_options(
-                            &state,
-                            &RandoLogic::MajorGlitches,
-                            agahnim_check,
-                            allow_out_of_logic_glitches,
-                        ));
-                }
+                    ));
             }
             DungeonAvailability::ThievesTown => {
                 return if *logic == RandoLogic::Glitchless {
-                    Rule::GlitchedLinkInDarkWorld.check(&state)
+                    Rule::GlitchedLinkInDarkWorld.check(state)
                         && Rule::CanEnterNorthWestDarkWorld.check_with_options(
-                            &state,
+                            state,
                             &RandoLogic::Glitchless,
                             agahnim_check,
                             allow_out_of_logic_glitches,
                         )
                 } else {
-                    Rule::MoonPearl.check(&state)
+                    Rule::MoonPearl.check(state)
                         && Rule::CanEnterNorthWestDarkWorld.check_with_options(
-                            &state,
+                            state,
                             logic,
                             agahnim_check,
                             allow_out_of_logic_glitches,
@@ -260,35 +263,35 @@ impl DungeonAvailability {
                 return match *logic {
                     RandoLogic::Glitchless => {
                         Rule::CanEnterWestDeathMountain.check_with_options(
-                            &state,
+                            state,
                             &RandoLogic::Glitchless,
                             false,
                             allow_out_of_logic_glitches,
-                        ) && (Rule::Mirror.check(&state)
-                            || (Rule::HookShot.check(&state) && Rule::Hammer.check(&state)))
+                        ) && (Rule::Mirror.check(state)
+                            || (Rule::HookShot.check(state) && Rule::Hammer.check(state)))
                     }
                     RandoLogic::OverWorldGlitches => {
-                        Rule::Boots.check(&state)
+                        Rule::Boots.check(state)
                             || (Rule::CanEnterWestDeathMountain.check_with_options(
-                                &state,
+                                state,
                                 &RandoLogic::OverWorldGlitches,
                                 false,
                                 allow_out_of_logic_glitches,
-                            ) && (Rule::Mirror.check(&state)
-                                || (Rule::HookShot.check(&state) && Rule::Hammer.check(&state))))
+                            ) && (Rule::Mirror.check(state)
+                                || (Rule::HookShot.check(state) && Rule::Hammer.check(state))))
                     }
                     RandoLogic::MajorGlitches => {
-                        Rule::Boots.check(&state)
+                        Rule::Boots.check(state)
                             || (Rule::CanEnterWestDeathMountain.check_with_options(
-                                &state,
+                                state,
                                 &RandoLogic::MajorGlitches,
                                 false,
                                 allow_out_of_logic_glitches,
-                            ) && (Rule::Mirror.check(&state)
-                                || (Rule::HookShot.check(&state) && Rule::Hammer.check(&state))))
+                            ) && (Rule::Mirror.check(state)
+                                || (Rule::HookShot.check(state) && Rule::Hammer.check(state))))
                             || DungeonAvailability::MiseryMire.can_enter(
-                                &state,
-                                &dungeons,
+                                state,
+                                dungeons,
                                 &RandoLogic::MajorGlitches,
                                 agahnim_check,
                                 allow_out_of_logic_glitches,
@@ -300,8 +303,8 @@ impl DungeonAvailability {
                 return match *logic {
                     RandoLogic::Glitchless => {
                         self.upper_can(
-                            &state,
-                            &dungeons,
+                            state,
+                            dungeons,
                             &RandoLogic::Glitchless,
                             agahnim_check,
                             allow_out_of_logic_glitches,
@@ -309,13 +312,13 @@ impl DungeonAvailability {
                     }
                     RandoLogic::OverWorldGlitches => {
                         self.middle(
-                            &state,
+                            state,
                             &RandoLogic::OverWorldGlitches,
                             agahnim_check,
                             allow_out_of_logic_glitches,
                         ) || self.upper_can(
-                            &state,
-                            &dungeons,
+                            state,
+                            dungeons,
                             &RandoLogic::OverWorldGlitches,
                             agahnim_check,
                             allow_out_of_logic_glitches,
@@ -323,18 +326,18 @@ impl DungeonAvailability {
                     }
                     RandoLogic::MajorGlitches => {
                         self.lower(
-                            &state,
+                            state,
                             &RandoLogic::MajorGlitches,
                             agahnim_check,
                             allow_out_of_logic_glitches,
                         ) || self.middle(
-                            &state,
+                            state,
                             &RandoLogic::MajorGlitches,
                             agahnim_check,
                             allow_out_of_logic_glitches,
                         ) || self.upper_can(
-                            &state,
-                            &dungeons,
+                            state,
+                            dungeons,
                             &RandoLogic::MajorGlitches,
                             agahnim_check,
                             allow_out_of_logic_glitches,
@@ -343,12 +346,14 @@ impl DungeonAvailability {
                 }
             }
 
-            x => eprintln!("can_enter not yet implemented for {:?}", x),
+            #[allow(clippy::match_wildcard_for_single_variants)]
+            x => error!("can_enter not yet implemented for {:?}", x),
         }
 
         false
     }
 
+    #[allow(clippy::too_many_lines)]
     pub fn may_enter(
         &self,
         state: &GameState,
@@ -361,37 +366,37 @@ impl DungeonAvailability {
             DungeonAvailability::MiseryMire => {
                 return match *logic {
                     RandoLogic::Glitchless => {
-                        self.may_have_medallion(&state, &dungeons)
-                            && Rule::Sword1.check(&state)
-                            && Rule::MoonPearl.check(&state)
-                            && (Rule::Boots.check(&state) || Rule::HookShot.check(&state))
+                        self.may_have_medallion(state, dungeons)
+                            && Rule::Sword1.check(state)
+                            && Rule::MoonPearl.check(state)
+                            && (Rule::Boots.check(state) || Rule::HookShot.check(state))
                             && Rule::CanEnterMireArea.check_with_options(
-                                &state,
+                                state,
                                 &RandoLogic::Glitchless,
                                 agahnim_check,
                                 allow_out_of_logic_glitches,
                             )
                     }
                     RandoLogic::OverWorldGlitches => {
-                        self.may_have_medallion(&state, &dungeons)
-                            && Rule::Sword1.check(&state)
-                            && Rule::MoonPearl.check(&state)
-                            && (Rule::Boots.check(&state) || Rule::HookShot.check(&state))
+                        self.may_have_medallion(state, dungeons)
+                            && Rule::Sword1.check(state)
+                            && Rule::MoonPearl.check(state)
+                            && (Rule::Boots.check(state) || Rule::HookShot.check(state))
                             && Rule::CanEnterMireArea.check_with_options(
-                                &state,
+                                state,
                                 &RandoLogic::OverWorldGlitches,
                                 agahnim_check,
                                 allow_out_of_logic_glitches,
                             )
                     }
                     RandoLogic::MajorGlitches => {
-                        self.may_have_medallion(&state, &dungeons)
-                            && Rule::Sword1.check(&state)
-                            && (Rule::MoonPearl.check(&state)
-                                || (Rule::Bottle.check(&state) && Rule::Boots.check(&state)))
-                            && (Rule::Boots.check(&state) || Rule::HookShot.check(&state))
+                        self.may_have_medallion(state, dungeons)
+                            && Rule::Sword1.check(state)
+                            && (Rule::MoonPearl.check(state)
+                                || (Rule::Bottle.check(state) && Rule::Boots.check(state)))
+                            && (Rule::Boots.check(state) || Rule::HookShot.check(state))
                             && Rule::CanEnterMireArea.check_with_options(
-                                &state,
+                                state,
                                 &RandoLogic::MajorGlitches,
                                 agahnim_check,
                                 allow_out_of_logic_glitches,
@@ -401,23 +406,23 @@ impl DungeonAvailability {
             }
             DungeonAvailability::TowerOfHera => {
                 if *logic < RandoLogic::MajorGlitches {
-                    return self.can_enter(&state, &dungeons, &logic, false, false);
-                } else {
-                    return DungeonAvailability::MiseryMire.may_enter(
-                        &state,
-                        &dungeons,
-                        &RandoLogic::MajorGlitches,
-                        agahnim_check,
-                        allow_out_of_logic_glitches,
-                    );
+                    return self.can_enter(state, dungeons, logic, false, false);
                 }
+
+                return DungeonAvailability::MiseryMire.may_enter(
+                    state,
+                    dungeons,
+                    &RandoLogic::MajorGlitches,
+                    agahnim_check,
+                    allow_out_of_logic_glitches,
+                );
             }
             DungeonAvailability::TurtleRock => {
                 return match *logic {
                     RandoLogic::Glitchless => {
                         self.upper_may(
-                            &state,
-                            &dungeons,
+                            state,
+                            dungeons,
                             &RandoLogic::Glitchless,
                             agahnim_check,
                             allow_out_of_logic_glitches,
@@ -425,13 +430,13 @@ impl DungeonAvailability {
                     }
                     RandoLogic::OverWorldGlitches => {
                         self.middle(
-                            &state,
+                            state,
                             &RandoLogic::OverWorldGlitches,
                             agahnim_check,
                             allow_out_of_logic_glitches,
                         ) || self.upper_may(
-                            &state,
-                            &dungeons,
+                            state,
+                            dungeons,
                             &RandoLogic::OverWorldGlitches,
                             agahnim_check,
                             allow_out_of_logic_glitches,
@@ -439,18 +444,18 @@ impl DungeonAvailability {
                     }
                     RandoLogic::MajorGlitches => {
                         self.lower(
-                            &state,
+                            state,
                             &RandoLogic::MajorGlitches,
                             agahnim_check,
                             allow_out_of_logic_glitches,
                         ) || self.middle(
-                            &state,
+                            state,
                             &RandoLogic::MajorGlitches,
                             agahnim_check,
                             allow_out_of_logic_glitches,
                         ) || self.upper_may(
-                            &state,
-                            &dungeons,
+                            state,
+                            dungeons,
                             &RandoLogic::MajorGlitches,
                             agahnim_check,
                             allow_out_of_logic_glitches,
@@ -459,12 +464,14 @@ impl DungeonAvailability {
                 }
             }
 
-            x => eprintln!("may_enter not yet implemented for {:?}", x),
+            #[allow(clippy::match_wildcard_for_single_variants)]
+            x => error!("may_enter not yet implemented for {:?}", x),
         }
 
         false
     }
 
+    #[allow(clippy::too_many_lines)]
     pub fn is_beatable(
         &self,
         state: &GameState,
@@ -473,57 +480,52 @@ impl DungeonAvailability {
     ) -> Availability {
         match self {
             DungeonAvailability::DesertPalace => {
-                if Rule::CanLiftRocks.check(&state) && Rule::CanLightTorches.check(&state) {
-                    if self.can_enter(&state, &dungeons, &RandoLogic::Glitchless, false, false) {
-                        if Rule::Boots.check(&state) {
-                            if self.can_hurt_boss(&state) {
+                if Rule::CanLiftRocks.check(state) && Rule::CanLightTorches.check(state) {
+                    if self.can_enter(state, dungeons, &RandoLogic::Glitchless, false, false) {
+                        if Rule::Boots.check(state) {
+                            if self.can_hurt_boss(state) {
                                 return Availability::Available;
-                            } else {
-                                return Availability::GlitchAvailable;
                             }
-                        } else if self.can_hurt_boss(&state) {
+
+                            return Availability::GlitchAvailable;
+                        } else if self.can_hurt_boss(state) {
                             return Availability::Possible;
-                        } else {
-                            return Availability::GlitchPossible;
                         }
+
+                        return Availability::GlitchPossible;
                     }
 
                     if *logic < RandoLogic::OverWorldGlitches {
                         return Availability::Unavailable;
                     }
-                    if self.can_enter(
-                        &state,
-                        &dungeons,
-                        &RandoLogic::OverWorldGlitches,
-                        false,
-                        false,
-                    ) {
-                        if Rule::Boots.check(&state) {
-                            if self.can_hurt_boss(&state) {
+                    if self.can_enter(state, dungeons, &RandoLogic::OverWorldGlitches, false, false)
+                    {
+                        if Rule::Boots.check(state) {
+                            if self.can_hurt_boss(state) {
                                 return Availability::Available;
-                            } else {
-                                return Availability::GlitchAvailable;
                             }
-                        } else if self.can_hurt_boss(&state) {
+
+                            return Availability::GlitchAvailable;
+                        } else if self.can_hurt_boss(state) {
                             return Availability::Possible;
-                        } else {
-                            return Availability::GlitchPossible;
                         }
+
+                        return Availability::GlitchPossible;
                     } else if self.can_enter(
-                        &state,
-                        &dungeons,
+                        state,
+                        dungeons,
                         &RandoLogic::OverWorldGlitches,
                         true,
                         false,
                     ) {
-                        if self.can_hurt_boss(&state) {
+                        if self.can_hurt_boss(state) {
                             return Availability::Agahnim;
-                        } else {
-                            return Availability::GlitchAgahnim;
                         }
+
+                        return Availability::GlitchAgahnim;
                     } else if self.can_enter(
-                        &state,
-                        &dungeons,
+                        state,
+                        dungeons,
                         &RandoLogic::OverWorldGlitches,
                         true,
                         true,
@@ -534,33 +536,33 @@ impl DungeonAvailability {
                     if *logic < RandoLogic::MajorGlitches {
                         return Availability::Unavailable;
                     }
-                    if self.can_enter(&state, &dungeons, &RandoLogic::MajorGlitches, false, false) {
-                        if Rule::Boots.check(&state) {
-                            if self.can_hurt_boss(&state) {
+                    if self.can_enter(state, dungeons, &RandoLogic::MajorGlitches, false, false) {
+                        if Rule::Boots.check(state) {
+                            if self.can_hurt_boss(state) {
                                 return Availability::Available;
-                            } else {
-                                return Availability::GlitchAvailable;
                             }
-                        } else if self.can_hurt_boss(&state) {
+
+                            return Availability::GlitchAvailable;
+                        } else if self.can_hurt_boss(state) {
                             return Availability::Possible;
-                        } else {
-                            return Availability::GlitchPossible;
                         }
+
+                        return Availability::GlitchPossible;
                     } else if self.can_enter(
-                        &state,
-                        &dungeons,
+                        state,
+                        dungeons,
                         &RandoLogic::MajorGlitches,
                         true,
                         false,
                     ) {
-                        if self.can_hurt_boss(&state) {
+                        if self.can_hurt_boss(state) {
                             return Availability::Agahnim;
-                        } else {
-                            return Availability::GlitchAgahnim;
                         }
+
+                        return Availability::GlitchAgahnim;
                     } else if self.can_enter(
-                        &state,
-                        &dungeons,
+                        state,
+                        dungeons,
                         &RandoLogic::MajorGlitches,
                         true,
                         true,
@@ -570,140 +572,120 @@ impl DungeonAvailability {
                 }
             }
             DungeonAvailability::EasternPalace => {
-                if Rule::Bow.check(&state) {
-                    if Rule::Lantern.check(&state) {
+                if Rule::Bow.check(state) {
+                    if Rule::Lantern.check(state) {
                         return Availability::Available;
-                    } else {
-                        return Availability::GlitchAvailable;
                     }
+
+                    return Availability::GlitchAvailable;
                 }
             }
             DungeonAvailability::GanonsTower => {
-                if Rule::HookShot.check(&state)
-                    && Rule::Bow.check(&state)
-                    && Rule::CanLightTorches.check(&state)
-                    && (Rule::Hammer.check(&state) || Rule::Sword1.check(&state))
+                if Rule::HookShot.check(state)
+                    && Rule::Bow.check(state)
+                    && Rule::CanLightTorches.check(state)
+                    && (Rule::Hammer.check(state) || Rule::Sword1.check(state))
                 {
-                    if self.can_enter(&state, &dungeons, &RandoLogic::Glitchless, false, false) {
-                        if Rule::Boots.check(&state)
-                            && Rule::Hammer.check(&state)
-                            && Rule::FireRod.check(&state)
-                            && Rule::SomariaCane.check(&state)
+                    if self.can_enter(state, dungeons, &RandoLogic::Glitchless, false, false) {
+                        if Rule::Boots.check(state)
+                            && Rule::Hammer.check(state)
+                            && Rule::FireRod.check(state)
+                            && Rule::SomariaCane.check(state)
                         {
                             return Availability::Available;
-                        } else {
-                            return Availability::Possible;
                         }
-                    } else if self.can_enter(
-                        &state,
-                        &dungeons,
-                        &RandoLogic::Glitchless,
-                        false,
-                        true,
-                    ) {
-                        if Rule::Boots.check(&state)
-                            && Rule::Hammer.check(&state)
-                            && Rule::FireRod.check(&state)
-                            && Rule::SomariaCane.check(&state)
+
+                        return Availability::Possible;
+                    } else if self.can_enter(state, dungeons, &RandoLogic::Glitchless, false, true)
+                    {
+                        if Rule::Boots.check(state)
+                            && Rule::Hammer.check(state)
+                            && Rule::FireRod.check(state)
+                            && Rule::SomariaCane.check(state)
                         {
                             return Availability::GlitchAvailable;
-                        } else {
-                            return Availability::GlitchPossible;
                         }
+
+                        return Availability::GlitchPossible;
                     }
 
                     if *logic < RandoLogic::OverWorldGlitches {
                         return Availability::Unavailable;
                     }
-                    if self.can_enter(
-                        &state,
-                        &dungeons,
-                        &RandoLogic::OverWorldGlitches,
-                        false,
-                        false,
-                    ) {
-                        if Rule::Boots.check(&state)
-                            && Rule::Hammer.check(&state)
-                            && Rule::FireRod.check(&state)
-                            && Rule::SomariaCane.check(&state)
+                    if self.can_enter(state, dungeons, &RandoLogic::OverWorldGlitches, false, false)
+                    {
+                        if Rule::Boots.check(state)
+                            && Rule::Hammer.check(state)
+                            && Rule::FireRod.check(state)
+                            && Rule::SomariaCane.check(state)
                         {
                             return Availability::Available;
-                        } else {
-                            return Availability::Possible;
                         }
+
+                        return Availability::Possible;
                     }
 
                     if *logic < RandoLogic::MajorGlitches {
                         return Availability::Unavailable;
                     }
-                    if self.can_enter(&state, &dungeons, &RandoLogic::MajorGlitches, false, false) {
-                        if Rule::Boots.check(&state)
-                            && Rule::Hammer.check(&state)
-                            && Rule::FireRod.check(&state)
-                            && Rule::SomariaCane.check(&state)
+                    if self.can_enter(state, dungeons, &RandoLogic::MajorGlitches, false, false) {
+                        if Rule::Boots.check(state)
+                            && Rule::Hammer.check(state)
+                            && Rule::FireRod.check(state)
+                            && Rule::SomariaCane.check(state)
                         {
                             return Availability::Available;
-                        } else {
-                            return Availability::Possible;
                         }
+
+                        return Availability::Possible;
                     } else if self.can_enter(
-                        &state,
-                        &dungeons,
+                        state,
+                        dungeons,
                         &RandoLogic::MajorGlitches,
                         false,
                         true,
                     ) {
-                        if Rule::Boots.check(&state)
-                            && Rule::Hammer.check(&state)
-                            && Rule::FireRod.check(&state)
-                            && Rule::SomariaCane.check(&state)
+                        if Rule::Boots.check(state)
+                            && Rule::Hammer.check(state)
+                            && Rule::FireRod.check(state)
+                            && Rule::SomariaCane.check(state)
                         {
                             return Availability::GlitchAvailable;
-                        } else {
-                            return Availability::GlitchPossible;
                         }
+
+                        return Availability::GlitchPossible;
                     }
                 }
             }
             DungeonAvailability::IcePalace => {
-                if Rule::CanMeltThings.check(&state) && Rule::CanLiftRocks.check(&state) {
-                    if self.can_enter(&state, &dungeons, &RandoLogic::Glitchless, false, false)
-                        && Rule::Hammer.check(&state)
+                if Rule::CanMeltThings.check(state) && Rule::CanLiftRocks.check(state) {
+                    if self.can_enter(state, dungeons, &RandoLogic::Glitchless, false, false)
+                        && Rule::Hammer.check(state)
                     {
-                        if Rule::HookShot.check(&state) && Rule::SomariaCane.check(&state) {
+                        if Rule::HookShot.check(state) && Rule::SomariaCane.check(state) {
                             return Availability::Available;
-                        } else {
-                            return Availability::Possible;
                         }
-                    } else if self.can_enter(
-                        &state,
-                        &dungeons,
-                        &RandoLogic::Glitchless,
-                        false,
-                        true,
-                    ) {
+
+                        return Availability::Possible;
+                    } else if self.can_enter(state, dungeons, &RandoLogic::Glitchless, false, true)
+                    {
                         return Availability::GlitchAvailable;
                     }
 
                     if *logic < RandoLogic::OverWorldGlitches {
                         return Availability::Unavailable;
                     }
-                    if self.can_enter(
-                        &state,
-                        &dungeons,
-                        &RandoLogic::OverWorldGlitches,
-                        false,
-                        false,
-                    ) && Rule::Hammer.check(&state)
+                    if self.can_enter(state, dungeons, &RandoLogic::OverWorldGlitches, false, false)
+                        && Rule::Hammer.check(state)
                     {
-                        if Rule::HookShot.check(&state) && Rule::SomariaCane.check(&state) {
+                        if Rule::HookShot.check(state) && Rule::SomariaCane.check(state) {
                             return Availability::Available;
-                        } else {
-                            return Availability::Possible;
                         }
+
+                        return Availability::Possible;
                     } else if self.can_enter(
-                        &state,
-                        &dungeons,
+                        state,
+                        dungeons,
                         &RandoLogic::OverWorldGlitches,
                         false,
                         true,
@@ -714,34 +696,34 @@ impl DungeonAvailability {
                     if *logic < RandoLogic::MajorGlitches {
                         return Availability::Unavailable;
                     }
-                    if self.can_enter(&state, &dungeons, &RandoLogic::MajorGlitches, false, false)
-                        && Rule::Hammer.check(&state)
+                    if self.can_enter(state, dungeons, &RandoLogic::MajorGlitches, false, false)
+                        && Rule::Hammer.check(state)
                     {
-                        if Rule::HookShot.check(&state) && Rule::SomariaCane.check(&state) {
+                        if Rule::HookShot.check(state) && Rule::SomariaCane.check(state) {
                             return Availability::Available;
-                        } else {
-                            return Availability::Possible;
                         }
+
+                        return Availability::Possible;
                     } else if self.can_enter(
-                        &state,
-                        &dungeons,
+                        state,
+                        dungeons,
                         &RandoLogic::MajorGlitches,
                         false,
                         true,
                     ) {
                         return Availability::GlitchAvailable;
                     } else if self.can_enter(
-                        &state,
-                        &dungeons,
+                        state,
+                        dungeons,
                         &RandoLogic::MajorGlitches,
                         true,
                         false,
-                    ) && Rule::Hammer.check(&state)
+                    ) && Rule::Hammer.check(state)
                     {
                         return Availability::Agahnim;
                     } else if self.can_enter(
-                        &state,
-                        &dungeons,
+                        state,
+                        dungeons,
                         &RandoLogic::MajorGlitches,
                         true,
                         true,
@@ -751,83 +733,83 @@ impl DungeonAvailability {
                 }
             }
             DungeonAvailability::MiseryMire => {
-                if Rule::SomariaCane.check(&state) && self.can_hurt_boss(&state) {
-                    if self.can_enter(&state, &dungeons, &RandoLogic::Glitchless, false, false)
-                        && Rule::Lantern.check(&state)
+                if Rule::SomariaCane.check(state) && self.can_hurt_boss(state) {
+                    if self.can_enter(state, dungeons, &RandoLogic::Glitchless, false, false)
+                        && Rule::Lantern.check(state)
                     {
-                        if Rule::ByrnaCane.check(&state) || Rule::Cape.check(&state) {
+                        if Rule::ByrnaCane.check(state) || Rule::Cape.check(state) {
                             return Availability::Available;
-                        } else {
-                            return Availability::Possible;
                         }
+
+                        return Availability::Possible;
                     }
-                } else if self.may_enter(&state, &dungeons, &RandoLogic::Glitchless, false, false)
-                    && Rule::Lantern.check(&state)
+                } else if self.may_enter(state, dungeons, &RandoLogic::Glitchless, false, false)
+                    && Rule::Lantern.check(state)
                 {
                     return Availability::Possible;
-                } else if self.can_enter(&state, &dungeons, &RandoLogic::Glitchless, false, true) {
-                    if Rule::CanLightTorches.check(&state)
-                        && (Rule::ByrnaCane.check(&state) || Rule::Cape.check(&state))
+                } else if self.can_enter(state, dungeons, &RandoLogic::Glitchless, false, true) {
+                    if Rule::CanLightTorches.check(state)
+                        && (Rule::ByrnaCane.check(state) || Rule::Cape.check(state))
                     {
                         return Availability::GlitchAvailable;
-                    } else {
-                        return Availability::GlitchPossible;
                     }
-                } else if self.may_enter(&state, &dungeons, &RandoLogic::Glitchless, false, true) {
+
+                    return Availability::GlitchPossible;
+                } else if self.may_enter(state, dungeons, &RandoLogic::Glitchless, false, true) {
                     return Availability::GlitchPossible;
                 }
 
                 if *logic < RandoLogic::OverWorldGlitches {
                     return Availability::Unavailable;
                 }
-                if self.can_enter(&state, &dungeons, &RandoLogic::OverWorldGlitches, false, false) {
-                    if Rule::ByrnaCane.check(&state) || Rule::Cape.check(&state) {
+                if self.can_enter(state, dungeons, &RandoLogic::OverWorldGlitches, false, false) {
+                    if Rule::ByrnaCane.check(state) || Rule::Cape.check(state) {
                         return Availability::Available;
-                    } else {
-                        return Availability::Possible;
                     }
+
+                    return Availability::Possible;
                 } else if self.may_enter(
-                    &state,
-                    &dungeons,
+                    state,
+                    dungeons,
                     &RandoLogic::OverWorldGlitches,
                     false,
                     false,
-                ) && Rule::Lantern.check(&state)
+                ) && Rule::Lantern.check(state)
                 {
                     return Availability::Possible;
                 } else if self.can_enter(
-                    &state,
-                    &dungeons,
+                    state,
+                    dungeons,
                     &RandoLogic::OverWorldGlitches,
                     false,
                     true,
                 ) {
-                    if Rule::CanLightTorches.check(&state)
-                        && (Rule::ByrnaCane.check(&state) || Rule::Cape.check(&state))
+                    if Rule::CanLightTorches.check(state)
+                        && (Rule::ByrnaCane.check(state) || Rule::Cape.check(state))
                     {
                         return Availability::GlitchAvailable;
-                    } else {
-                        return Availability::GlitchPossible;
                     }
+
+                    return Availability::GlitchPossible;
                 } else if self.may_enter(
-                    &state,
-                    &dungeons,
+                    state,
+                    dungeons,
                     &RandoLogic::OverWorldGlitches,
                     false,
                     true,
                 ) {
                     return Availability::GlitchPossible;
                 } else if self.may_enter(
-                    &state,
-                    &dungeons,
+                    state,
+                    dungeons,
                     &RandoLogic::OverWorldGlitches,
                     true,
                     false,
                 ) {
                     return Availability::Agahnim;
                 } else if self.may_enter(
-                    &state,
-                    &dungeons,
+                    state,
+                    dungeons,
                     &RandoLogic::OverWorldGlitches,
                     true,
                     true,
@@ -838,103 +820,78 @@ impl DungeonAvailability {
                 if *logic < RandoLogic::MajorGlitches {
                     return Availability::Unavailable;
                 }
-                if self.can_enter(&state, &dungeons, &RandoLogic::MajorGlitches, false, false)
-                    && Rule::Lantern.check(&state)
+                if self.can_enter(state, dungeons, &RandoLogic::MajorGlitches, false, false)
+                    && Rule::Lantern.check(state)
                 {
-                    if Rule::ByrnaCane.check(&state) || Rule::Cape.check(&state) {
+                    if Rule::ByrnaCane.check(state) || Rule::Cape.check(state) {
                         return Availability::Available;
-                    } else {
-                        return Availability::Possible;
                     }
-                } else if self.may_enter(
-                    &state,
-                    &dungeons,
-                    &RandoLogic::MajorGlitches,
-                    false,
-                    false,
-                ) && Rule::Lantern.check(&state)
+
+                    return Availability::Possible;
+                } else if self.may_enter(state, dungeons, &RandoLogic::MajorGlitches, false, false)
+                    && Rule::Lantern.check(state)
                 {
                     return Availability::Possible;
-                } else if self.can_enter(&state, &dungeons, &RandoLogic::MajorGlitches, false, true)
-                {
-                    if Rule::CanLightTorches.check(&state)
-                        && (Rule::ByrnaCane.check(&state) || Rule::Cape.check(&state))
+                } else if self.can_enter(state, dungeons, &RandoLogic::MajorGlitches, false, true) {
+                    if Rule::CanLightTorches.check(state)
+                        && (Rule::ByrnaCane.check(state) || Rule::Cape.check(state))
                     {
                         return Availability::GlitchAvailable;
-                    } else {
-                        return Availability::GlitchPossible;
                     }
-                } else if self.may_enter(&state, &dungeons, &RandoLogic::MajorGlitches, false, true)
-                {
+
                     return Availability::GlitchPossible;
-                } else if self.may_enter(&state, &dungeons, &RandoLogic::MajorGlitches, true, false)
-                {
+                } else if self.may_enter(state, dungeons, &RandoLogic::MajorGlitches, false, true) {
+                    return Availability::GlitchPossible;
+                } else if self.may_enter(state, dungeons, &RandoLogic::MajorGlitches, true, false) {
                     return Availability::Agahnim;
-                } else if self.may_enter(&state, &dungeons, &RandoLogic::MajorGlitches, true, true)
-                {
+                } else if self.may_enter(state, dungeons, &RandoLogic::MajorGlitches, true, true) {
                     return Availability::GlitchAgahnim;
                 }
             }
             DungeonAvailability::PalaceOfDarkness => {
-                if Rule::Hammer.check(&state) && Rule::Bow.check(&state) {
-                    if self.can_enter(&state, &dungeons, &RandoLogic::Glitchless, false, false)
-                        && Rule::Lantern.check(&state)
+                if Rule::Hammer.check(state) && Rule::Bow.check(state) {
+                    if self.can_enter(state, dungeons, &RandoLogic::Glitchless, false, false)
+                        && Rule::Lantern.check(state)
                     {
                         return Availability::Available;
-                    } else if self.can_enter(
-                        &state,
-                        &dungeons,
-                        &RandoLogic::Glitchless,
-                        false,
-                        true,
-                    ) {
+                    } else if self.can_enter(state, dungeons, &RandoLogic::Glitchless, false, true)
+                    {
                         return Availability::GlitchAvailable;
-                    } else if self.can_enter(
-                        &state,
-                        &dungeons,
-                        &RandoLogic::Glitchless,
-                        true,
-                        false,
-                    ) && Rule::Lantern.check(&state)
+                    } else if self.can_enter(state, dungeons, &RandoLogic::Glitchless, true, false)
+                        && Rule::Lantern.check(state)
                     {
                         return Availability::Agahnim;
-                    } else if self.can_enter(&state, &dungeons, &RandoLogic::Glitchless, true, true)
-                    {
+                    } else if self.can_enter(state, dungeons, &RandoLogic::Glitchless, true, true) {
                         return Availability::GlitchAgahnim;
                     }
 
                     if *logic < RandoLogic::OverWorldGlitches {
                         return Availability::Unavailable;
                     }
-                    if self.can_enter(
-                        &state,
-                        &dungeons,
-                        &RandoLogic::OverWorldGlitches,
-                        false,
-                        false,
-                    ) && Rule::Lantern.check(&state)
+                    if self.can_enter(state, dungeons, &RandoLogic::OverWorldGlitches, false, false)
+                        && Rule::Lantern.check(state)
                     {
                         return Availability::Available;
                     } else if self.can_enter(
-                        &state,
-                        &dungeons,
+                        state,
+                        dungeons,
                         &RandoLogic::OverWorldGlitches,
                         false,
                         true,
                     ) {
                         return Availability::GlitchAvailable;
                     } else if self.can_enter(
-                        &state,
-                        &dungeons,
+                        state,
+                        dungeons,
                         &RandoLogic::OverWorldGlitches,
                         true,
                         false,
-                    ) && Rule::Lantern.check(&state)
+                    ) && Rule::Lantern.check(state)
                     {
                         return Availability::Agahnim;
                     } else if self.can_enter(
-                        &state,
-                        &dungeons,
+                        state,
+                        dungeons,
                         &RandoLogic::OverWorldGlitches,
                         true,
                         true,
@@ -945,30 +902,30 @@ impl DungeonAvailability {
                     if *logic < RandoLogic::MajorGlitches {
                         return Availability::Unavailable;
                     }
-                    if self.can_enter(&state, &dungeons, &RandoLogic::MajorGlitches, false, false)
-                        && Rule::Lantern.check(&state)
+                    if self.can_enter(state, dungeons, &RandoLogic::MajorGlitches, false, false)
+                        && Rule::Lantern.check(state)
                     {
                         return Availability::Available;
                     } else if self.can_enter(
-                        &state,
-                        &dungeons,
+                        state,
+                        dungeons,
                         &RandoLogic::MajorGlitches,
                         false,
                         true,
                     ) {
                         return Availability::GlitchAvailable;
                     } else if self.can_enter(
-                        &state,
-                        &dungeons,
+                        state,
+                        dungeons,
                         &RandoLogic::MajorGlitches,
                         true,
                         false,
-                    ) && Rule::Lantern.check(&state)
+                    ) && Rule::Lantern.check(state)
                     {
                         return Availability::Agahnim;
                     } else if self.can_enter(
-                        &state,
-                        &dungeons,
+                        state,
+                        dungeons,
                         &RandoLogic::MajorGlitches,
                         true,
                         true,
@@ -978,55 +935,44 @@ impl DungeonAvailability {
                 }
             }
             DungeonAvailability::SkullWoods => {
-                if Rule::MoonPearl.check(&state)
-                    && Rule::FireRod.check(&state)
-                    && Rule::Sword1.check(&state)
+                if Rule::MoonPearl.check(state)
+                    && Rule::FireRod.check(state)
+                    && Rule::Sword1.check(state)
                 {
-                    if self.can_enter(&state, &dungeons, &RandoLogic::Glitchless, false, false) {
+                    if self.can_enter(state, dungeons, &RandoLogic::Glitchless, false, false) {
                         return Availability::Available;
-                    } else if self.can_enter(
-                        &state,
-                        &dungeons,
-                        &RandoLogic::Glitchless,
-                        true,
-                        false,
-                    ) {
-                        return Availability::Agahnim;
-                    } else if self.can_enter(&state, &dungeons, &RandoLogic::Glitchless, true, true)
+                    } else if self.can_enter(state, dungeons, &RandoLogic::Glitchless, true, false)
                     {
+                        return Availability::Agahnim;
+                    } else if self.can_enter(state, dungeons, &RandoLogic::Glitchless, true, true) {
                         return Availability::GlitchAgahnim;
                     }
 
                     if *logic < RandoLogic::OverWorldGlitches {
                         return Availability::Unavailable;
                     }
-                    if self.can_enter(
-                        &state,
-                        &dungeons,
-                        &RandoLogic::OverWorldGlitches,
-                        false,
-                        false,
-                    ) {
+                    if self.can_enter(state, dungeons, &RandoLogic::OverWorldGlitches, false, false)
+                    {
                         return Availability::Available;
                     } else if self.can_enter(
-                        &state,
-                        &dungeons,
+                        state,
+                        dungeons,
                         &RandoLogic::OverWorldGlitches,
                         false,
                         true,
                     ) {
                         return Availability::GlitchAvailable;
                     } else if self.can_enter(
-                        &state,
-                        &dungeons,
+                        state,
+                        dungeons,
                         &RandoLogic::OverWorldGlitches,
                         true,
                         false,
                     ) {
                         return Availability::Agahnim;
                     } else if self.can_enter(
-                        &state,
-                        &dungeons,
+                        state,
+                        dungeons,
                         &RandoLogic::OverWorldGlitches,
                         true,
                         true,
@@ -1037,27 +983,27 @@ impl DungeonAvailability {
                     if *logic < RandoLogic::MajorGlitches {
                         return Availability::Unavailable;
                     }
-                    if self.can_enter(&state, &dungeons, &RandoLogic::MajorGlitches, false, false) {
+                    if self.can_enter(state, dungeons, &RandoLogic::MajorGlitches, false, false) {
                         return Availability::Available;
                     } else if self.can_enter(
-                        &state,
-                        &dungeons,
+                        state,
+                        dungeons,
                         &RandoLogic::MajorGlitches,
                         false,
                         true,
                     ) {
                         return Availability::GlitchAvailable;
                     } else if self.can_enter(
-                        &state,
-                        &dungeons,
+                        state,
+                        dungeons,
                         &RandoLogic::MajorGlitches,
                         true,
                         false,
                     ) {
                         return Availability::Agahnim;
                     } else if self.can_enter(
-                        &state,
-                        &dungeons,
+                        state,
+                        dungeons,
                         &RandoLogic::MajorGlitches,
                         true,
                         true,
@@ -1067,52 +1013,41 @@ impl DungeonAvailability {
                 }
             }
             DungeonAvailability::SwampPalace => {
-                if Rule::Hammer.check(&state) && Rule::HookShot.check(&state) {
-                    if self.can_enter(&state, &dungeons, &RandoLogic::Glitchless, false, false) {
+                if Rule::Hammer.check(state) && Rule::HookShot.check(state) {
+                    if self.can_enter(state, dungeons, &RandoLogic::Glitchless, false, false) {
                         return Availability::Available;
-                    } else if self.can_enter(
-                        &state,
-                        &dungeons,
-                        &RandoLogic::Glitchless,
-                        true,
-                        false,
-                    ) {
-                        return Availability::Agahnim;
-                    } else if self.can_enter(&state, &dungeons, &RandoLogic::Glitchless, true, true)
+                    } else if self.can_enter(state, dungeons, &RandoLogic::Glitchless, true, false)
                     {
+                        return Availability::Agahnim;
+                    } else if self.can_enter(state, dungeons, &RandoLogic::Glitchless, true, true) {
                         return Availability::GlitchAgahnim;
                     }
 
                     if *logic < RandoLogic::OverWorldGlitches {
                         return Availability::Unavailable;
                     }
-                    if self.can_enter(
-                        &state,
-                        &dungeons,
-                        &RandoLogic::OverWorldGlitches,
-                        false,
-                        false,
-                    ) {
+                    if self.can_enter(state, dungeons, &RandoLogic::OverWorldGlitches, false, false)
+                    {
                         return Availability::Available;
                     } else if self.can_enter(
-                        &state,
-                        &dungeons,
+                        state,
+                        dungeons,
                         &RandoLogic::OverWorldGlitches,
                         false,
                         true,
                     ) {
                         return Availability::GlitchAvailable;
                     } else if self.can_enter(
-                        &state,
-                        &dungeons,
+                        state,
+                        dungeons,
                         &RandoLogic::OverWorldGlitches,
                         true,
                         false,
                     ) {
                         return Availability::Agahnim;
                     } else if self.can_enter(
-                        &state,
-                        &dungeons,
+                        state,
+                        dungeons,
                         &RandoLogic::OverWorldGlitches,
                         true,
                         true,
@@ -1124,18 +1059,18 @@ impl DungeonAvailability {
                 if *logic < RandoLogic::MajorGlitches {
                     return Availability::Unavailable;
                 }
-                if Rule::HookShot.check(&state)
-                    && Rule::Flippers.check(&state)
-                    && (Rule::Sword1.check(&state)
-                        || Rule::Hammer.check(&state)
-                        || ((Rule::Bow.check(&state) || Rule::CanExtendMagic.check(&state))
-                            && (Rule::FireRod.check(&state) || Rule::IceRod.check(&state))))
+                if Rule::HookShot.check(state)
+                    && Rule::Flippers.check(state)
+                    && (Rule::Sword1.check(state)
+                        || Rule::Hammer.check(state)
+                        || ((Rule::Bow.check(state) || Rule::CanExtendMagic.check(state))
+                            && (Rule::FireRod.check(state) || Rule::IceRod.check(state))))
                 {
-                    if self.can_enter(&state, &dungeons, &RandoLogic::MajorGlitches, false, false)
-                        && (Rule::Hammer.check(&state)
+                    if self.can_enter(state, dungeons, &RandoLogic::MajorGlitches, false, false)
+                        && (Rule::Hammer.check(state)
                             || DungeonAvailability::MiseryMire.can_enter(
-                                &state,
-                                &dungeons,
+                                state,
+                                dungeons,
                                 &RandoLogic::MajorGlitches,
                                 false,
                                 false,
@@ -1143,15 +1078,15 @@ impl DungeonAvailability {
                     {
                         return Availability::Available;
                     } else if self.can_enter(
-                        &state,
-                        &dungeons,
+                        state,
+                        dungeons,
                         &RandoLogic::MajorGlitches,
                         false,
                         true,
-                    ) && (Rule::Hammer.check(&state)
+                    ) && (Rule::Hammer.check(state)
                         || DungeonAvailability::MiseryMire.can_enter(
-                            &state,
-                            &dungeons,
+                            state,
+                            dungeons,
                             &RandoLogic::MajorGlitches,
                             false,
                             true,
@@ -1159,15 +1094,15 @@ impl DungeonAvailability {
                     {
                         return Availability::GlitchAvailable;
                     } else if self.can_enter(
-                        &state,
-                        &dungeons,
+                        state,
+                        dungeons,
                         &RandoLogic::MajorGlitches,
                         true,
                         false,
-                    ) && (Rule::Hammer.check(&state)
+                    ) && (Rule::Hammer.check(state)
                         || DungeonAvailability::MiseryMire.can_enter(
-                            &state,
-                            &dungeons,
+                            state,
+                            dungeons,
                             &RandoLogic::MajorGlitches,
                             true,
                             false,
@@ -1175,15 +1110,15 @@ impl DungeonAvailability {
                     {
                         return Availability::Agahnim;
                     } else if self.can_enter(
-                        &state,
-                        &dungeons,
+                        state,
+                        dungeons,
                         &RandoLogic::MajorGlitches,
                         true,
                         true,
-                    ) && (Rule::Hammer.check(&state)
+                    ) && (Rule::Hammer.check(state)
                         || DungeonAvailability::MiseryMire.can_enter(
-                            &state,
-                            &dungeons,
+                            state,
+                            dungeons,
                             &RandoLogic::MajorGlitches,
                             true,
                             true,
@@ -1194,52 +1129,41 @@ impl DungeonAvailability {
                 }
             }
             DungeonAvailability::ThievesTown => {
-                if self.can_hurt_boss(&state) {
-                    if self.can_enter(&state, &dungeons, &RandoLogic::Glitchless, false, false) {
+                if self.can_hurt_boss(state) {
+                    if self.can_enter(state, dungeons, &RandoLogic::Glitchless, false, false) {
                         return Availability::Available;
-                    } else if self.can_enter(
-                        &state,
-                        &dungeons,
-                        &RandoLogic::Glitchless,
-                        true,
-                        false,
-                    ) {
-                        return Availability::Agahnim;
-                    } else if self.can_enter(&state, &dungeons, &RandoLogic::Glitchless, true, true)
+                    } else if self.can_enter(state, dungeons, &RandoLogic::Glitchless, true, false)
                     {
+                        return Availability::Agahnim;
+                    } else if self.can_enter(state, dungeons, &RandoLogic::Glitchless, true, true) {
                         return Availability::GlitchAgahnim;
                     }
 
                     if *logic < RandoLogic::OverWorldGlitches {
                         return Availability::Unavailable;
                     }
-                    if self.can_enter(
-                        &state,
-                        &dungeons,
-                        &RandoLogic::OverWorldGlitches,
-                        false,
-                        false,
-                    ) {
+                    if self.can_enter(state, dungeons, &RandoLogic::OverWorldGlitches, false, false)
+                    {
                         return Availability::Available;
                     } else if self.can_enter(
-                        &state,
-                        &dungeons,
+                        state,
+                        dungeons,
                         &RandoLogic::OverWorldGlitches,
                         false,
                         true,
                     ) {
                         return Availability::GlitchAvailable;
                     } else if self.can_enter(
-                        &state,
-                        &dungeons,
+                        state,
+                        dungeons,
                         &RandoLogic::OverWorldGlitches,
                         true,
                         false,
                     ) {
                         return Availability::Agahnim;
                     } else if self.can_enter(
-                        &state,
-                        &dungeons,
+                        state,
+                        dungeons,
                         &RandoLogic::OverWorldGlitches,
                         true,
                         true,
@@ -1250,27 +1174,27 @@ impl DungeonAvailability {
                     if *logic < RandoLogic::MajorGlitches {
                         return Availability::Unavailable;
                     }
-                    if self.can_enter(&state, &dungeons, &RandoLogic::MajorGlitches, false, false) {
+                    if self.can_enter(state, dungeons, &RandoLogic::MajorGlitches, false, false) {
                         return Availability::Available;
                     } else if self.can_enter(
-                        &state,
-                        &dungeons,
+                        state,
+                        dungeons,
                         &RandoLogic::MajorGlitches,
                         false,
                         true,
                     ) {
                         return Availability::GlitchAvailable;
                     } else if self.can_enter(
-                        &state,
-                        &dungeons,
+                        state,
+                        dungeons,
                         &RandoLogic::MajorGlitches,
                         true,
                         false,
                     ) {
                         return Availability::Agahnim;
                     } else if self.can_enter(
-                        &state,
-                        &dungeons,
+                        state,
+                        dungeons,
                         &RandoLogic::MajorGlitches,
                         true,
                         true,
@@ -1280,120 +1204,110 @@ impl DungeonAvailability {
                 }
             }
             DungeonAvailability::TowerOfHera => {
-                if Rule::Sword1.check(&state) || Rule::Hammer.check(&state) {
-                    if self.can_enter(&state, &dungeons, &RandoLogic::Glitchless, false, false) {
-                        if Rule::CanLightTorches.check(&state) {
+                if Rule::Sword1.check(state) || Rule::Hammer.check(state) {
+                    if self.can_enter(state, dungeons, &RandoLogic::Glitchless, false, false) {
+                        if Rule::CanLightTorches.check(state) {
                             return Availability::Available;
-                        } else {
-                            return Availability::Possible;
                         }
-                    } else if self.can_enter(
-                        &state,
-                        &dungeons,
-                        &RandoLogic::Glitchless,
-                        false,
-                        true,
-                    ) {
-                        if Rule::CanLightTorches.check(&state) {
+
+                        return Availability::Possible;
+                    } else if self.can_enter(state, dungeons, &RandoLogic::Glitchless, false, true)
+                    {
+                        if Rule::CanLightTorches.check(state) {
                             return Availability::GlitchAvailable;
-                        } else {
-                            return Availability::GlitchPossible;
                         }
+
+                        return Availability::GlitchPossible;
                     }
 
                     if *logic < RandoLogic::OverWorldGlitches {
                         return Availability::Unavailable;
                     }
-                    if self.can_enter(
-                        &state,
-                        &dungeons,
-                        &RandoLogic::OverWorldGlitches,
-                        false,
-                        false,
-                    ) {
-                        if Rule::CanLightTorches.check(&state) {
+                    if self.can_enter(state, dungeons, &RandoLogic::OverWorldGlitches, false, false)
+                    {
+                        if Rule::CanLightTorches.check(state) {
                             return Availability::Available;
-                        } else {
-                            return Availability::Possible;
                         }
+
+                        return Availability::Possible;
                     } else if self.can_enter(
-                        &state,
-                        &dungeons,
+                        state,
+                        dungeons,
                         &RandoLogic::OverWorldGlitches,
                         false,
                         true,
                     ) {
-                        if Rule::CanLightTorches.check(&state) {
+                        if Rule::CanLightTorches.check(state) {
                             return Availability::GlitchAvailable;
-                        } else {
-                            return Availability::GlitchPossible;
                         }
+
+                        return Availability::GlitchPossible;
                     }
 
                     if *logic < RandoLogic::MajorGlitches {
                         return Availability::Unavailable;
                     }
-                    if self.can_enter(&state, &dungeons, &RandoLogic::MajorGlitches, false, false) {
-                        if Rule::CanLightTorches.check(&state)
+                    if self.can_enter(state, dungeons, &RandoLogic::MajorGlitches, false, false) {
+                        if Rule::CanLightTorches.check(state)
                             || DungeonAvailability::MiseryMire.can_enter(
-                                &state,
-                                &dungeons,
+                                state,
+                                dungeons,
                                 &RandoLogic::MajorGlitches,
                                 false,
                                 false,
                             )
                         {
                             return Availability::Available;
-                        } else {
-                            return Availability::Possible;
                         }
+
+                        return Availability::Possible;
                     } else if self.can_enter(
-                        &state,
-                        &dungeons,
+                        state,
+                        dungeons,
                         &RandoLogic::MajorGlitches,
                         false,
                         true,
                     ) {
-                        if Rule::CanLightTorches.check(&state)
+                        if Rule::CanLightTorches.check(state)
                             || DungeonAvailability::MiseryMire.can_enter(
-                                &state,
-                                &dungeons,
+                                state,
+                                dungeons,
                                 &RandoLogic::MajorGlitches,
                                 false,
                                 true,
                             )
                         {
                             return Availability::GlitchAvailable;
-                        } else {
-                            return Availability::GlitchPossible;
                         }
+
+                        return Availability::GlitchPossible;
                     } else if self.may_enter(
-                        &state,
-                        &dungeons,
+                        state,
+                        dungeons,
                         &RandoLogic::MajorGlitches,
                         false,
                         false,
                     ) {
                         return Availability::Possible;
                     } else if self.may_enter(
-                        &state,
-                        &dungeons,
+                        state,
+                        dungeons,
                         &RandoLogic::MajorGlitches,
                         false,
                         true,
                     ) {
                         return Availability::GlitchPossible;
                     } else if self.may_enter(
-                        &state,
-                        &dungeons,
+                        state,
+                        dungeons,
                         &RandoLogic::MajorGlitches,
                         true,
                         false,
                     ) {
                         return Availability::Agahnim;
                     } else if self.may_enter(
-                        &state,
-                        &dungeons,
+                        state,
+                        dungeons,
                         &RandoLogic::MajorGlitches,
                         true,
                         true,
@@ -1403,101 +1317,81 @@ impl DungeonAvailability {
                 }
             }
             DungeonAvailability::TurtleRock => {
-                if Rule::FireRod.check(&state)
-                    && Rule::IceRod.check(&state)
-                    && Rule::SomariaCane.check(&state)
+                if Rule::FireRod.check(state)
+                    && Rule::IceRod.check(state)
+                    && Rule::SomariaCane.check(state)
                 {
-                    if self.can_enter(&state, &dungeons, &RandoLogic::Glitchless, false, false)
-                        && Rule::Lantern.check(&state)
-                        && (Rule::Hammer.check(&state) || Rule::Sword2.check(&state))
+                    if self.can_enter(state, dungeons, &RandoLogic::Glitchless, false, false)
+                        && Rule::Lantern.check(state)
+                        && (Rule::Hammer.check(state) || Rule::Sword2.check(state))
                     {
-                        if Rule::Cape.check(&state)
-                            || Rule::ByrnaCane.check(&state)
-                            || Rule::CanBlockLasers.check(&state)
+                        if Rule::Cape.check(state)
+                            || Rule::ByrnaCane.check(state)
+                            || Rule::CanBlockLasers.check(state)
                         {
                             return Availability::Available;
-                        } else {
-                            return Availability::Possible;
                         }
-                    } else if self.may_enter(
-                        &state,
-                        &dungeons,
-                        &RandoLogic::Glitchless,
-                        false,
-                        false,
-                    ) {
+
                         return Availability::Possible;
-                    } else if self.can_enter(
-                        &state,
-                        &dungeons,
-                        &RandoLogic::Glitchless,
-                        false,
-                        true,
-                    ) {
-                        if Rule::Cape.check(&state)
-                            || Rule::ByrnaCane.check(&state)
-                            || Rule::CanBlockLasers.check(&state)
+                    } else if self.may_enter(state, dungeons, &RandoLogic::Glitchless, false, false)
+                    {
+                        return Availability::Possible;
+                    } else if self.can_enter(state, dungeons, &RandoLogic::Glitchless, false, true)
+                    {
+                        if Rule::Cape.check(state)
+                            || Rule::ByrnaCane.check(state)
+                            || Rule::CanBlockLasers.check(state)
                         {
                             return Availability::GlitchAvailable;
-                        } else {
-                            return Availability::GlitchPossible;
                         }
-                    } else if self.may_enter(
-                        &state,
-                        &dungeons,
-                        &RandoLogic::Glitchless,
-                        false,
-                        true,
-                    ) {
+
+                        return Availability::GlitchPossible;
+                    } else if self.may_enter(state, dungeons, &RandoLogic::Glitchless, false, true)
+                    {
                         return Availability::GlitchPossible;
                     }
 
                     if *logic < RandoLogic::OverWorldGlitches {
                         return Availability::Unavailable;
                     }
-                    if self.can_enter(
-                        &state,
-                        &dungeons,
-                        &RandoLogic::OverWorldGlitches,
-                        false,
-                        false,
-                    ) && Rule::Lantern.check(&state)
-                        && (Rule::Hammer.check(&state) || Rule::Sword2.check(&state))
+                    if self.can_enter(state, dungeons, &RandoLogic::OverWorldGlitches, false, false)
+                        && Rule::Lantern.check(state)
+                        && (Rule::Hammer.check(state) || Rule::Sword2.check(state))
                     {
-                        if Rule::Cape.check(&state)
-                            || Rule::ByrnaCane.check(&state)
-                            || Rule::CanBlockLasers.check(&state)
+                        if Rule::Cape.check(state)
+                            || Rule::ByrnaCane.check(state)
+                            || Rule::CanBlockLasers.check(state)
                         {
                             return Availability::Available;
-                        } else {
-                            return Availability::Possible;
                         }
+
+                        return Availability::Possible;
                     } else if self.may_enter(
-                        &state,
-                        &dungeons,
+                        state,
+                        dungeons,
                         &RandoLogic::OverWorldGlitches,
                         false,
                         false,
                     ) {
                         return Availability::Possible;
                     } else if self.can_enter(
-                        &state,
-                        &dungeons,
+                        state,
+                        dungeons,
                         &RandoLogic::OverWorldGlitches,
                         false,
                         true,
                     ) {
-                        if Rule::Cape.check(&state)
-                            || Rule::ByrnaCane.check(&state)
-                            || Rule::CanBlockLasers.check(&state)
+                        if Rule::Cape.check(state)
+                            || Rule::ByrnaCane.check(state)
+                            || Rule::CanBlockLasers.check(state)
                         {
                             return Availability::GlitchAvailable;
-                        } else {
-                            return Availability::GlitchPossible;
                         }
+
+                        return Availability::GlitchPossible;
                     } else if self.may_enter(
-                        &state,
-                        &dungeons,
+                        state,
+                        dungeons,
                         &RandoLogic::OverWorldGlitches,
                         false,
                         true,
@@ -1508,44 +1402,44 @@ impl DungeonAvailability {
                     if *logic < RandoLogic::MajorGlitches {
                         return Availability::Unavailable;
                     }
-                    if self.can_enter(&state, &dungeons, &RandoLogic::MajorGlitches, false, false)
-                        && Rule::Lantern.check(&state)
-                        && (Rule::Hammer.check(&state) || Rule::Sword2.check(&state))
+                    if self.can_enter(state, dungeons, &RandoLogic::MajorGlitches, false, false)
+                        && Rule::Lantern.check(state)
+                        && (Rule::Hammer.check(state) || Rule::Sword2.check(state))
                     {
-                        if Rule::Cape.check(&state)
-                            || Rule::ByrnaCane.check(&state)
-                            || Rule::CanBlockLasers.check(&state)
+                        if Rule::Cape.check(state)
+                            || Rule::ByrnaCane.check(state)
+                            || Rule::CanBlockLasers.check(state)
                         {
                             return Availability::Available;
-                        } else {
-                            return Availability::Possible;
                         }
+
+                        return Availability::Possible;
                     } else if self.may_enter(
-                        &state,
-                        &dungeons,
+                        state,
+                        dungeons,
                         &RandoLogic::MajorGlitches,
                         false,
                         false,
                     ) {
                         return Availability::Possible;
                     } else if self.can_enter(
-                        &state,
-                        &dungeons,
+                        state,
+                        dungeons,
                         &RandoLogic::MajorGlitches,
                         false,
                         true,
                     ) {
-                        if Rule::Cape.check(&state)
-                            || Rule::ByrnaCane.check(&state)
-                            || Rule::CanBlockLasers.check(&state)
+                        if Rule::Cape.check(state)
+                            || Rule::ByrnaCane.check(state)
+                            || Rule::CanBlockLasers.check(state)
                         {
                             return Availability::GlitchAvailable;
-                        } else {
-                            return Availability::GlitchPossible;
                         }
+
+                        return Availability::GlitchPossible;
                     } else if self.may_enter(
-                        &state,
-                        &dungeons,
+                        state,
+                        dungeons,
                         &RandoLogic::MajorGlitches,
                         false,
                         true,
@@ -1562,30 +1456,31 @@ impl DungeonAvailability {
     pub fn can_hurt_boss(&self, state: &GameState) -> bool {
         return match self {
             DungeonAvailability::DesertPalace => {
-                Rule::Sword1.check(&state)
-                    || Rule::Hammer.check(&state)
-                    || Rule::Bow.check(&state)
-                    || Rule::FireRod.check(&state)
-                    || Rule::IceRod.check(&state)
-                    || Rule::ByrnaCane.check(&state)
-                    || Rule::SomariaCane.check(&state)
+                Rule::Sword1.check(state)
+                    || Rule::Hammer.check(state)
+                    || Rule::Bow.check(state)
+                    || Rule::FireRod.check(state)
+                    || Rule::IceRod.check(state)
+                    || Rule::ByrnaCane.check(state)
+                    || Rule::SomariaCane.check(state)
             }
             DungeonAvailability::ThievesTown => {
-                Rule::Sword1.check(&state)
-                    || Rule::Hammer.check(&state)
-                    || Rule::SomariaCane.check(&state)
-                    || Rule::ByrnaCane.check(&state)
+                Rule::Sword1.check(state)
+                    || Rule::Hammer.check(state)
+                    || Rule::SomariaCane.check(state)
+                    || Rule::ByrnaCane.check(state)
             }
             DungeonAvailability::MiseryMire => {
-                Rule::Sword1.check(&state) || Rule::Hammer.check(&state) || Rule::Bow.check(&state)
+                Rule::Sword1.check(state) || Rule::Hammer.check(state) || Rule::Bow.check(state)
             }
             x => {
-                eprintln!("can_hurt_boss not yet implemented for {:?}", x);
+                error!("can_hurt_boss not yet implemented for {:?}", x);
                 false
             }
         };
     }
 
+    #[allow(clippy::too_many_lines)]
     pub fn can_get_chest(
         &self,
         state: &GameState,
@@ -1594,44 +1489,44 @@ impl DungeonAvailability {
     ) -> Availability {
         match self {
             DungeonAvailability::DesertPalace => {
-                if self.can_enter(&state, &dungeons, &RandoLogic::Glitchless, false, false) {
-                    if Rule::Boots.check(&state)
-                        && (self.dungeon_from_state(&dungeons).remaining_chests() == 2
-                            || (self.can_hurt_boss(&state)
-                                && Rule::CanLightTorches.check(&state)
-                                && Rule::CanLiftRocks.check(&state)))
+                if self.can_enter(state, dungeons, &RandoLogic::Glitchless, false, false) {
+                    if Rule::Boots.check(state)
+                        && (self.dungeon_from_state(dungeons).remaining_chests() == 2
+                            || (self.can_hurt_boss(state)
+                                && Rule::CanLightTorches.check(state)
+                                && Rule::CanLiftRocks.check(state)))
                     {
                         return Availability::Available;
-                    } else {
-                        return Availability::Possible;
                     }
+
+                    return Availability::Possible;
                 }
 
                 if *logic < RandoLogic::OverWorldGlitches {
                     return Availability::Unavailable;
                 }
-                if self.can_enter(&state, &dungeons, &RandoLogic::OverWorldGlitches, false, false) {
-                    if Rule::Boots.check(&state)
-                        && (self.dungeon_from_state(&dungeons).remaining_chests() == 2
-                            || (self.can_hurt_boss(&state)
-                                && Rule::CanLightTorches.check(&state)
-                                && Rule::CanLiftRocks.check(&state)))
+                if self.can_enter(state, dungeons, &RandoLogic::OverWorldGlitches, false, false) {
+                    if Rule::Boots.check(state)
+                        && (self.dungeon_from_state(dungeons).remaining_chests() == 2
+                            || (self.can_hurt_boss(state)
+                                && Rule::CanLightTorches.check(state)
+                                && Rule::CanLiftRocks.check(state)))
                     {
                         return Availability::Available;
-                    } else {
-                        return Availability::Possible;
                     }
+
+                    return Availability::Possible;
                 } else if self.can_enter(
-                    &state,
-                    &dungeons,
+                    state,
+                    dungeons,
                     &RandoLogic::OverWorldGlitches,
                     true,
                     false,
                 ) {
                     return Availability::Agahnim;
                 } else if self.can_enter(
-                    &state,
-                    &dungeons,
+                    state,
+                    dungeons,
                     &RandoLogic::OverWorldGlitches,
                     true,
                     true,
@@ -1642,39 +1537,37 @@ impl DungeonAvailability {
                 if *logic < RandoLogic::MajorGlitches {
                     return Availability::Unavailable;
                 }
-                if self.can_enter(&state, &dungeons, &RandoLogic::MajorGlitches, false, false) {
-                    if Rule::Boots.check(&state)
-                        && (self.dungeon_from_state(&dungeons).remaining_chests() == 2
-                            || (self.can_hurt_boss(&state)
-                                && Rule::CanLightTorches.check(&state)
-                                && Rule::CanLiftRocks.check(&state)))
+                if self.can_enter(state, dungeons, &RandoLogic::MajorGlitches, false, false) {
+                    if Rule::Boots.check(state)
+                        && (self.dungeon_from_state(dungeons).remaining_chests() == 2
+                            || (self.can_hurt_boss(state)
+                                && Rule::CanLightTorches.check(state)
+                                && Rule::CanLiftRocks.check(state)))
                     {
                         return Availability::Available;
-                    } else {
-                        return Availability::Possible;
                     }
-                } else if self.can_enter(&state, &dungeons, &RandoLogic::MajorGlitches, true, false)
-                {
+
+                    return Availability::Possible;
+                } else if self.can_enter(state, dungeons, &RandoLogic::MajorGlitches, true, false) {
                     return Availability::Agahnim;
-                } else if self.can_enter(&state, &dungeons, &RandoLogic::MajorGlitches, true, true)
-                {
+                } else if self.can_enter(state, dungeons, &RandoLogic::MajorGlitches, true, true) {
                     return Availability::GlitchAgahnim;
                 }
             }
             DungeonAvailability::EasternPalace => {
-                if Rule::Lantern.check(&state) {
-                    if Rule::Bow.check(&state) {
+                if Rule::Lantern.check(state) {
+                    if Rule::Bow.check(state)
+                        || self.dungeon_from_state(dungeons).remaining_chests() >= 2
+                    {
                         return Availability::Available;
-                    } else if self.dungeon_from_state(&dungeons).remaining_chests() >= 2 {
-                        return Availability::Available;
-                    } else {
-                        return Availability::Possible;
                     }
-                } else if self.dungeon_from_state(&dungeons).remaining_chests() == 3 {
-                    return Availability::Available;
-                } else {
+
                     return Availability::Possible;
+                } else if self.dungeon_from_state(dungeons).remaining_chests() == 3 {
+                    return Availability::Available;
                 }
+
+                return Availability::Possible;
             }
             DungeonAvailability::GanonsTower => {
                 let mut small_keys_needed = 0;
@@ -1684,59 +1577,59 @@ impl DungeonAvailability {
                 let mut min_available_chests: u8 = 2;
                 let mut max_available_chests: u8 = 2;
                 // Bob's Torch
-                if Rule::Boots.check(&state) {
+                if Rule::Boots.check(state) {
                     min_available_chests += 1;
                     max_available_chests += 1;
                 }
                 // DMs Room x4 + Randomizer Room x4 + Firesnake Room
-                if Rule::Hammer.check(&state) && Rule::HookShot.check(&state) {
+                if Rule::Hammer.check(state) && Rule::HookShot.check(state) {
                     min_available_chests += 9;
                     max_available_chests += 9;
                     small_keys_needed = 4;
                 }
                 // Map Chest
-                if Rule::Hammer.check(&state)
-                    && (Rule::Boots.check(&state) || Rule::HookShot.check(&state))
+                if Rule::Hammer.check(state)
+                    && (Rule::Boots.check(state) || Rule::HookShot.check(state))
                 {
                     min_available_chests += 1;
                     max_available_chests += 1;
                 }
                 // Bob's Chest + Big Key Room x3
-                if (Rule::Hammer.check(&state) && Rule::HookShot.check(&state))
-                    || (Rule::FireRod.check(&state) && Rule::SomariaCane.check(&state))
+                if (Rule::Hammer.check(state) && Rule::HookShot.check(state))
+                    || (Rule::FireRod.check(state) && Rule::SomariaCane.check(state))
                 {
                     min_available_chests += 4;
                     max_available_chests += 4;
                     small_keys_needed = max(3, small_keys_needed);
                 }
                 // Tile Room
-                if Rule::SomariaCane.check(&state) {
+                if Rule::SomariaCane.check(state) {
                     min_available_chests += 1;
                     max_available_chests += 1;
                 }
                 // Compass Room x4
-                if Rule::FireRod.check(&state) && Rule::SomariaCane.check(&state) {
+                if Rule::FireRod.check(state) && Rule::SomariaCane.check(state) {
                     min_available_chests += 4;
                     max_available_chests += 4;
                     small_keys_needed = max(4, small_keys_needed);
                 }
                 // Big Chest
-                if Rule::Hammer.check(&state)
-                    && Rule::Boots.check(&state)
-                    && Rule::HookShot.check(&state)
-                    && Rule::SomariaCane.check(&state)
-                    && Rule::FireRod.check(&state)
+                if Rule::Hammer.check(state)
+                    && Rule::Boots.check(state)
+                    && Rule::HookShot.check(state)
+                    && Rule::SomariaCane.check(state)
+                    && Rule::FireRod.check(state)
                 {
                     min_available_chests += 1;
                     max_available_chests += 1;
                     big_key_needed = 1;
                     big_key_guaranteed = true;
-                } // Mini Helmasaur Room x2 + Pre-Moldorm Chest if Rule::Bow.check(&state) && Rule::CanLightTorches.check(&state) { if big_key_guaranteed { min_available_chests += 3; } max_available_chests += 3; small_keys_needed = max(3, small_keys_needed); big_key_needed = 1; }
+                } // Mini Helmasaur Room x2 + Pre-Moldorm Chest if Rule::Bow.check(state) && Rule::CanLightTorches.check(state) { if big_key_guaranteed { min_available_chests += 3; } max_available_chests += 3; small_keys_needed = max(3, small_keys_needed); big_key_needed = 1; }
                   // Moldorm Chest
-                if Rule::HookShot.check(&state)
-                    && Rule::Bow.check(&state)
-                    && Rule::CanLightTorches.check(&state)
-                    && (Rule::Hammer.check(&state) || Rule::Sword1.check(&state))
+                if Rule::HookShot.check(state)
+                    && Rule::Bow.check(state)
+                    && Rule::CanLightTorches.check(state)
+                    && (Rule::Hammer.check(state) || Rule::Sword1.check(state))
                 {
                     if big_key_guaranteed {
                         min_available_chests += 1;
@@ -1752,16 +1645,16 @@ impl DungeonAvailability {
                         .saturating_sub(big_key_needed),
                 );
                 // 4 keys + big key + map + compass
-                let min_items_available = min_available_chests.checked_sub(7).unwrap_or(0);
+                let min_items_available = min_available_chests.saturating_sub(7);
 
-                let this_dungeon = self.dungeon_from_state(&dungeons);
-                if self.can_enter(&state, &dungeons, &RandoLogic::Glitchless, false, false) {
+                let this_dungeon = self.dungeon_from_state(dungeons);
+                if self.can_enter(state, dungeons, &RandoLogic::Glitchless, false, false) {
                     if this_dungeon.remaining_chests() > (20 - min_items_available) {
                         return Availability::Available;
                     } else if this_dungeon.remaining_chests() > (20 - max_items_available) {
                         return Availability::Possible;
                     }
-                } else if self.can_enter(&state, &dungeons, &RandoLogic::Glitchless, false, true) {
+                } else if self.can_enter(state, dungeons, &RandoLogic::Glitchless, false, true) {
                     if this_dungeon.remaining_chests() > (20 - min_items_available) {
                         return Availability::GlitchAvailable;
                     } else if this_dungeon.remaining_chests() > (20 - max_items_available) {
@@ -1772,7 +1665,7 @@ impl DungeonAvailability {
                 if *logic < RandoLogic::OverWorldGlitches {
                     return Availability::Unavailable;
                 }
-                if self.can_enter(&state, &dungeons, &RandoLogic::OverWorldGlitches, false, false) {
+                if self.can_enter(state, dungeons, &RandoLogic::OverWorldGlitches, false, false) {
                     if this_dungeon.remaining_chests() > (20 - min_items_available) {
                         return Availability::Available;
                     } else if this_dungeon.remaining_chests() > (20 - max_items_available) {
@@ -1783,14 +1676,13 @@ impl DungeonAvailability {
                 if *logic < RandoLogic::MajorGlitches {
                     return Availability::Unavailable;
                 }
-                if self.can_enter(&state, &dungeons, &RandoLogic::MajorGlitches, false, false) {
+                if self.can_enter(state, dungeons, &RandoLogic::MajorGlitches, false, false) {
                     if this_dungeon.remaining_chests() > (20 - min_items_available) {
                         return Availability::Available;
                     } else if this_dungeon.remaining_chests() > (20 - max_items_available) {
                         return Availability::Possible;
                     }
-                } else if self.can_enter(&state, &dungeons, &RandoLogic::MajorGlitches, false, true)
-                {
+                } else if self.can_enter(state, dungeons, &RandoLogic::MajorGlitches, false, true) {
                     if this_dungeon.remaining_chests() > (20 - min_items_available) {
                         return Availability::GlitchAvailable;
                     } else if this_dungeon.remaining_chests() > (20 - max_items_available) {
@@ -1799,224 +1691,205 @@ impl DungeonAvailability {
                 }
             }
             DungeonAvailability::IcePalace => {
-                let this_dungeon = self.dungeon_from_state(&dungeons);
-                if self.can_enter(&state, &dungeons, &RandoLogic::Glitchless, false, false) {
-                    if Rule::Hammer.check(&state) && Rule::CanLiftRocks.check(&state) {
-                        if Rule::HookShot.check(&state) {
+                let this_dungeon = self.dungeon_from_state(dungeons);
+                if self.can_enter(state, dungeons, &RandoLogic::Glitchless, false, false) {
+                    if Rule::Hammer.check(state) && Rule::CanLiftRocks.check(state) {
+                        if Rule::HookShot.check(state) {
                             return Availability::Available;
-                        } else if Rule::ByrnaCane.check(&state) || Rule::Cape.check(&state) {
+                        } else if Rule::ByrnaCane.check(state) || Rule::Cape.check(state) {
                             if this_dungeon.remaining_chests() >= 2 {
                                 return Availability::Available;
-                            } else {
-                                return Availability::Possible;
                             }
-                        } else {
+
                             return Availability::Possible;
                         }
-                    } else {
+
                         return Availability::Possible;
                     }
-                } else if self.can_enter(&state, &dungeons, &RandoLogic::Glitchless, false, true) {
-                    if Rule::Hammer.check(&state) && Rule::CanLiftRocks.check(&state) {
-                        if Rule::HookShot.check(&state) {
+
+                    return Availability::Possible;
+                } else if self.can_enter(state, dungeons, &RandoLogic::Glitchless, false, true) {
+                    if Rule::Hammer.check(state) && Rule::CanLiftRocks.check(state) {
+                        if Rule::HookShot.check(state) || this_dungeon.remaining_chests() >= 2 {
                             return Availability::GlitchAvailable;
-                        } else {
-                            if this_dungeon.remaining_chests() >= 2 {
-                                return Availability::GlitchAvailable;
-                            } else {
-                                return Availability::GlitchPossible;
-                            }
                         }
-                    } else {
+
                         return Availability::GlitchPossible;
                     }
+
+                    return Availability::GlitchPossible;
                 }
 
                 if *logic < RandoLogic::OverWorldGlitches {
                     return Availability::Unavailable;
                 }
-                if self.can_enter(&state, &dungeons, &RandoLogic::OverWorldGlitches, false, false) {
-                    if Rule::Hammer.check(&state) && Rule::CanLiftRocks.check(&state) {
-                        if Rule::HookShot.check(&state) {
+                if self.can_enter(state, dungeons, &RandoLogic::OverWorldGlitches, false, false) {
+                    if Rule::Hammer.check(state) && Rule::CanLiftRocks.check(state) {
+                        if Rule::HookShot.check(state) {
                             return Availability::Available;
-                        } else if Rule::ByrnaCane.check(&state) || Rule::Cape.check(&state) {
+                        } else if Rule::ByrnaCane.check(state) || Rule::Cape.check(state) {
                             if this_dungeon.remaining_chests() >= 2 {
                                 return Availability::Available;
-                            } else {
-                                return Availability::Possible;
                             }
-                        } else {
+
                             return Availability::Possible;
                         }
-                    } else {
+
                         return Availability::Possible;
                     }
+
+                    return Availability::Possible;
                 } else if self.can_enter(
-                    &state,
-                    &dungeons,
+                    state,
+                    dungeons,
                     &RandoLogic::OverWorldGlitches,
                     false,
                     true,
                 ) {
-                    if Rule::Hammer.check(&state) && Rule::CanLiftRocks.check(&state) {
-                        if Rule::HookShot.check(&state) {
+                    if Rule::Hammer.check(state) && Rule::CanLiftRocks.check(state) {
+                        if Rule::HookShot.check(state) || this_dungeon.remaining_chests() >= 2 {
                             return Availability::GlitchAvailable;
-                        } else {
-                            if this_dungeon.remaining_chests() >= 2 {
-                                return Availability::GlitchAvailable;
-                            } else {
-                                return Availability::GlitchPossible;
-                            }
                         }
-                    } else {
+
                         return Availability::GlitchPossible;
                     }
+
+                    return Availability::GlitchPossible;
                 }
 
                 if *logic < RandoLogic::MajorGlitches {
                     return Availability::Unavailable;
                 }
-                if self.can_enter(&state, &dungeons, &RandoLogic::MajorGlitches, false, false) {
-                    if Rule::Hammer.check(&state) && Rule::CanLiftRocks.check(&state) {
-                        if Rule::HookShot.check(&state) {
+                if self.can_enter(state, dungeons, &RandoLogic::MajorGlitches, false, false) {
+                    if Rule::Hammer.check(state) && Rule::CanLiftRocks.check(state) {
+                        if Rule::HookShot.check(state) {
                             return Availability::Available;
-                        } else if Rule::ByrnaCane.check(&state) || Rule::Cape.check(&state) {
+                        } else if Rule::ByrnaCane.check(state) || Rule::Cape.check(state) {
                             if this_dungeon.remaining_chests() >= 2 {
                                 return Availability::Available;
-                            } else {
-                                return Availability::Possible;
                             }
-                        } else {
+
                             return Availability::Possible;
                         }
-                    } else {
+
                         return Availability::Possible;
                     }
-                } else if self.can_enter(&state, &dungeons, &RandoLogic::MajorGlitches, false, true)
-                {
-                    if Rule::Hammer.check(&state) && Rule::CanLiftRocks.check(&state) {
-                        if Rule::HookShot.check(&state) {
+
+                    return Availability::Possible;
+                } else if self.can_enter(state, dungeons, &RandoLogic::MajorGlitches, false, true) {
+                    if Rule::Hammer.check(state) && Rule::CanLiftRocks.check(state) {
+                        if Rule::HookShot.check(state) || this_dungeon.remaining_chests() >= 2 {
                             return Availability::GlitchAvailable;
-                        } else {
-                            if this_dungeon.remaining_chests() >= 2 {
-                                return Availability::GlitchAvailable;
-                            } else {
-                                return Availability::GlitchPossible;
-                            }
                         }
-                    } else {
+
                         return Availability::GlitchPossible;
                     }
+
+                    return Availability::GlitchPossible;
                 }
             }
             DungeonAvailability::MiseryMire => {
-                let this_dungeon = self.dungeon_from_state(&dungeons);
-                if self.can_enter(&state, &dungeons, &RandoLogic::Glitchless, false, false) {
-                    if Rule::CanLightTorches.check(&state) {
-                        if this_dungeon.remaining_chests() == 2
-                            && (Rule::Cape.check(&state)
-                                || Rule::ByrnaCane.check(&state)
-                                || (Rule::SomariaCane.check(&state) && self.can_hurt_boss(&state)))
+                let this_dungeon = self.dungeon_from_state(dungeons);
+                if self.can_enter(state, dungeons, &RandoLogic::Glitchless, false, false) {
+                    if Rule::CanLightTorches.check(state) {
+                        if (this_dungeon.remaining_chests() == 2
+                            && (Rule::Cape.check(state)
+                                || Rule::ByrnaCane.check(state)
+                                || (Rule::SomariaCane.check(state) && self.can_hurt_boss(state))))
+                            || (this_dungeon.remaining_chests() == 1
+                                && (Rule::Cape.check(state) || Rule::ByrnaCane.check(state))
+                                && Rule::SomariaCane.check(state)
+                                && self.can_hurt_boss(state))
                         {
                             return Availability::Available;
-                        } else if this_dungeon.remaining_chests() == 1
-                            && (Rule::Cape.check(&state) || Rule::ByrnaCane.check(&state))
-                            && Rule::SomariaCane.check(&state)
-                            && self.can_hurt_boss(&state)
-                        {
-                            return Availability::Available;
-                        } else {
-                            return Availability::Possible;
                         }
-                    } else {
+
                         return Availability::Possible;
                     }
-                } else if self.may_enter(&state, &dungeons, &RandoLogic::Glitchless, false, false) {
+
+                    return Availability::Possible;
+                } else if self.may_enter(state, dungeons, &RandoLogic::Glitchless, false, false) {
                     return Availability::Possible;
                 }
 
                 if *logic < RandoLogic::OverWorldGlitches {
                     return Availability::Unavailable;
                 }
-                if self.can_enter(&state, &dungeons, &RandoLogic::OverWorldGlitches, false, false) {
-                    if Rule::CanLightTorches.check(&state) {
-                        if this_dungeon.remaining_chests() == 2
-                            && (Rule::Cape.check(&state)
-                                || Rule::ByrnaCane.check(&state)
-                                || (Rule::SomariaCane.check(&state)
-                                    && self.can_hurt_boss(&state)
-                                    && Rule::Lantern.check(&state)))
+                if self.can_enter(state, dungeons, &RandoLogic::OverWorldGlitches, false, false) {
+                    if Rule::CanLightTorches.check(state) {
+                        if (this_dungeon.remaining_chests() == 2
+                            && (Rule::Cape.check(state)
+                                || Rule::ByrnaCane.check(state)
+                                || (Rule::SomariaCane.check(state)
+                                    && self.can_hurt_boss(state)
+                                    && Rule::Lantern.check(state))))
+                            || (this_dungeon.remaining_chests() == 1
+                                && (Rule::Cape.check(state) || Rule::ByrnaCane.check(state))
+                                && Rule::SomariaCane.check(state)
+                                && self.can_hurt_boss(state)
+                                && Rule::Lantern.check(state))
                         {
                             return Availability::Available;
-                        } else if this_dungeon.remaining_chests() == 1
-                            && (Rule::Cape.check(&state) || Rule::ByrnaCane.check(&state))
-                            && Rule::SomariaCane.check(&state)
-                            && self.can_hurt_boss(&state)
-                            && Rule::Lantern.check(&state)
-                        {
-                            return Availability::Available;
-                        } else {
-                            return Availability::Possible;
                         }
-                    } else {
+
                         return Availability::Possible;
                     }
+
+                    return Availability::Possible;
                 } else if self.may_enter(
-                    &state,
-                    &dungeons,
+                    state,
+                    dungeons,
                     &RandoLogic::OverWorldGlitches,
                     false,
                     false,
                 ) {
                     return Availability::Possible;
                 } else if self.can_enter(
-                    &state,
-                    &dungeons,
+                    state,
+                    dungeons,
                     &RandoLogic::OverWorldGlitches,
                     false,
                     true,
                 ) {
-                    if Rule::CanLightTorches.check(&state) {
-                        if this_dungeon.remaining_chests() == 2
-                            && (Rule::Cape.check(&state)
-                                || Rule::ByrnaCane.check(&state)
-                                || (Rule::SomariaCane.check(&state)
-                                    && self.can_hurt_boss(&state)
-                                    && Rule::Lantern.check(&state)))
+                    if Rule::CanLightTorches.check(state) {
+                        if (this_dungeon.remaining_chests() == 2
+                            && (Rule::Cape.check(state)
+                                || Rule::ByrnaCane.check(state)
+                                || (Rule::SomariaCane.check(state)
+                                    && self.can_hurt_boss(state)
+                                    && Rule::Lantern.check(state))))
+                            || (this_dungeon.remaining_chests() == 1
+                                && (Rule::Cape.check(state) || Rule::ByrnaCane.check(state))
+                                && Rule::SomariaCane.check(state)
+                                && self.can_hurt_boss(state)
+                                && Rule::Lantern.check(state))
                         {
                             return Availability::GlitchAvailable;
-                        } else if this_dungeon.remaining_chests() == 1
-                            && (Rule::Cape.check(&state) || Rule::ByrnaCane.check(&state))
-                            && Rule::SomariaCane.check(&state)
-                            && self.can_hurt_boss(&state)
-                            && Rule::Lantern.check(&state)
-                        {
-                            return Availability::GlitchAvailable;
-                        } else {
-                            return Availability::GlitchPossible;
                         }
-                    } else {
+
                         return Availability::GlitchPossible;
                     }
+
+                    return Availability::GlitchPossible;
                 } else if self.may_enter(
-                    &state,
-                    &dungeons,
+                    state,
+                    dungeons,
                     &RandoLogic::OverWorldGlitches,
                     false,
                     true,
                 ) {
                     return Availability::GlitchPossible;
                 } else if self.may_enter(
-                    &state,
-                    &dungeons,
+                    state,
+                    dungeons,
                     &RandoLogic::OverWorldGlitches,
                     true,
                     false,
                 ) {
                     return Availability::Agahnim;
                 } else if self.may_enter(
-                    &state,
-                    &dungeons,
+                    state,
+                    dungeons,
                     &RandoLogic::OverWorldGlitches,
                     true,
                     true,
@@ -2027,136 +1900,123 @@ impl DungeonAvailability {
                 if *logic < RandoLogic::MajorGlitches {
                     return Availability::Unavailable;
                 }
-                if self.can_enter(&state, &dungeons, &RandoLogic::MajorGlitches, false, false) {
-                    if Rule::CanLightTorches.check(&state) {
-                        if this_dungeon.remaining_chests() == 2
-                            && (Rule::Cape.check(&state)
-                                || Rule::ByrnaCane.check(&state)
-                                || (Rule::SomariaCane.check(&state)
-                                    && self.can_hurt_boss(&state)
-                                    && Rule::Lantern.check(&state)))
+                if self.can_enter(state, dungeons, &RandoLogic::MajorGlitches, false, false) {
+                    if Rule::CanLightTorches.check(state) {
+                        if (this_dungeon.remaining_chests() == 2
+                            && (Rule::Cape.check(state)
+                                || Rule::ByrnaCane.check(state)
+                                || (Rule::SomariaCane.check(state)
+                                    && self.can_hurt_boss(state)
+                                    && Rule::Lantern.check(state))))
+                            || (this_dungeon.remaining_chests() == 1
+                                && (Rule::Cape.check(state) || Rule::ByrnaCane.check(state))
+                                && Rule::SomariaCane.check(state)
+                                && self.can_hurt_boss(state)
+                                && Rule::Lantern.check(state))
                         {
                             return Availability::Available;
-                        } else if this_dungeon.remaining_chests() == 1
-                            && (Rule::Cape.check(&state) || Rule::ByrnaCane.check(&state))
-                            && Rule::SomariaCane.check(&state)
-                            && self.can_hurt_boss(&state)
-                            && Rule::Lantern.check(&state)
-                        {
-                            return Availability::Available;
-                        } else {
-                            return Availability::Possible;
                         }
-                    } else {
+
                         return Availability::Possible;
                     }
-                } else if self.may_enter(
-                    &state,
-                    &dungeons,
-                    &RandoLogic::MajorGlitches,
-                    false,
-                    false,
-                ) {
+
                     return Availability::Possible;
-                } else if self.can_enter(&state, &dungeons, &RandoLogic::MajorGlitches, false, true)
+                } else if self.may_enter(state, dungeons, &RandoLogic::MajorGlitches, false, false)
                 {
-                    if Rule::CanLightTorches.check(&state) {
-                        if this_dungeon.remaining_chests() == 2
-                            && (Rule::Cape.check(&state)
-                                || Rule::ByrnaCane.check(&state)
-                                || (Rule::SomariaCane.check(&state)
-                                    && self.can_hurt_boss(&state)
-                                    && Rule::Lantern.check(&state)))
+                    return Availability::Possible;
+                } else if self.can_enter(state, dungeons, &RandoLogic::MajorGlitches, false, true) {
+                    if Rule::CanLightTorches.check(state) {
+                        if (this_dungeon.remaining_chests() == 2
+                            && (Rule::Cape.check(state)
+                                || Rule::ByrnaCane.check(state)
+                                || (Rule::SomariaCane.check(state)
+                                    && self.can_hurt_boss(state)
+                                    && Rule::Lantern.check(state))))
+                            || (this_dungeon.remaining_chests() == 1
+                                && (Rule::Cape.check(state) || Rule::ByrnaCane.check(state))
+                                && Rule::SomariaCane.check(state)
+                                && self.can_hurt_boss(state)
+                                && Rule::Lantern.check(state))
                         {
                             return Availability::GlitchAvailable;
-                        } else if this_dungeon.remaining_chests() == 1
-                            && (Rule::Cape.check(&state) || Rule::ByrnaCane.check(&state))
-                            && Rule::SomariaCane.check(&state)
-                            && self.can_hurt_boss(&state)
-                            && Rule::Lantern.check(&state)
-                        {
-                            return Availability::GlitchAvailable;
-                        } else {
-                            return Availability::GlitchPossible;
                         }
-                    } else {
+
                         return Availability::GlitchPossible;
                     }
-                } else if self.may_enter(&state, &dungeons, &RandoLogic::MajorGlitches, false, true)
-                {
+
                     return Availability::GlitchPossible;
-                } else if self.may_enter(&state, &dungeons, &RandoLogic::MajorGlitches, true, false)
-                {
+                } else if self.may_enter(state, dungeons, &RandoLogic::MajorGlitches, false, true) {
+                    return Availability::GlitchPossible;
+                } else if self.may_enter(state, dungeons, &RandoLogic::MajorGlitches, true, false) {
                     return Availability::Agahnim;
-                } else if self.may_enter(&state, &dungeons, &RandoLogic::MajorGlitches, true, true)
-                {
+                } else if self.may_enter(state, dungeons, &RandoLogic::MajorGlitches, true, true) {
                     return Availability::GlitchAgahnim;
                 }
             }
             DungeonAvailability::PalaceOfDarkness => {
-                let this_dungeon = self.dungeon_from_state(&dungeons);
-                if self.can_enter(&state, &dungeons, &RandoLogic::Glitchless, false, false) {
-                    if Rule::Bow.check(&state)
-                        && (this_dungeon.remaining_chests() >= 2 || Rule::Hammer.check(&state))
+                let this_dungeon = self.dungeon_from_state(dungeons);
+                if self.can_enter(state, dungeons, &RandoLogic::Glitchless, false, false) {
+                    if Rule::Bow.check(state)
+                        && (this_dungeon.remaining_chests() >= 2 || Rule::Hammer.check(state))
                     {
-                        if Rule::Lantern.check(&state) {
+                        if Rule::Lantern.check(state) {
                             return Availability::Available;
-                        } else {
-                            return Availability::Possible;
                         }
-                    } else if Rule::Lantern.check(&state) {
+
                         return Availability::Possible;
-                    } else {
-                        return Availability::GlitchPossible;
+                    } else if Rule::Lantern.check(state) {
+                        return Availability::Possible;
                     }
-                } else if self.can_enter(&state, &dungeons, &RandoLogic::Glitchless, true, false) {
+
+                    return Availability::GlitchPossible;
+                } else if self.can_enter(state, dungeons, &RandoLogic::Glitchless, true, false) {
                     return Availability::Agahnim;
-                } else if self.can_enter(&state, &dungeons, &RandoLogic::Glitchless, true, true) {
+                } else if self.can_enter(state, dungeons, &RandoLogic::Glitchless, true, true) {
                     return Availability::GlitchAgahnim;
                 }
 
                 if *logic < RandoLogic::OverWorldGlitches {
                     return Availability::Unavailable;
                 }
-                if self.can_enter(&state, &dungeons, &RandoLogic::OverWorldGlitches, false, false) {
-                    if Rule::Bow.check(&state)
-                        && (this_dungeon.remaining_chests() >= 2 || Rule::Hammer.check(&state))
+                if self.can_enter(state, dungeons, &RandoLogic::OverWorldGlitches, false, false) {
+                    if Rule::Bow.check(state)
+                        && (this_dungeon.remaining_chests() >= 2 || Rule::Hammer.check(state))
                     {
-                        if Rule::Lantern.check(&state) {
+                        if Rule::Lantern.check(state) {
                             return Availability::Available;
-                        } else {
-                            return Availability::Possible;
                         }
-                    } else if Rule::Lantern.check(&state) {
+
                         return Availability::Possible;
-                    } else {
-                        return Availability::GlitchPossible;
+                    } else if Rule::Lantern.check(state) {
+                        return Availability::Possible;
                     }
+
+                    return Availability::GlitchPossible;
                 } else if self.can_enter(
-                    &state,
-                    &dungeons,
+                    state,
+                    dungeons,
                     &RandoLogic::OverWorldGlitches,
                     false,
                     true,
                 ) {
-                    if Rule::Bow.check(&state)
-                        && (this_dungeon.remaining_chests() >= 2 || Rule::Hammer.check(&state))
+                    if Rule::Bow.check(state)
+                        && (this_dungeon.remaining_chests() >= 2 || Rule::Hammer.check(state))
                     {
                         return Availability::GlitchAvailable;
-                    } else {
-                        return Availability::GlitchPossible;
                     }
+
+                    return Availability::GlitchPossible;
                 } else if self.can_enter(
-                    &state,
-                    &dungeons,
+                    state,
+                    dungeons,
                     &RandoLogic::OverWorldGlitches,
                     true,
                     false,
                 ) {
                     return Availability::Agahnim;
                 } else if self.can_enter(
-                    &state,
-                    &dungeons,
+                    state,
+                    dungeons,
                     &RandoLogic::OverWorldGlitches,
                     true,
                     true,
@@ -2167,92 +2027,89 @@ impl DungeonAvailability {
                 if *logic < RandoLogic::MajorGlitches {
                     return Availability::Unavailable;
                 }
-                if self.can_enter(&state, &dungeons, &RandoLogic::MajorGlitches, false, false) {
-                    if Rule::Bow.check(&state)
-                        && (this_dungeon.remaining_chests() >= 2 || Rule::Hammer.check(&state))
+                if self.can_enter(state, dungeons, &RandoLogic::MajorGlitches, false, false) {
+                    if Rule::Bow.check(state)
+                        && (this_dungeon.remaining_chests() >= 2 || Rule::Hammer.check(state))
                     {
-                        if Rule::Lantern.check(&state) {
+                        if Rule::Lantern.check(state) {
                             return Availability::Available;
-                        } else {
-                            return Availability::Possible;
                         }
-                    } else if Rule::Lantern.check(&state) {
+
                         return Availability::Possible;
-                    } else {
-                        return Availability::GlitchPossible;
+                    } else if Rule::Lantern.check(state) {
+                        return Availability::Possible;
                     }
-                } else if self.can_enter(&state, &dungeons, &RandoLogic::MajorGlitches, false, true)
-                {
-                    if Rule::Bow.check(&state)
-                        && (this_dungeon.remaining_chests() >= 2 || Rule::Hammer.check(&state))
+
+                    return Availability::GlitchPossible;
+                } else if self.can_enter(state, dungeons, &RandoLogic::MajorGlitches, false, true) {
+                    if Rule::Bow.check(state)
+                        && (this_dungeon.remaining_chests() >= 2 || Rule::Hammer.check(state))
                     {
                         return Availability::GlitchAvailable;
-                    } else {
-                        return Availability::GlitchPossible;
                     }
-                } else if self.can_enter(&state, &dungeons, &RandoLogic::MajorGlitches, true, false)
-                {
+
+                    return Availability::GlitchPossible;
+                } else if self.can_enter(state, dungeons, &RandoLogic::MajorGlitches, true, false) {
                     return Availability::Agahnim;
-                } else if self.can_enter(&state, &dungeons, &RandoLogic::MajorGlitches, true, true)
-                {
+                } else if self.can_enter(state, dungeons, &RandoLogic::MajorGlitches, true, true) {
                     return Availability::GlitchAgahnim;
                 }
             }
             DungeonAvailability::SkullWoods => {
-                let this_dungeon = self.dungeon_from_state(&dungeons);
-                if self.can_enter(&state, &dungeons, &RandoLogic::Glitchless, false, false) {
-                    if Rule::MoonPearl.check(&state)
-                        && Rule::FireRod.check(&state)
-                        && (Rule::Sword1.check(&state) || this_dungeon.remaining_chests() == 2)
+                let this_dungeon = self.dungeon_from_state(dungeons);
+                if self.can_enter(state, dungeons, &RandoLogic::Glitchless, false, false) {
+                    if Rule::MoonPearl.check(state)
+                        && Rule::FireRod.check(state)
+                        && (Rule::Sword1.check(state) || this_dungeon.remaining_chests() == 2)
                     {
                         return Availability::Available;
-                    } else {
-                        return Availability::Possible;
                     }
-                } else if self.can_enter(&state, &dungeons, &RandoLogic::Glitchless, true, false) {
+
+                    return Availability::Possible;
+                } else if self.can_enter(state, dungeons, &RandoLogic::Glitchless, true, false) {
                     return Availability::Agahnim;
-                } else if self.can_enter(&state, &dungeons, &RandoLogic::Glitchless, true, true) {
+                } else if self.can_enter(state, dungeons, &RandoLogic::Glitchless, true, true) {
                     return Availability::GlitchAgahnim;
                 }
 
                 if *logic < RandoLogic::OverWorldGlitches {
                     return Availability::Unavailable;
                 }
-                if self.can_enter(&state, &dungeons, &RandoLogic::OverWorldGlitches, false, false) {
-                    if Rule::MoonPearl.check(&state)
-                        && Rule::FireRod.check(&state)
-                        && (Rule::Sword1.check(&state) || this_dungeon.remaining_chests() == 2)
+                if self.can_enter(state, dungeons, &RandoLogic::OverWorldGlitches, false, false) {
+                    if Rule::MoonPearl.check(state)
+                        && Rule::FireRod.check(state)
+                        && (Rule::Sword1.check(state) || this_dungeon.remaining_chests() == 2)
                     {
                         return Availability::Available;
-                    } else {
-                        return Availability::Possible;
                     }
+
+                    return Availability::Possible;
                 } else if self.can_enter(
-                    &state,
-                    &dungeons,
+                    state,
+                    dungeons,
                     &RandoLogic::OverWorldGlitches,
                     false,
                     true,
                 ) {
-                    if Rule::MoonPearl.check(&state)
-                        && Rule::FireRod.check(&state)
-                        && (Rule::Sword1.check(&state) || this_dungeon.remaining_chests() == 2)
+                    if Rule::MoonPearl.check(state)
+                        && Rule::FireRod.check(state)
+                        && (Rule::Sword1.check(state) || this_dungeon.remaining_chests() == 2)
                     {
                         return Availability::GlitchAvailable;
-                    } else {
-                        return Availability::GlitchPossible;
                     }
+
+                    return Availability::GlitchPossible;
                 } else if self.can_enter(
-                    &state,
-                    &dungeons,
+                    state,
+                    dungeons,
                     &RandoLogic::OverWorldGlitches,
                     true,
                     false,
                 ) {
                     return Availability::Agahnim;
                 } else if self.can_enter(
-                    &state,
-                    &dungeons,
+                    state,
+                    dungeons,
                     &RandoLogic::OverWorldGlitches,
                     true,
                     true,
@@ -2263,38 +2120,35 @@ impl DungeonAvailability {
                 if *logic < RandoLogic::MajorGlitches {
                     return Availability::Unavailable;
                 }
-                if self.can_enter(&state, &dungeons, &RandoLogic::MajorGlitches, false, false) {
-                    if Rule::MoonPearl.check(&state)
-                        && Rule::FireRod.check(&state)
-                        && (Rule::Sword1.check(&state) || this_dungeon.remaining_chests() == 2)
+                if self.can_enter(state, dungeons, &RandoLogic::MajorGlitches, false, false) {
+                    if Rule::MoonPearl.check(state)
+                        && Rule::FireRod.check(state)
+                        && (Rule::Sword1.check(state) || this_dungeon.remaining_chests() == 2)
                     {
                         return Availability::Available;
-                    } else {
-                        return Availability::Possible;
                     }
-                } else if self.can_enter(&state, &dungeons, &RandoLogic::MajorGlitches, false, true)
-                {
-                    if Rule::MoonPearl.check(&state)
-                        && Rule::FireRod.check(&state)
-                        && (Rule::Sword1.check(&state) || this_dungeon.remaining_chests() == 2)
+
+                    return Availability::Possible;
+                } else if self.can_enter(state, dungeons, &RandoLogic::MajorGlitches, false, true) {
+                    if Rule::MoonPearl.check(state)
+                        && Rule::FireRod.check(state)
+                        && (Rule::Sword1.check(state) || this_dungeon.remaining_chests() == 2)
                     {
                         return Availability::GlitchAvailable;
-                    } else {
-                        return Availability::GlitchPossible;
                     }
-                } else if self.can_enter(&state, &dungeons, &RandoLogic::MajorGlitches, true, false)
-                {
+
+                    return Availability::GlitchPossible;
+                } else if self.can_enter(state, dungeons, &RandoLogic::MajorGlitches, true, false) {
                     return Availability::Agahnim;
-                } else if self.can_enter(&state, &dungeons, &RandoLogic::MajorGlitches, true, true)
-                {
+                } else if self.can_enter(state, dungeons, &RandoLogic::MajorGlitches, true, true) {
                     return Availability::GlitchAgahnim;
                 }
             }
             DungeonAvailability::SwampPalace => {
-                let this_dungeon = self.dungeon_from_state(&dungeons);
-                if self.can_enter(&state, &dungeons, &RandoLogic::Glitchless, false, false) {
-                    if Rule::Hammer.check(&state) {
-                        if Rule::HookShot.check(&state) || this_dungeon.remaining_chests() >= 5 {
+                let this_dungeon = self.dungeon_from_state(dungeons);
+                if self.can_enter(state, dungeons, &RandoLogic::Glitchless, false, false) {
+                    if Rule::Hammer.check(state) {
+                        if Rule::HookShot.check(state) || this_dungeon.remaining_chests() >= 5 {
                             return Availability::Available;
                         } else if this_dungeon.remaining_chests() >= 3 {
                             return Availability::Possible;
@@ -2302,18 +2156,18 @@ impl DungeonAvailability {
                     } else if this_dungeon.remaining_chests() == 6 {
                         return Availability::Possible;
                     }
-                } else if self.can_enter(&state, &dungeons, &RandoLogic::Glitchless, true, false) {
+                } else if self.can_enter(state, dungeons, &RandoLogic::Glitchless, true, false) {
                     return Availability::Agahnim;
-                } else if self.can_enter(&state, &dungeons, &RandoLogic::Glitchless, true, true) {
+                } else if self.can_enter(state, dungeons, &RandoLogic::Glitchless, true, true) {
                     return Availability::GlitchAgahnim;
                 }
 
                 if *logic < RandoLogic::OverWorldGlitches {
                     return Availability::Unavailable;
                 }
-                if self.can_enter(&state, &dungeons, &RandoLogic::OverWorldGlitches, false, false) {
-                    if Rule::Hammer.check(&state) {
-                        if Rule::HookShot.check(&state) || this_dungeon.remaining_chests() >= 5 {
+                if self.can_enter(state, dungeons, &RandoLogic::OverWorldGlitches, false, false) {
+                    if Rule::Hammer.check(state) {
+                        if Rule::HookShot.check(state) || this_dungeon.remaining_chests() >= 5 {
                             return Availability::Available;
                         } else if this_dungeon.remaining_chests() >= 3 {
                             return Availability::Possible;
@@ -2322,14 +2176,14 @@ impl DungeonAvailability {
                         return Availability::Possible;
                     }
                 } else if self.can_enter(
-                    &state,
-                    &dungeons,
+                    state,
+                    dungeons,
                     &RandoLogic::OverWorldGlitches,
                     false,
                     true,
                 ) {
-                    if Rule::Hammer.check(&state) {
-                        if Rule::HookShot.check(&state) || this_dungeon.remaining_chests() >= 5 {
+                    if Rule::Hammer.check(state) {
+                        if Rule::HookShot.check(state) || this_dungeon.remaining_chests() >= 5 {
                             return Availability::GlitchAvailable;
                         } else if this_dungeon.remaining_chests() >= 3 {
                             return Availability::GlitchPossible;
@@ -2338,16 +2192,16 @@ impl DungeonAvailability {
                         return Availability::GlitchPossible;
                     }
                 } else if self.can_enter(
-                    &state,
-                    &dungeons,
+                    state,
+                    dungeons,
                     &RandoLogic::OverWorldGlitches,
                     true,
                     false,
                 ) {
                     return Availability::Agahnim;
                 } else if self.can_enter(
-                    &state,
-                    &dungeons,
+                    state,
+                    dungeons,
                     &RandoLogic::OverWorldGlitches,
                     true,
                     true,
@@ -2358,18 +2212,18 @@ impl DungeonAvailability {
                 if *logic < RandoLogic::MajorGlitches {
                     return Availability::Unavailable;
                 }
-                if self.can_enter(&state, &dungeons, &RandoLogic::MajorGlitches, false, false) {
-                    if Rule::Flippers.check(&state)
-                        && (Rule::Hammer.check(&state)
+                if self.can_enter(state, dungeons, &RandoLogic::MajorGlitches, false, false) {
+                    if Rule::Flippers.check(state)
+                        && (Rule::Hammer.check(state)
                             || DungeonAvailability::MiseryMire.can_enter(
-                                &state,
-                                &dungeons,
+                                state,
+                                dungeons,
                                 &RandoLogic::MajorGlitches,
                                 false,
                                 false,
                             ))
                     {
-                        if Rule::HookShot.check(&state) {
+                        if Rule::HookShot.check(state) {
                             return Availability::Available;
                         } else if this_dungeon.remaining_chests() >= 3 {
                             return Availability::Possible;
@@ -2377,19 +2231,18 @@ impl DungeonAvailability {
                     } else if this_dungeon.remaining_chests() >= 5 {
                         return Availability::Possible;
                     }
-                } else if self.can_enter(&state, &dungeons, &RandoLogic::MajorGlitches, false, true)
-                {
-                    if Rule::Flippers.check(&state)
-                        && (Rule::Hammer.check(&state)
+                } else if self.can_enter(state, dungeons, &RandoLogic::MajorGlitches, false, true) {
+                    if Rule::Flippers.check(state)
+                        && (Rule::Hammer.check(state)
                             || DungeonAvailability::MiseryMire.can_enter(
-                                &state,
-                                &dungeons,
+                                state,
+                                dungeons,
                                 &RandoLogic::MajorGlitches,
                                 false,
                                 true,
                             ))
                     {
-                        if Rule::HookShot.check(&state) {
+                        if Rule::HookShot.check(state) {
                             return Availability::GlitchAvailable;
                         } else if this_dungeon.remaining_chests() >= 3 {
                             return Availability::GlitchPossible;
@@ -2397,69 +2250,67 @@ impl DungeonAvailability {
                     } else if this_dungeon.remaining_chests() >= 5 {
                         return Availability::GlitchPossible;
                     }
-                } else if self.can_enter(&state, &dungeons, &RandoLogic::MajorGlitches, true, false)
-                {
+                } else if self.can_enter(state, dungeons, &RandoLogic::MajorGlitches, true, false) {
                     return Availability::Agahnim;
-                } else if self.can_enter(&state, &dungeons, &RandoLogic::MajorGlitches, true, true)
-                {
+                } else if self.can_enter(state, dungeons, &RandoLogic::MajorGlitches, true, true) {
                     return Availability::GlitchAgahnim;
                 }
             }
             DungeonAvailability::ThievesTown => {
-                let this_dungeon = self.dungeon_from_state(&dungeons);
-                if self.can_enter(&state, &dungeons, &RandoLogic::Glitchless, false, false) {
-                    if Rule::Hammer.check(&state)
+                let this_dungeon = self.dungeon_from_state(dungeons);
+                if self.can_enter(state, dungeons, &RandoLogic::Glitchless, false, false) {
+                    if Rule::Hammer.check(state)
                         || this_dungeon.remaining_chests() >= 3
-                        || (self.can_hurt_boss(&state) && this_dungeon.remaining_chests() >= 2)
+                        || (self.can_hurt_boss(state) && this_dungeon.remaining_chests() >= 2)
                     {
                         return Availability::Available;
-                    } else {
-                        return Availability::Possible;
                     }
-                } else if self.can_enter(&state, &dungeons, &RandoLogic::Glitchless, true, false) {
+
+                    return Availability::Possible;
+                } else if self.can_enter(state, dungeons, &RandoLogic::Glitchless, true, false) {
                     return Availability::Agahnim;
-                } else if self.can_enter(&state, &dungeons, &RandoLogic::Glitchless, true, true) {
+                } else if self.can_enter(state, dungeons, &RandoLogic::Glitchless, true, true) {
                     return Availability::GlitchAgahnim;
                 }
 
                 if *logic < RandoLogic::OverWorldGlitches {
                     return Availability::Unavailable;
                 }
-                if self.can_enter(&state, &dungeons, &RandoLogic::OverWorldGlitches, false, false) {
-                    if Rule::Hammer.check(&state)
+                if self.can_enter(state, dungeons, &RandoLogic::OverWorldGlitches, false, false) {
+                    if Rule::Hammer.check(state)
                         || this_dungeon.remaining_chests() >= 3
-                        || (self.can_hurt_boss(&state) && this_dungeon.remaining_chests() >= 2)
+                        || (self.can_hurt_boss(state) && this_dungeon.remaining_chests() >= 2)
                     {
                         return Availability::Available;
-                    } else {
-                        return Availability::Possible;
                     }
+
+                    return Availability::Possible;
                 } else if self.can_enter(
-                    &state,
-                    &dungeons,
+                    state,
+                    dungeons,
                     &RandoLogic::OverWorldGlitches,
                     false,
                     true,
                 ) {
-                    if Rule::Hammer.check(&state)
+                    if Rule::Hammer.check(state)
                         || this_dungeon.remaining_chests() >= 3
-                        || (self.can_hurt_boss(&state) && this_dungeon.remaining_chests() >= 2)
+                        || (self.can_hurt_boss(state) && this_dungeon.remaining_chests() >= 2)
                     {
                         return Availability::GlitchAvailable;
-                    } else {
-                        return Availability::GlitchPossible;
                     }
+
+                    return Availability::GlitchPossible;
                 } else if self.can_enter(
-                    &state,
-                    &dungeons,
+                    state,
+                    dungeons,
                     &RandoLogic::OverWorldGlitches,
                     true,
                     false,
                 ) {
                     return Availability::Agahnim;
                 } else if self.can_enter(
-                    &state,
-                    &dungeons,
+                    state,
+                    dungeons,
                     &RandoLogic::OverWorldGlitches,
                     true,
                     true,
@@ -2470,316 +2321,290 @@ impl DungeonAvailability {
                 if *logic < RandoLogic::MajorGlitches {
                     return Availability::Unavailable;
                 }
-                if self.can_enter(&state, &dungeons, &RandoLogic::MajorGlitches, false, false) {
-                    if Rule::Hammer.check(&state)
+                if self.can_enter(state, dungeons, &RandoLogic::MajorGlitches, false, false) {
+                    if Rule::Hammer.check(state)
                         || this_dungeon.remaining_chests() >= 3
-                        || (self.can_hurt_boss(&state) && this_dungeon.remaining_chests() >= 2)
+                        || (self.can_hurt_boss(state) && this_dungeon.remaining_chests() >= 2)
                     {
                         return Availability::Available;
-                    } else {
-                        return Availability::Possible;
                     }
-                } else if self.can_enter(&state, &dungeons, &RandoLogic::MajorGlitches, false, true)
-                {
-                    if Rule::Hammer.check(&state)
+
+                    return Availability::Possible;
+                } else if self.can_enter(state, dungeons, &RandoLogic::MajorGlitches, false, true) {
+                    if Rule::Hammer.check(state)
                         || this_dungeon.remaining_chests() >= 3
-                        || (self.can_hurt_boss(&state) && this_dungeon.remaining_chests() >= 2)
+                        || (self.can_hurt_boss(state) && this_dungeon.remaining_chests() >= 2)
                     {
                         return Availability::GlitchAvailable;
-                    } else {
-                        return Availability::GlitchPossible;
                     }
-                } else if self.can_enter(&state, &dungeons, &RandoLogic::MajorGlitches, true, false)
-                {
+
+                    return Availability::GlitchPossible;
+                } else if self.can_enter(state, dungeons, &RandoLogic::MajorGlitches, true, false) {
                     return Availability::Agahnim;
-                } else if self.can_enter(&state, &dungeons, &RandoLogic::MajorGlitches, true, true)
-                {
+                } else if self.can_enter(state, dungeons, &RandoLogic::MajorGlitches, true, true) {
                     return Availability::GlitchAgahnim;
                 }
             }
             DungeonAvailability::TowerOfHera => {
-                let this_dungeon = self.dungeon_from_state(&dungeons);
-                if self.can_enter(&state, &dungeons, &RandoLogic::Glitchless, false, false) {
-                    if Rule::CanLightTorches.check(&state)
+                let this_dungeon = self.dungeon_from_state(dungeons);
+                if self.can_enter(state, dungeons, &RandoLogic::Glitchless, false, false) {
+                    if Rule::CanLightTorches.check(state)
                         && (this_dungeon.remaining_chests() == 2
-                            || Rule::Sword1.check(&state)
-                            || Rule::Hammer.check(&state))
+                            || Rule::Sword1.check(state)
+                            || Rule::Hammer.check(state))
                     {
                         return Availability::Available;
-                    } else {
-                        return Availability::Possible;
                     }
-                } else if self.can_enter(&state, &dungeons, &RandoLogic::Glitchless, false, true) {
-                    if Rule::CanLightTorches.check(&state)
+
+                    return Availability::Possible;
+                } else if self.can_enter(state, dungeons, &RandoLogic::Glitchless, false, true) {
+                    if Rule::CanLightTorches.check(state)
                         && (this_dungeon.remaining_chests() == 2
-                            || Rule::Sword1.check(&state)
-                            || Rule::Hammer.check(&state))
+                            || Rule::Sword1.check(state)
+                            || Rule::Hammer.check(state))
                     {
                         return Availability::GlitchAvailable;
-                    } else {
-                        return Availability::GlitchPossible;
                     }
+
+                    return Availability::GlitchPossible;
                 }
 
                 if *logic < RandoLogic::OverWorldGlitches {
                     return Availability::Unavailable;
                 }
-                if self.can_enter(&state, &dungeons, &RandoLogic::OverWorldGlitches, false, false) {
-                    if Rule::CanLightTorches.check(&state)
+                if self.can_enter(state, dungeons, &RandoLogic::OverWorldGlitches, false, false) {
+                    if Rule::CanLightTorches.check(state)
                         && (this_dungeon.remaining_chests() == 2
-                            || Rule::Sword1.check(&state)
-                            || Rule::Hammer.check(&state))
+                            || Rule::Sword1.check(state)
+                            || Rule::Hammer.check(state))
                     {
                         return Availability::Available;
-                    } else {
-                        return Availability::Possible;
                     }
+
+                    return Availability::Possible;
                 } else if self.can_enter(
-                    &state,
-                    &dungeons,
+                    state,
+                    dungeons,
                     &RandoLogic::OverWorldGlitches,
                     false,
                     true,
                 ) {
-                    if Rule::CanLightTorches.check(&state)
+                    if Rule::CanLightTorches.check(state)
                         && (this_dungeon.remaining_chests() == 2
-                            || Rule::Sword1.check(&state)
-                            || Rule::Hammer.check(&state))
+                            || Rule::Sword1.check(state)
+                            || Rule::Hammer.check(state))
                     {
                         return Availability::GlitchAvailable;
-                    } else {
-                        return Availability::GlitchPossible;
                     }
+
+                    return Availability::GlitchPossible;
                 }
 
                 if *logic < RandoLogic::MajorGlitches {
                     return Availability::Unavailable;
                 }
-                if self.can_enter(&state, &dungeons, &RandoLogic::MajorGlitches, false, false) {
-                    if (Rule::CanLightTorches.check(&state)
+                if self.can_enter(state, dungeons, &RandoLogic::MajorGlitches, false, false) {
+                    if (Rule::CanLightTorches.check(state)
                         || DungeonAvailability::MiseryMire.can_enter(
-                            &state,
-                            &dungeons,
+                            state,
+                            dungeons,
                             &RandoLogic::MajorGlitches,
                             false,
                             false,
                         ))
                         && (this_dungeon.remaining_chests() == 2
-                            || Rule::Sword1.check(&state)
-                            || Rule::Hammer.check(&state))
+                            || Rule::Sword1.check(state)
+                            || Rule::Hammer.check(state))
                     {
                         return Availability::Available;
-                    } else {
-                        return Availability::Possible;
                     }
-                } else if self.can_enter(&state, &dungeons, &RandoLogic::MajorGlitches, false, true)
-                {
-                    if (Rule::CanLightTorches.check(&state)
+
+                    return Availability::Possible;
+                } else if self.can_enter(state, dungeons, &RandoLogic::MajorGlitches, false, true) {
+                    if (Rule::CanLightTorches.check(state)
                         || DungeonAvailability::MiseryMire.can_enter(
-                            &state,
-                            &dungeons,
+                            state,
+                            dungeons,
                             &RandoLogic::MajorGlitches,
                             false,
                             false,
                         ))
                         && (this_dungeon.remaining_chests() == 2
-                            || Rule::Sword1.check(&state)
-                            || Rule::Hammer.check(&state))
+                            || Rule::Sword1.check(state)
+                            || Rule::Hammer.check(state))
                     {
                         return Availability::GlitchAvailable;
-                    } else {
-                        return Availability::GlitchPossible;
                     }
-                } else if self.may_enter(
-                    &state,
-                    &dungeons,
-                    &RandoLogic::MajorGlitches,
-                    false,
-                    false,
-                ) {
-                    return Availability::Possible;
-                } else if self.may_enter(&state, &dungeons, &RandoLogic::MajorGlitches, false, true)
-                {
+
                     return Availability::GlitchPossible;
-                } else if self.may_enter(&state, &dungeons, &RandoLogic::MajorGlitches, true, false)
+                } else if self.may_enter(state, dungeons, &RandoLogic::MajorGlitches, false, false)
                 {
+                    return Availability::Possible;
+                } else if self.may_enter(state, dungeons, &RandoLogic::MajorGlitches, false, true) {
+                    return Availability::GlitchPossible;
+                } else if self.may_enter(state, dungeons, &RandoLogic::MajorGlitches, true, false) {
                     return Availability::Agahnim;
-                } else if self.may_enter(&state, &dungeons, &RandoLogic::MajorGlitches, true, true)
-                {
+                } else if self.may_enter(state, dungeons, &RandoLogic::MajorGlitches, true, true) {
                     return Availability::GlitchAgahnim;
                 }
             }
             DungeonAvailability::TurtleRock => {
-                let this_dungeon = self.dungeon_from_state(&dungeons);
-                if self.can_enter(&state, &dungeons, &RandoLogic::Glitchless, false, false) {
-                    if Rule::FireRod.check(&state) {
-                        if Rule::Lantern.check(&state)
-                            && (Rule::Cape.check(&state)
-                                || Rule::ByrnaCane.check(&state)
-                                || Rule::CanBlockLasers.check(&state))
+                let this_dungeon = self.dungeon_from_state(dungeons);
+                if self.can_enter(state, dungeons, &RandoLogic::Glitchless, false, false) {
+                    if Rule::FireRod.check(state) {
+                        if Rule::Lantern.check(state)
+                            && (Rule::Cape.check(state)
+                                || Rule::ByrnaCane.check(state)
+                                || Rule::CanBlockLasers.check(state))
                         {
                             if this_dungeon.remaining_chests() >= 2
-                                || self.is_beatable(&state, &dungeons, &RandoLogic::Glitchless)
+                                || self.is_beatable(state, dungeons, &RandoLogic::Glitchless)
                                     == Availability::Available
                             {
                                 return Availability::Available;
-                            } else {
-                                return Availability::Possible;
                             }
-                        } else if this_dungeon.remaining_chests() >= 2 {
-                            return Availability::Possible;
-                        } else {
-                            return Availability::GlitchPossible;
-                        }
-                    } else {
-                        if Rule::Lantern.check(&state)
-                            && (Rule::Cape.check(&state)
-                                || Rule::ByrnaCane.check(&state)
-                                || Rule::CanBlockLasers.check(&state))
-                        {
-                            return Availability::Possible;
-                        } else if this_dungeon.remaining_chests() >= 4 {
-                            return Availability::Possible;
-                        } else {
-                            return Availability::GlitchPossible;
-                        }
-                    }
-                } else if self.may_enter(&state, &dungeons, &RandoLogic::Glitchless, false, false) {
-                    if Rule::FireRod.check(&state) {
-                        if Rule::Lantern.check(&state)
-                            && (Rule::Cape.check(&state)
-                                || Rule::ByrnaCane.check(&state)
-                                || Rule::CanBlockLasers.check(&state))
-                        {
+
                             return Availability::Possible;
                         } else if this_dungeon.remaining_chests() >= 2 {
                             return Availability::Possible;
-                        } else {
-                            return Availability::GlitchPossible;
                         }
-                    } else {
-                        if Rule::Lantern.check(&state)
-                            && (Rule::Cape.check(&state)
-                                || Rule::ByrnaCane.check(&state)
-                                || Rule::CanBlockLasers.check(&state))
+
+                        return Availability::GlitchPossible;
+                    } else if (Rule::Lantern.check(state)
+                        && (Rule::Cape.check(state)
+                            || Rule::ByrnaCane.check(state)
+                            || Rule::CanBlockLasers.check(state)))
+                        || this_dungeon.remaining_chests() >= 4
+                    {
+                        return Availability::Possible;
+                    }
+
+                    return Availability::GlitchPossible;
+                } else if self.may_enter(state, dungeons, &RandoLogic::Glitchless, false, false) {
+                    if Rule::FireRod.check(state) {
+                        if (Rule::Lantern.check(state)
+                            && (Rule::Cape.check(state)
+                                || Rule::ByrnaCane.check(state)
+                                || Rule::CanBlockLasers.check(state)))
+                            || this_dungeon.remaining_chests() >= 2
                         {
                             return Availability::Possible;
-                        } else if this_dungeon.remaining_chests() >= 4 {
-                            return Availability::Possible;
-                        } else {
-                            return Availability::GlitchPossible;
                         }
+
+                        return Availability::GlitchPossible;
+                    } else if (Rule::Lantern.check(state)
+                        && (Rule::Cape.check(state)
+                            || Rule::ByrnaCane.check(state)
+                            || Rule::CanBlockLasers.check(state)))
+                        || this_dungeon.remaining_chests() >= 4
+                    {
+                        return Availability::Possible;
                     }
-                } else if self.can_enter(&state, &dungeons, &RandoLogic::Glitchless, false, true) {
-                    if Rule::FireRod.check(&state) {
+
+                    return Availability::GlitchPossible;
+                } else if self.can_enter(state, dungeons, &RandoLogic::Glitchless, false, true) {
+                    if Rule::FireRod.check(state) {
                         if this_dungeon.remaining_chests() >= 2
-                            || self.is_beatable(&state, &dungeons, &RandoLogic::Glitchless)
+                            || self.is_beatable(state, dungeons, &RandoLogic::Glitchless)
                                 == Availability::Available
-                            || self.is_beatable(&state, &dungeons, &RandoLogic::Glitchless)
+                            || self.is_beatable(state, dungeons, &RandoLogic::Glitchless)
                                 == Availability::GlitchAvailable
                         {
                             return Availability::GlitchAvailable;
-                        } else {
-                            return Availability::GlitchPossible;
                         }
-                    } else {
+
                         return Availability::GlitchPossible;
                     }
-                } else if self.may_enter(&state, &dungeons, &RandoLogic::Glitchless, false, true) {
+
+                    return Availability::GlitchPossible;
+                } else if self.may_enter(state, dungeons, &RandoLogic::Glitchless, false, true) {
                     return Availability::GlitchPossible;
                 }
 
                 if *logic < RandoLogic::OverWorldGlitches {
                     return Availability::Unavailable;
                 }
-                if self.can_enter(&state, &dungeons, &RandoLogic::OverWorldGlitches, false, false) {
-                    if Rule::FireRod.check(&state) {
-                        if Rule::Lantern.check(&state)
-                            && (Rule::Cape.check(&state)
-                                || Rule::ByrnaCane.check(&state)
-                                || Rule::CanBlockLasers.check(&state))
+                if self.can_enter(state, dungeons, &RandoLogic::OverWorldGlitches, false, false) {
+                    if Rule::FireRod.check(state) {
+                        if Rule::Lantern.check(state)
+                            && (Rule::Cape.check(state)
+                                || Rule::ByrnaCane.check(state)
+                                || Rule::CanBlockLasers.check(state))
                         {
                             if this_dungeon.remaining_chests() >= 2
                                 // TODO: Should this actually be checking if the dungeon is beatable under OverWorld Glitches rules?
-                                || self.is_beatable(&state, &dungeons, &RandoLogic::Glitchless) == Availability::Available
+                                || self.is_beatable(state, dungeons, &RandoLogic::Glitchless) == Availability::Available
                             {
                                 return Availability::Available;
-                            } else {
-                                return Availability::Possible;
                             }
+
+                            return Availability::Possible;
                         } else if this_dungeon.remaining_chests() >= 2 {
                             return Availability::Possible;
-                        } else {
-                            return Availability::GlitchPossible;
                         }
-                    } else {
-                        if Rule::Lantern.check(&state)
-                            && (Rule::Cape.check(&state)
-                                || Rule::ByrnaCane.check(&state)
-                                || Rule::CanBlockLasers.check(&state))
-                        {
-                            return Availability::Possible;
-                        } else if this_dungeon.remaining_chests() >= 4 {
-                            return Availability::Possible;
-                        } else {
-                            return Availability::GlitchPossible;
-                        }
+
+                        return Availability::GlitchPossible;
+                    } else if (Rule::Lantern.check(state)
+                        && (Rule::Cape.check(state)
+                            || Rule::ByrnaCane.check(state)
+                            || Rule::CanBlockLasers.check(state)))
+                        || this_dungeon.remaining_chests() >= 4
+                    {
+                        return Availability::Possible;
                     }
+
+                    return Availability::GlitchPossible;
                 } else if self.may_enter(
-                    &state,
-                    &dungeons,
+                    state,
+                    dungeons,
                     &RandoLogic::OverWorldGlitches,
                     false,
                     false,
                 ) {
-                    if Rule::FireRod.check(&state) {
-                        if Rule::Lantern.check(&state)
-                            && (Rule::Cape.check(&state)
-                                || Rule::ByrnaCane.check(&state)
-                                || Rule::CanBlockLasers.check(&state))
+                    if Rule::FireRod.check(state) {
+                        if (Rule::Lantern.check(state)
+                            && (Rule::Cape.check(state)
+                                || Rule::ByrnaCane.check(state)
+                                || Rule::CanBlockLasers.check(state)))
+                            || this_dungeon.remaining_chests() >= 2
                         {
                             return Availability::Possible;
-                        } else if this_dungeon.remaining_chests() >= 2 {
-                            return Availability::Possible;
-                        } else {
-                            return Availability::GlitchPossible;
                         }
-                    } else {
-                        if Rule::Lantern.check(&state)
-                            && (Rule::Cape.check(&state)
-                                || Rule::ByrnaCane.check(&state)
-                                || Rule::CanBlockLasers.check(&state))
-                        {
-                            return Availability::Possible;
-                        } else if this_dungeon.remaining_chests() >= 4 {
-                            return Availability::Possible;
-                        } else {
-                            return Availability::GlitchPossible;
-                        }
+
+                        return Availability::GlitchPossible;
+                    } else if (Rule::Lantern.check(state)
+                        && (Rule::Cape.check(state)
+                            || Rule::ByrnaCane.check(state)
+                            || Rule::CanBlockLasers.check(state)))
+                        || this_dungeon.remaining_chests() >= 4
+                    {
+                        return Availability::Possible;
                     }
+
+                    return Availability::GlitchPossible;
                 } else if self.can_enter(
-                    &state,
-                    &dungeons,
+                    state,
+                    dungeons,
                     &RandoLogic::OverWorldGlitches,
                     false,
                     true,
                 ) {
-                    if Rule::FireRod.check(&state) {
+                    if Rule::FireRod.check(state) {
                         if this_dungeon.remaining_chests() >= 2
                             // TODO: Should these be checking is_beatable with OverWorldGlitches logic?
-                            || self.is_beatable(&state, &dungeons, &RandoLogic::Glitchless)
+                            || self.is_beatable(state, dungeons, &RandoLogic::Glitchless)
                                 == Availability::Available
-                            || self.is_beatable(&state, &dungeons, &RandoLogic::Glitchless)
+                            || self.is_beatable(state, dungeons, &RandoLogic::Glitchless)
                                 == Availability::GlitchAvailable
                         {
                             return Availability::GlitchAvailable;
-                        } else {
-                            return Availability::GlitchPossible;
                         }
+
+                        return Availability::GlitchPossible;
                     }
                 } else if self.may_enter(
-                    &state,
-                    &dungeons,
+                    state,
+                    dungeons,
                     &RandoLogic::OverWorldGlitches,
                     false,
                     true,
@@ -2790,91 +2615,77 @@ impl DungeonAvailability {
                 if *logic < RandoLogic::MajorGlitches {
                     return Availability::Unavailable;
                 }
-                if self.can_enter(&state, &dungeons, &RandoLogic::MajorGlitches, false, false) {
-                    if Rule::FireRod.check(&state) {
-                        if Rule::Lantern.check(&state)
-                            && (Rule::Cape.check(&state)
-                                || Rule::ByrnaCane.check(&state)
-                                || Rule::CanBlockLasers.check(&state))
+                if self.can_enter(state, dungeons, &RandoLogic::MajorGlitches, false, false) {
+                    if Rule::FireRod.check(state) {
+                        if Rule::Lantern.check(state)
+                            && (Rule::Cape.check(state)
+                                || Rule::ByrnaCane.check(state)
+                                || Rule::CanBlockLasers.check(state))
                         {
                             if this_dungeon.remaining_chests() >= 2
                                 // TODO: Should this be using MajorGlitches logic to check is_beatable?
-                                || self.is_beatable(&state, &dungeons, &RandoLogic::Glitchless)
+                                || self.is_beatable(state, dungeons, &RandoLogic::Glitchless)
                                     == Availability::Available
                             {
                                 return Availability::Available;
-                            } else {
-                                return Availability::Possible;
                             }
-                        } else if this_dungeon.remaining_chests() >= 2 {
-                            return Availability::Possible;
-                        } else {
-                            return Availability::GlitchPossible;
-                        }
-                    } else {
-                        if Rule::Lantern.check(&state)
-                            && (Rule::Cape.check(&state)
-                                || Rule::ByrnaCane.check(&state)
-                                || Rule::CanBlockLasers.check(&state))
-                        {
-                            return Availability::Possible;
-                        } else if this_dungeon.remaining_chests() >= 4 {
-                            return Availability::Possible;
-                        } else {
-                            return Availability::GlitchPossible;
-                        }
-                    }
-                } else if self.may_enter(
-                    &state,
-                    &dungeons,
-                    &RandoLogic::MajorGlitches,
-                    false,
-                    false,
-                ) {
-                    if Rule::FireRod.check(&state) {
-                        if Rule::Lantern.check(&state)
-                            && (Rule::Cape.check(&state)
-                                || Rule::ByrnaCane.check(&state)
-                                || Rule::CanBlockLasers.check(&state))
-                        {
+
                             return Availability::Possible;
                         } else if this_dungeon.remaining_chests() >= 2 {
                             return Availability::Possible;
-                        } else {
-                            return Availability::GlitchPossible;
                         }
-                    } else {
-                        if Rule::Lantern.check(&state)
-                            && (Rule::Cape.check(&state)
-                                || Rule::ByrnaCane.check(&state)
-                                || Rule::CanBlockLasers.check(&state))
-                        {
-                            return Availability::Possible;
-                        } else if this_dungeon.remaining_chests() >= 4 {
-                            return Availability::Possible;
-                        } else {
-                            return Availability::GlitchPossible;
-                        }
+
+                        return Availability::GlitchPossible;
+                    } else if (Rule::Lantern.check(state)
+                        && (Rule::Cape.check(state)
+                            || Rule::ByrnaCane.check(state)
+                            || Rule::CanBlockLasers.check(state)))
+                        || this_dungeon.remaining_chests() >= 4
+                    {
+                        return Availability::Possible;
                     }
-                } else if self.can_enter(&state, &dungeons, &RandoLogic::MajorGlitches, false, true)
+
+                    return Availability::GlitchPossible;
+                } else if self.may_enter(state, dungeons, &RandoLogic::MajorGlitches, false, false)
                 {
-                    if Rule::FireRod.check(&state) {
+                    if Rule::FireRod.check(state) {
+                        if (Rule::Lantern.check(state)
+                            && (Rule::Cape.check(state)
+                                || Rule::ByrnaCane.check(state)
+                                || Rule::CanBlockLasers.check(state)))
+                            || this_dungeon.remaining_chests() >= 2
+                        {
+                            return Availability::Possible;
+                        }
+
+                        return Availability::GlitchPossible;
+                    } else if (Rule::Lantern.check(state)
+                        && (Rule::Cape.check(state)
+                            || Rule::ByrnaCane.check(state)
+                            || Rule::CanBlockLasers.check(state)))
+                        || this_dungeon.remaining_chests() >= 4
+                    {
+                        return Availability::Possible;
+                    }
+
+                    return Availability::GlitchPossible;
+                } else if self.can_enter(state, dungeons, &RandoLogic::MajorGlitches, false, true) {
+                    if Rule::FireRod.check(state) {
                         if this_dungeon.remaining_chests() >= 2
                             // TODO: Should this be using MajorGlitches logic when checking is_beatable?
-                            || self.is_beatable(&state, &dungeons, &RandoLogic::Glitchless)
+                            || self.is_beatable(state, dungeons, &RandoLogic::Glitchless)
                                 == Availability::Available
-                            || self.is_beatable(&state, &dungeons, &RandoLogic::Glitchless)
+                            || self.is_beatable(state, dungeons, &RandoLogic::Glitchless)
                                 == Availability::GlitchAvailable
                         {
                             return Availability::GlitchAvailable;
-                        } else {
-                            return Availability::GlitchPossible;
                         }
-                    } else {
+
                         return Availability::GlitchPossible;
                     }
-                } else if self.may_enter(&state, &dungeons, &RandoLogic::MajorGlitches, false, true)
-                {
+
+                    return Availability::GlitchPossible;
+                } else if self.may_enter(state, dungeons, &RandoLogic::MajorGlitches, false, true) {
                     return Availability::GlitchPossible;
                 }
             }
@@ -2885,34 +2696,34 @@ impl DungeonAvailability {
 
     fn has_medallion(&self, state: &GameState, dungeons: &DungeonState) -> bool {
         if *self == DungeonAvailability::MiseryMire || *self == DungeonAvailability::TurtleRock {
-            let this_dungeon = self.dungeon_from_state(&dungeons);
+            let this_dungeon = self.dungeon_from_state(dungeons);
             (match this_dungeon.medallion {
-                Medallion::Bombos => Rule::BombosMedallion.check(&state),
-                Medallion::Ether => Rule::EtherMedallion.check(&state),
-                Medallion::Quake => Rule::QuakeMedallion.check(&state),
+                Medallion::Bombos => Rule::BombosMedallion.check(state),
+                Medallion::Ether => Rule::EtherMedallion.check(state),
+                Medallion::Quake => Rule::QuakeMedallion.check(state),
                 Medallion::Unknown => false,
-            }) || (Rule::BombosMedallion.check(&state)
-                && Rule::EtherMedallion.check(&state)
-                && Rule::QuakeMedallion.check(&state))
+            }) || (Rule::BombosMedallion.check(state)
+                && Rule::EtherMedallion.check(state)
+                && Rule::QuakeMedallion.check(state))
         } else {
-            eprintln!("{:?} is not accessed via medallion", self);
+            error!("{:?} is not accessed via medallion", self);
             false
         }
     }
 
     fn may_have_medallion(&self, state: &GameState, dungeons: &DungeonState) -> bool {
         if *self == DungeonAvailability::MiseryMire || *self == DungeonAvailability::TurtleRock {
-            let this_dungeon = self.dungeon_from_state(&dungeons);
+            let this_dungeon = self.dungeon_from_state(dungeons);
             !(match this_dungeon.medallion {
-                Medallion::Bombos => !Rule::BombosMedallion.check(&state),
-                Medallion::Ether => !Rule::EtherMedallion.check(&state),
-                Medallion::Quake => !Rule::QuakeMedallion.check(&state),
+                Medallion::Bombos => !Rule::BombosMedallion.check(state),
+                Medallion::Ether => !Rule::EtherMedallion.check(state),
+                Medallion::Quake => !Rule::QuakeMedallion.check(state),
                 Medallion::Unknown => true,
-            }) || (!Rule::BombosMedallion.check(&state)
-                && !Rule::EtherMedallion.check(&state)
-                && !Rule::QuakeMedallion.check(&state))
+            }) || (!Rule::BombosMedallion.check(state)
+                && !Rule::EtherMedallion.check(state)
+                && !Rule::QuakeMedallion.check(state))
         } else {
-            eprintln!("{:?} is not accessed via medallion", self);
+            error!("{:?} is not accessed via medallion", self);
             false
         }
     }
@@ -2926,14 +2737,14 @@ impl DungeonAvailability {
     ) -> bool {
         *logic == RandoLogic::MajorGlitches
             && Rule::CanEnterWestDeathMountain.check_with_options(
-                &state,
+                state,
                 &RandoLogic::MajorGlitches,
                 agahnim_check,
                 allow_out_of_logic_glitches,
             )
-            && (Rule::MoonPearl.check(&state)
-                || (Rule::Bottle.check(&state) && Rule::Boots.check(&state)))
-            && Rule::Mirror.check(&state)
+            && (Rule::MoonPearl.check(state)
+                || (Rule::Bottle.check(state) && Rule::Boots.check(state)))
+            && Rule::Mirror.check(state)
     }
 
     fn middle(
@@ -2946,27 +2757,27 @@ impl DungeonAvailability {
         match *logic {
             RandoLogic::Glitchless => false,
             RandoLogic::OverWorldGlitches => {
-                (Rule::Mirror.check(&state)
-                    || (Rule::MoonPearl.check(&state) && Rule::CanSpinSpeed.check(&state)))
-                    && (Rule::Boots.check(&state)
-                        || Rule::SomariaCane.check(&state)
-                        || Rule::HookShot.check(&state))
+                (Rule::Mirror.check(state)
+                    || (Rule::MoonPearl.check(state) && Rule::CanSpinSpeed.check(state)))
+                    && (Rule::Boots.check(state)
+                        || Rule::SomariaCane.check(state)
+                        || Rule::HookShot.check(state))
                     && Rule::CanEnterEastDarkWorldDeathMountain.check_with_options(
-                        &state,
+                        state,
                         &RandoLogic::OverWorldGlitches,
                         agahnim_check,
                         allow_out_of_logic_glitches,
                     )
             }
             RandoLogic::MajorGlitches => {
-                (Rule::Mirror.check(&state)
-                    || (Rule::GlitchedLinkInDarkWorld.check(&state)
-                        && Rule::CanSpinSpeed.check(&state)))
-                    && (Rule::Boots.check(&state)
-                        || Rule::SomariaCane.check(&state)
-                        || Rule::HookShot.check(&state))
+                (Rule::Mirror.check(state)
+                    || (Rule::GlitchedLinkInDarkWorld.check(state)
+                        && Rule::CanSpinSpeed.check(state)))
+                    && (Rule::Boots.check(state)
+                        || Rule::SomariaCane.check(state)
+                        || Rule::HookShot.check(state))
                     && (Rule::CanEnterEastDarkWorldDeathMountain.check_with_options(
-                        &state,
+                        state,
                         &RandoLogic::MajorGlitches,
                         agahnim_check,
                         allow_out_of_logic_glitches,
@@ -2985,43 +2796,43 @@ impl DungeonAvailability {
     ) -> bool {
         match *logic {
             RandoLogic::Glitchless => {
-                DungeonAvailability::TurtleRock.has_medallion(&state, &dungeons)
-                    && Rule::Sword1.check(&state)
-                    && Rule::MoonPearl.check(&state)
-                    && Rule::SomariaCane.check(&state)
-                    && Rule::Hammer.check(&state)
-                    && Rule::CanLiftRocks.check(&state)
+                DungeonAvailability::TurtleRock.has_medallion(state, dungeons)
+                    && Rule::Sword1.check(state)
+                    && Rule::MoonPearl.check(state)
+                    && Rule::SomariaCane.check(state)
+                    && Rule::Hammer.check(state)
+                    && Rule::CanLiftRocks.check(state)
                     && Rule::CanEnterEastDeathMountain.check_with_options(
-                        &state,
+                        state,
                         &RandoLogic::Glitchless,
                         agahnim_check,
                         allow_out_of_logic_glitches,
                     )
             }
             RandoLogic::OverWorldGlitches => {
-                DungeonAvailability::TurtleRock.has_medallion(&state, &dungeons)
-                    && Rule::Sword1.check(&state)
-                    && Rule::MoonPearl.check(&state)
-                    && Rule::SomariaCane.check(&state)
-                    && Rule::Hammer.check(&state)
-                    && (Rule::CanLiftDarkRocks.check(&state) || Rule::Boots.check(&state))
+                DungeonAvailability::TurtleRock.has_medallion(state, dungeons)
+                    && Rule::Sword1.check(state)
+                    && Rule::MoonPearl.check(state)
+                    && Rule::SomariaCane.check(state)
+                    && Rule::Hammer.check(state)
+                    && (Rule::CanLiftDarkRocks.check(state) || Rule::Boots.check(state))
                     && Rule::CanEnterEastDeathMountain.check_with_options(
-                        &state,
+                        state,
                         &RandoLogic::OverWorldGlitches,
                         agahnim_check,
                         allow_out_of_logic_glitches,
                     )
             }
             RandoLogic::MajorGlitches => {
-                DungeonAvailability::TurtleRock.has_medallion(&state, &dungeons)
-                    && Rule::Sword1.check(&state)
-                    && (Rule::MoonPearl.check(&state)
-                        || (Rule::Bottle.check(&state) && Rule::Boots.check(&state)))
-                    && Rule::SomariaCane.check(&state)
-                    && Rule::Hammer.check(&state)
-                    && (Rule::CanLiftDarkRocks.check(&state) || Rule::Boots.check(&state))
+                DungeonAvailability::TurtleRock.has_medallion(state, dungeons)
+                    && Rule::Sword1.check(state)
+                    && (Rule::MoonPearl.check(state)
+                        || (Rule::Bottle.check(state) && Rule::Boots.check(state)))
+                    && Rule::SomariaCane.check(state)
+                    && Rule::Hammer.check(state)
+                    && (Rule::CanLiftDarkRocks.check(state) || Rule::Boots.check(state))
                     && Rule::CanEnterEastDeathMountain.check_with_options(
-                        &state,
+                        state,
                         &RandoLogic::MajorGlitches,
                         agahnim_check,
                         allow_out_of_logic_glitches,
@@ -3040,43 +2851,43 @@ impl DungeonAvailability {
     ) -> bool {
         match *logic {
             RandoLogic::Glitchless => {
-                DungeonAvailability::TurtleRock.may_have_medallion(&state, &dungeons)
-                    && Rule::Sword1.check(&state)
-                    && Rule::MoonPearl.check(&state)
-                    && Rule::SomariaCane.check(&state)
-                    && Rule::Hammer.check(&state)
-                    && Rule::CanLiftDarkRocks.check(&state)
+                DungeonAvailability::TurtleRock.may_have_medallion(state, dungeons)
+                    && Rule::Sword1.check(state)
+                    && Rule::MoonPearl.check(state)
+                    && Rule::SomariaCane.check(state)
+                    && Rule::Hammer.check(state)
+                    && Rule::CanLiftDarkRocks.check(state)
                     && Rule::CanEnterEastDeathMountain.check_with_options(
-                        &state,
+                        state,
                         &RandoLogic::Glitchless,
                         agahnim_check,
                         allow_out_of_logic_glitches,
                     )
             }
             RandoLogic::OverWorldGlitches => {
-                DungeonAvailability::TurtleRock.may_have_medallion(&state, &dungeons)
-                    && Rule::Sword1.check(&state)
-                    && Rule::MoonPearl.check(&state)
-                    && Rule::SomariaCane.check(&state)
-                    && Rule::Hammer.check(&state)
-                    && (Rule::CanLiftDarkRocks.check(&state) || Rule::Boots.check(&state))
+                DungeonAvailability::TurtleRock.may_have_medallion(state, dungeons)
+                    && Rule::Sword1.check(state)
+                    && Rule::MoonPearl.check(state)
+                    && Rule::SomariaCane.check(state)
+                    && Rule::Hammer.check(state)
+                    && (Rule::CanLiftDarkRocks.check(state) || Rule::Boots.check(state))
                     && Rule::CanEnterEastDeathMountain.check_with_options(
-                        &state,
+                        state,
                         &RandoLogic::OverWorldGlitches,
                         agahnim_check,
                         allow_out_of_logic_glitches,
                     )
             }
             RandoLogic::MajorGlitches => {
-                DungeonAvailability::TurtleRock.may_have_medallion(&state, &dungeons)
-                    && Rule::Sword1.check(&state)
-                    && (Rule::MoonPearl.check(&state)
-                        || (Rule::Bottle.check(&state) && Rule::Boots.check(&state)))
-                    && Rule::SomariaCane.check(&state)
-                    && Rule::Hammer.check(&state)
-                    && (Rule::CanLiftDarkRocks.check(&state) || Rule::Boots.check(&state))
+                DungeonAvailability::TurtleRock.may_have_medallion(state, dungeons)
+                    && Rule::Sword1.check(state)
+                    && (Rule::MoonPearl.check(state)
+                        || (Rule::Bottle.check(state) && Rule::Boots.check(state)))
+                    && Rule::SomariaCane.check(state)
+                    && Rule::Hammer.check(state)
+                    && (Rule::CanLiftDarkRocks.check(state) || Rule::Boots.check(state))
                     && Rule::CanEnterEastDeathMountain.check_with_options(
-                        &state,
+                        state,
                         &RandoLogic::MajorGlitches,
                         agahnim_check,
                         allow_out_of_logic_glitches,

@@ -1,13 +1,11 @@
-use failure::{
-    self,
-    format_err,
-};
-use serde_derive::{
+use anyhow::anyhow;
+use serde::{
     Deserialize,
     Serialize,
 };
 use std::convert::TryFrom;
 
+#[allow(clippy::struct_excessive_bools)]
 #[derive(Debug, Default, Clone, Copy, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct BigKey {
@@ -34,6 +32,7 @@ pub struct Pendant {
     pub green: bool,
 }
 
+#[allow(clippy::struct_excessive_bools)]
 #[derive(Debug, Default, Clone, Copy, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Crystal {
@@ -60,7 +59,7 @@ impl Default for Bow {
 }
 
 impl TryFrom<u8> for Bow {
-    type Error = failure::Error;
+    type Error = anyhow::Error;
 
     fn try_from(number: u8) -> Result<Bow, Self::Error> {
         match number {
@@ -69,7 +68,7 @@ impl TryFrom<u8> for Bow {
             2 => Ok(Bow::WoodWithArrows),
             3 => Ok(Bow::Silver),
             4 => Ok(Bow::SilverWithArrows),
-            _ => Err(format_err!("Unknown bow flag: 0x{:X}", number)),
+            _ => Err(anyhow!("Unknown bow flag: 0x{:X}", number)),
         }
     }
 }
@@ -86,14 +85,14 @@ impl Default for Boomerang {
 }
 
 impl TryFrom<u8> for Boomerang {
-    type Error = failure::Error;
+    type Error = anyhow::Error;
 
     fn try_from(number: u8) -> Result<Boomerang, Self::Error> {
         match number {
             0 => Ok(Boomerang::None),
             1 => Ok(Boomerang::Blue),
             2 => Ok(Boomerang::Red),
-            _ => Err(format_err!("Unknown boomerang flag: 0x{:X}", number)),
+            _ => Err(anyhow!("Unknown boomerang flag: 0x{:X}", number)),
         }
     }
 }
@@ -110,14 +109,14 @@ impl Default for ShroomPowder {
 }
 
 impl TryFrom<u8> for ShroomPowder {
-    type Error = failure::Error;
+    type Error = anyhow::Error;
 
     fn try_from(number: u8) -> Result<ShroomPowder, Self::Error> {
         match number {
             0 => Ok(ShroomPowder::None),
             1 => Ok(ShroomPowder::Shroom),
             2 => Ok(ShroomPowder::Powder),
-            _ => Err(format_err!("Unknown shroom/powder flag: 0x{:X}", number)),
+            _ => Err(anyhow!("Unknown shroom/powder flag: 0x{:X}", number)),
         }
     }
 }
@@ -135,7 +134,7 @@ impl Default for FluteShovel {
 }
 
 impl TryFrom<u8> for FluteShovel {
-    type Error = failure::Error;
+    type Error = anyhow::Error;
 
     fn try_from(number: u8) -> Result<FluteShovel, Self::Error> {
         match number {
@@ -143,7 +142,7 @@ impl TryFrom<u8> for FluteShovel {
             1 => Ok(FluteShovel::Shovel),
             2 => Ok(FluteShovel::Flute),
             3 => Ok(FluteShovel::FluteAndBird),
-            _ => Err(format_err!("Unknown flute/shovel flag: 0x{:X}", number)),
+            _ => Err(anyhow!("Unknown flute/shovel flag: 0x{:X}", number)),
         }
     }
 }
@@ -160,19 +159,20 @@ impl Default for Gloves {
 }
 
 impl TryFrom<u8> for Gloves {
-    type Error = failure::Error;
+    type Error = anyhow::Error;
 
     fn try_from(number: u8) -> Result<Gloves, Self::Error> {
         match number {
             0 => Ok(Gloves::None),
             1 => Ok(Gloves::PowerGlove),
             2 => Ok(Gloves::TitansMitt),
-            _ => Err(format_err!("Unknown gloves flag: 0x{:X}", number)),
+            _ => Err(anyhow!("Unknown gloves flag: 0x{:X}", number)),
         }
     }
 }
 
 #[derive(Debug, Copy, Clone, PartialEq, PartialOrd, Serialize, Deserialize)]
+#[allow(clippy::enum_variant_names)]
 pub enum Sword {
     None          = 0,
     FightersSword = 1,
@@ -186,7 +186,7 @@ impl Default for Sword {
 }
 
 impl TryFrom<u8> for Sword {
-    type Error = failure::Error;
+    type Error = anyhow::Error;
 
     fn try_from(number: u8) -> Result<Sword, Self::Error> {
         match number {
@@ -195,12 +195,13 @@ impl TryFrom<u8> for Sword {
             2 => Ok(Sword::MasterSword),
             3 => Ok(Sword::TemperedSword),
             4 => Ok(Sword::GoldenSword),
-            _ => Err(format_err!("Unknown sword flag: 0x{:X}", number)),
+            _ => Err(anyhow!("Unknown sword flag: 0x{:X}", number)),
         }
     }
 }
 
 #[derive(Debug, Copy, Clone, PartialEq, PartialOrd, Serialize, Deserialize)]
+#[allow(clippy::enum_variant_names)]
 pub enum Shield {
     None           = 0,
     FightersShield = 1,
@@ -213,7 +214,7 @@ impl Default for Shield {
 }
 
 impl TryFrom<u8> for Shield {
-    type Error = failure::Error;
+    type Error = anyhow::Error;
 
     fn try_from(number: u8) -> Result<Shield, Self::Error> {
         match number {
@@ -221,12 +222,13 @@ impl TryFrom<u8> for Shield {
             1 => Ok(Shield::FightersShield),
             2 => Ok(Shield::RedShield),
             3 => Ok(Shield::MirrorShield),
-            _ => Err(format_err!("Unknown shield flag: 0x{:X}", number)),
+            _ => Err(anyhow!("Unknown shield flag: 0x{:X}", number)),
         }
     }
 }
 
 #[derive(Debug, Copy, Clone, PartialEq, PartialOrd, Serialize, Deserialize)]
+#[allow(clippy::enum_variant_names)]
 pub enum Armor {
     GreenMail = 0,
     BlueMail  = 1,
@@ -238,19 +240,20 @@ impl Default for Armor {
 }
 
 impl TryFrom<u8> for Armor {
-    type Error = failure::Error;
+    type Error = anyhow::Error;
 
     fn try_from(number: u8) -> Result<Armor, Self::Error> {
         match number {
             0 => Ok(Armor::GreenMail),
             1 => Ok(Armor::BlueMail),
             2 => Ok(Armor::RedMail),
-            _ => Err(format_err!("Unknown armor flag: 0x{:X}", number)),
+            _ => Err(anyhow!("Unknown armor flag: 0x{:X}", number)),
         }
     }
 }
 
 #[derive(Debug, Copy, Clone, PartialEq, Serialize, Deserialize)]
+#[allow(clippy::enum_variant_names)]
 pub enum Bottle {
     NoBottle    = 0x00,
     Mushroom    = 0x01,
@@ -268,7 +271,7 @@ impl Default for Bottle {
 }
 
 impl TryFrom<u8> for Bottle {
-    type Error = failure::Error;
+    type Error = anyhow::Error;
 
     fn try_from(number: u8) -> Result<Bottle, Self::Error> {
         match number {
@@ -281,7 +284,7 @@ impl TryFrom<u8> for Bottle {
             0x06 => Ok(Bottle::Fairy),
             0x07 => Ok(Bottle::Bee),
             0x08 => Ok(Bottle::MagicBee),
-            _ => Err(format_err!("Unknown bottle flag: 0x{:X}", number)),
+            _ => Err(anyhow!("Unknown bottle flag: 0x{:X}", number)),
         }
     }
 }
@@ -298,14 +301,14 @@ impl Default for Magic {
 }
 
 impl TryFrom<u8> for Magic {
-    type Error = failure::Error;
+    type Error = anyhow::Error;
 
     fn try_from(number: u8) -> Result<Magic, Self::Error> {
         match number {
             0 => Ok(Magic::Normal),
             1 => Ok(Magic::Half),
             2 => Ok(Magic::Quarter),
-            _ => Err(format_err!("Unknown magic flag: 0x{:X}", number)),
+            _ => Err(anyhow!("Unknown magic flag: 0x{:X}", number)),
         }
     }
 }

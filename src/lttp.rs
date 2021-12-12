@@ -1,5 +1,12 @@
-mod item;
+pub mod app_config;
+pub mod app_state;
+pub mod item;
 pub mod logic;
+
+pub use self::{
+    app_config::AppConfig,
+    app_state::AppState,
+};
 
 use crate::lttp::{
     item::{
@@ -24,13 +31,13 @@ use crate::lttp::{
         RandoLogic,
     },
 };
-use failure;
-use serde_derive::{
+use serde::{
     Deserialize,
     Serialize,
 };
 use std::convert::TryFrom;
 
+#[allow(clippy::struct_excessive_bools)]
 #[derive(Debug, Default, Copy, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct GameState {
@@ -95,7 +102,7 @@ pub struct GameState {
 }
 
 impl TryFrom<Vec<u8>> for GameState {
-    type Error = failure::Error;
+    type Error = anyhow::Error;
 
     fn try_from(response: Vec<u8>) -> Result<GameState, Self::Error> {
         let bow = Bow::try_from(response[0x00])?;
@@ -108,16 +115,16 @@ impl TryFrom<Vec<u8>> for GameState {
 
         let mut bottle_count = 0;
         if bottle1 != Bottle::NoBottle {
-            bottle_count += 1
+            bottle_count += 1;
         };
         if bottle2 != Bottle::NoBottle {
-            bottle_count += 1
+            bottle_count += 1;
         };
         if bottle3 != Bottle::NoBottle {
-            bottle_count += 1
+            bottle_count += 1;
         };
         if bottle4 != Bottle::NoBottle {
-            bottle_count += 1
+            bottle_count += 1;
         };
 
         Ok(GameState {
@@ -251,7 +258,7 @@ impl TryFrom<Vec<u8>> for GameState {
 }
 
 impl GameState {
-    /// Return a new GameState merging in the items from the old GameState.
+    /// Return a new [`GameState`] merging in the items from the old [`GameState`].
     /// Things like bomb count, hearts, rupees, etc are taken from self.
     pub fn merge(&self, old: GameState) -> Self {
         GameState {
@@ -359,7 +366,7 @@ impl Location {
         dungeons: &DungeonState,
         logic: &RandoLogic,
     ) {
-        self.availability = self.logic.check(&state, &dungeons, &logic);
+        self.availability = self.logic.check(state, dungeons, logic);
     }
 }
 
@@ -377,10 +384,7 @@ pub struct LocationState {
 
 impl LocationState {
     pub fn get(&self, name: &str) -> Option<Location> {
-        match self.locations.iter().position(|l| l.name == name) {
-            Some(i) => Some(self.locations[i].clone()),
-            None => None,
-        }
+        self.locations.iter().position(|l| l.name == name).map(|i| self.locations[i].clone())
     }
 
     pub fn update(&mut self, name: &str, update: LocationUpdate) {
@@ -392,12 +396,12 @@ impl LocationState {
     pub fn update_availability(
         &mut self,
         game_state: GameState,
-        dungeon_state: DungeonState,
+        dungeon_state: &DungeonState,
         logic: RandoLogic,
     ) {
         self.locations
             .iter_mut()
-            .for_each(|loc| loc.calculate_availability(&game_state, &dungeon_state, &logic));
+            .for_each(|loc| loc.calculate_availability(&game_state, dungeon_state, &logic));
     }
 }
 
@@ -440,16 +444,16 @@ pub struct Dungeon {
 impl Dungeon {
     pub fn update(&mut self, update: DungeonUpdate) {
         if let Some(chests) = update.found_chests {
-            self.found_chests = chests
+            self.found_chests = chests;
         }
         if let Some(reward) = update.reward {
-            self.reward = reward
+            self.reward = reward;
         }
         if let Some(medallion) = update.medallion {
-            self.medallion = medallion
+            self.medallion = medallion;
         }
         if let Some(cleared) = update.cleared {
-            self.cleared = cleared
+            self.cleared = cleared;
         }
     }
 
@@ -462,8 +466,8 @@ impl Dungeon {
         logic: &RandoLogic,
     ) {
         if let Some(dungeon_logic) = self.logic {
-            self.dungeon_availability = dungeon_logic.can_get_chest(&state, &dungeons, &logic);
-            self.boss_availability = dungeon_logic.is_beatable(&state, &dungeons, &logic);
+            self.dungeon_availability = dungeon_logic.can_get_chest(state, dungeons, logic);
+            self.boss_availability = dungeon_logic.is_beatable(state, dungeons, logic);
         }
     }
 }
@@ -510,10 +514,10 @@ pub struct DungeonState {
 
 impl DungeonState {
     pub fn get(&self, dungeon_code: &str) -> Option<Dungeon> {
-        match self.dungeons.iter().position(|d| d.dungeon_code == dungeon_code) {
-            Some(i) => Some(self.dungeons[i].clone()),
-            None => None,
-        }
+        self.dungeons
+            .iter()
+            .position(|d| d.dungeon_code == dungeon_code)
+            .map(|i| self.dungeons[i].clone())
     }
 
     pub fn update(&mut self, dungeon_code: &str, update: DungeonUpdate) {
@@ -525,7 +529,7 @@ impl DungeonState {
     pub fn update_availability(&mut self, game_state: GameState, logic: RandoLogic) {
         let dungeon_state = self.clone();
         self.dungeons.iter_mut().for_each(|dungeon| {
-            dungeon.calculate_availability(&game_state, &dungeon_state, &logic)
+            dungeon.calculate_availability(&game_state, &dungeon_state, &logic);
         });
     }
 }
