@@ -23,13 +23,13 @@ use tracing::{
 pub async fn poll_status(app_state: Arc<AppState>, client_config: Qusb2snesConfig) -> Result<()> {
     let mut client = qusb2snes_client::Client::new().await?;
     debug!("Attaching to {}", &client_config.selected_device);
-    client.attach(&client_config.selected_device).await;
+    let _ = client.attach(&client_config.selected_device).await?;
 
     let region_start = qusb2snes_client::offsets::WRAM + 0x0000_F340;
     let region_length = 0x0200;
     if let results::Result {
         results: results::ResultData::Binary(snes_state),
-    } = client.get_address(region_start, region_length).await
+    } = client.get_address(region_start, region_length).await?
     {
         let prev_game_state = match app_state.game_state.read() {
             Ok(pgs) => pgs.clone(),

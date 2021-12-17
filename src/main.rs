@@ -114,7 +114,7 @@ async fn main() -> Result<()> {
     }
 
     let data_source = if let Some(file_name) = matches.value_of("file") {
-        lttp::app_config::DataSource::LocalFile(file_name.to_string())
+        lttp::app_config::DataSource::LocalFile(lttp::app_config::LocalFileConfig { source: file_name.to_string() })
     } else if let Some(device_name) = matches.value_of("device") {
         lttp::app_config::DataSource::Qusb2snes(lttp::app_config::Qusb2snesConfig {
             selected_device: device_name.to_string(),
@@ -127,6 +127,7 @@ async fn main() -> Result<()> {
     let app_config = AppConfig {
         data_poll_rate: 1_000,
         data_source,
+        api_port: server_port,
         ..AppConfig::default()
     };
 
@@ -151,7 +152,7 @@ async fn main() -> Result<()> {
         io::game_state_poller(app_state).await;
     });
 
-    axum::Server::bind(&"127.0.0.1:8000".parse().unwrap())
+    axum::Server::bind(&format!("{}:{}", server_address, server_port).parse().unwrap())
         .serve(app.into_make_service())
         .await
         .unwrap();

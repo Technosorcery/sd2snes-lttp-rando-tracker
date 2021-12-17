@@ -3,7 +3,10 @@ mod websocket;
 use crate::lttp::{
     app_state::Update,
     AppState,
+    DungeonState,
     DungeonUpdate,
+    GameState,
+    LocationState,
     LocationUpdate,
 };
 
@@ -12,8 +15,12 @@ use axum::{
         self,
         Extension,
         Path,
+        ws::{
+            Message,
+            WebSocket,
+            WebSocketUpgrade,
+        }
     },
-    http::Method,
     response::{
         IntoResponse,
         Json,
@@ -25,22 +32,14 @@ use axum::{
     AddExtensionLayer,
     Router,
 };
-use axum_typed_websockets::{
-    Message,
-    WebSocket,
-    WebSocketUpgrade,
-};
 use serde_json::json;
 use std::sync::Arc;
 use tower::ServiceBuilder;
-use tower_http::cors::{
-    any,
-    CorsLayer,
-};
+use tower_http::cors::CorsLayer;
 
 pub fn build(app_state: Arc<AppState>) -> Router {
     let cors_layer =
-        CorsLayer::new().allow_methods(vec![Method::GET, Method::POST]).allow_origin(any());
+        CorsLayer::permissive();
 
     Router::new()
         .route("/config", get(get_config))
@@ -130,7 +129,7 @@ async fn post_location_state(
 
 #[allow(clippy::unused_async)]
 async fn websocket_upgrade_handler(
-    ws: WebSocketUpgrade<websocket::ServerMessage, websocket::ClientMessage>,
+    ws: WebSocketUpgrade,
     Extension(app_state): Extension<Arc<AppState>>,
 ) -> impl IntoResponse {
     ws.on_upgrade(|socket| websocket_handler(socket, Extension(app_state)))
@@ -138,38 +137,62 @@ async fn websocket_upgrade_handler(
 
 #[allow(clippy::unused_async)]
 async fn websocket_handler(
-    mut socket: WebSocket<websocket::ServerMessage, websocket::ClientMessage>,
+    mut socket: WebSocket,
     Extension(app_state): Extension<Arc<AppState>>,
 ) {
+    if let Some(game_state) = clone_game_state(app_state.clone()) {
+        if let Ok(message) = serde_json::to_string(&websocket::ServerMessage::Item(game_state)) {
+            socket.send(Message::Text(message)).await.ok();
+        }
+    }
+    if let Some(dungeon_state) = clone_dungeon_state(app_state.clone()) {
+        if let Ok(message) = serde_json::to_string(&websocket::ServerMessage::Dungeon(dungeon_state.dungeons)) {
+            socket.send(Message::Text(message)).await.ok();
+        }
+    }
+    if let Some(location_state) = clone_location_state(app_state.clone()) {
+        if let Ok(message) = serde_json::to_string(&websocket::ServerMessage::Location(location_state.locations)) {
+            socket.send(Message::Text(message)).await.ok();
+        }
+    }
+
     let mut updates = app_state.update_sender.subscribe();
 
     while let Ok(update_type) = updates.recv().await {
         let update_message = match update_type {
-            Update::Items => {
-                if let Ok(game_state) = app_state.game_state.read().map(|gs| gs.clone()) {
-                    Some(websocket::ServerMessage::Item(game_state))
-                } else {
-                    None
-                }
-            }
-            Update::Dungeons => {
-                if let Ok(dungeon_state) = app_state.dungeon_state.read().map(|ds| ds.clone()) {
-                    Some(websocket::ServerMessage::Dungeon(dungeon_state.dungeons))
-                } else {
-                    None
-                }
-            }
-            Update::Locations => {
-                if let Ok(location_state) = app_state.location_state.read().map(|ls| ls.clone()) {
-                    Some(websocket::ServerMessage::Location(location_state.locations))
-                } else {
-                    None
-                }
-            }
+            Update::Items => clone_game_state(app_state.clone()).map(|gs| websocket::ServerMessage::Item(gs)),
+            Update::Dungeons => clone_dungeon_state(app_state.clone()).map(|ds| websocket::ServerMessage::Dungeon(ds.dungeons)),
+            Update::Locations => clone_location_state(app_state.clone()).map(|ls| websocket::ServerMessage::Location(ls.locations)),
         };
 
         if let Some(message) = update_message {
-            socket.send(Message::Item(message)).await.ok();
+            if let Ok(string_message) = serde_json::to_string(&message) {
+                socket.send(Message::Text(string_message)).await.ok();
+            }
         }
+    }
+}
+
+fn clone_game_state(app_state: Arc<AppState>) -> Option<GameState> {
+    if let Ok(game_state) = app_state.game_state.read().map(|gs| gs.clone()) {
+        Some(game_state)
+    } else {
+        None
+    }
+}
+
+fn clone_dungeon_state(app_state: Arc<AppState>) -> Option<DungeonState> {
+    if let Ok(dungeon_state) = app_state.dungeon_state.read().map(|ds| ds.clone()) {
+        Some(dungeon_state)
+    } else {
+        None
+    }
+}
+
+fn clone_location_state(app_state: Arc<AppState>) -> Option<LocationState> {
+    if let Ok(location_state) = app_state.location_state.read().map(|ls| ls.clone()) {
+        Some(location_state)
+    } else {
+        None
     }
 }

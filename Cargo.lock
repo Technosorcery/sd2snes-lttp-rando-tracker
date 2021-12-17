@@ -113,18 +113,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "axum-typed-websockets"
-version = "0.3.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2e0cecf54aa1c7213d33054d4179a1c09c3abc5f8703512b0588d0b378a9703b"
-dependencies = [
- "axum",
- "futures-util",
- "serde",
- "serde_json",
-]
-
-[[package]]
 name = "base64"
 version = "0.12.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -755,6 +743,16 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "2a60c7ce501c71e03a9c9c0d35b861413ae925bd979cc7a4e30d060069aaac8d"
 
 [[package]]
+name = "mime_guess"
+version = "2.0.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "2684d4c2e97d99848d30b324b00c8fcc7e5c897b7cbb5819b09e7c90e8baf212"
+dependencies = [
+ "mime",
+ "unicase",
+]
+
+[[package]]
 name = "mio"
 version = "0.7.14"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1005,12 +1003,13 @@ dependencies = [
 
 [[package]]
 name = "qusb2snes-client"
-version = "0.1.2"
+version = "0.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2f384cb0cc757690cb719302bc84da6ff9e56dbbea80bd0a4d3378dfa06e0e66"
+checksum = "d2a6b0e503c95d5c90a766425856943269523b05319b826c6ac08efbb79a2b2a"
 dependencies = [
  "serde",
  "serde_json",
+ "thiserror",
  "tracing",
  "websockets",
 ]
@@ -1193,11 +1192,11 @@ dependencies = [
  "anyhow",
  "axum",
  "axum-debug",
- "axum-typed-websockets",
  "clap",
  "hyper",
  "iftree",
  "mime",
+ "mime_guess",
  "once_cell",
  "qusb2snes-client",
  "serde",
@@ -1674,6 +1673,15 @@ name = "typenum"
 version = "1.14.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b63708a265f51345575b27fe43f9500ad611579e764c79edbc2037b1121959ec"
+
+[[package]]
+name = "unicase"
+version = "2.6.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "50f37be617794602aabbeee0be4f259dc1778fabe05e2d67ee8f79326d5cb4f6"
+dependencies = [
+ "version_check",
+]
 
 [[package]]
 name = "unicode-bidi"

@@ -42,11 +42,13 @@ pub async fn game_state_poller(app_state: Arc<AppState>) {
         };
 
         match data_poll_source {
-            DataSource::LocalFile(file_name) => {
-                file_state::poll_status(app_state.clone(), &file_name);
+            DataSource::LocalFile(config) => {
+                file_state::poll_status(app_state.clone(), config.clone());
             }
             DataSource::Qusb2snes(config) => {
-                snes_state::poll_status(app_state.clone(), config.clone()).await;
+                if let Err(e) = snes_state::poll_status(app_state.clone(), config.clone()).await {
+                    error!("Problem fetching SNES state: {:?}", e);
+                };
             }
         }
 

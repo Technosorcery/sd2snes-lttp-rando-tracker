@@ -24,151 +24,202 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
 export default {
   name: 'Dungeon',
-  props: {
-    dungeon: Object
-  },
-  data() {
-    return {
-      medallionSequence: ['Unknown', 'Bombos', 'Ether', 'Quake'],
-      rewardSequence: [
-        'Unknown',
-        'GreenPendant',
-        'RedBluePendant',
-        'Crystal',
-        'RedCrystal'
-      ]
-    }
-  },
-  computed: {
-    rewardNumber() {
-      return this.rewardSequence.indexOf(this.dungeon.reward)
-    },
+}
+</script>
+<script setup lang="ts">
+import { computed } from 'vue'
+import { useStore } from '../../store'
 
-    medallionNumber() {
-      return this.medallionSequence.indexOf(this.dungeon.medallion)
-    },
+interface DungeonBoss {
+  name: string,
+  hoverText: string,
+  imageNumber: string,
+}
 
-    dungeonClass() {
-      if (this.dungeon.name === 'Aga' && !this.dungeon.cleared) {
-        return 'dungeon false'
-      } else {
-        return 'dungeon'
-      }
-    },
+enum DungeonReward {
+  Unknown = "Unknown",
+  GreenPendant = "GreenPendant",
+  RedBluePendant = "RedBluePendant",
+  Crystal = "Crystal",
+  RedCrystal = "RedCrystal",
+}
 
-    displayStyle() {
-      return 'background-image: url(' + this.displayImage + ');'
-    },
+enum Medallion {
+  Unknown = "Unknown",
+  Bombos = "Bombos",
+  Ether = "Ether",
+  Quake = "Quake",
+}
 
-    chestsStyle() {
-      return 'background-image: url(' + this.chestImage + ');'
-    },
+interface LocationPosition {
+  horizontal: LocationCoordinates,
+  vertical: LocationCoordinates,
+}
 
-    rewardStyle() {
-      return 'background-image: url(' + this.rewardImage + ');'
-    },
+interface LocationCoordinates {
+  left: number,
+  top: number,
+}
 
-    medallionStyle() {
-      return 'background-image: url(' + this.medallionImage + ');'
-    },
+enum DungeonAvailability {
+  DesertPalace = "DesertPalace",
+  EasternPalace = "EasternPalace",
+  GanonsTower = "GanonsTower",
+  IcePalace = "IcePalace",
+  MiseryMire = "MiseryMire",
+  PalaceOfDarkness = "PalaceOfDarkness",
+  SkullWoods = "SkullWoods",
+  SwampPalace = "SwampPalace",
+  ThievesTown = "ThievesTown",
+  TowerOfHera = "TowerOfHera",
+  TurtleRock = "TurtleRock",
+}
 
-    chestImage() {
-      return (
-        '/static/image/chest' + (this.dungeon.totalChests - this.dungeon.foundChests) + '.png'
-      )
-    },
+enum Availability {
+  Unavailable = "Unavailable",
+  GlitchPossible = "GlitchPossible",
+  Possible = "Possible",
+  GlitchAgahnim = "GlitchAgahnim",
+  Agahnim = "Agahnim",
+  GlitchAvailable = "GlitchAvailable",
+  Available = "Available",
+}
 
-    medallionImage() {
-      return '/static/image/medallion' + this.medallionNumber + '.png'
-    },
+interface Dungeon {
+  name: string,
+  dungeonCode: string,
+  hoverText: string,
+  totalChests: number,
+  clearedImage: string,
+  defaultImage: string,
+  hasReward: boolean,
+  position?: LocationPosition,
+  boss?: DungeonBoss,
+  foundChests: number,
+  reward: DungeonReward,
+  medallion: Medallion,
+  cleared: boolean,
+  dungeonAvailability: Availability,
+  bossAvailability: Availability,
+  logic?: DungeonAvailability,
+}
 
-    rewardImage() {
-      return '/static/image/dungeon' + this.rewardNumber + '.png'
-    },
+interface Props {
+  dungeon: Dungeon,
+}
 
-    displayImage() {
-      if (this.dungeon.cleared) {
-        return '/static/image/' + this.dungeon.clearedImage
-      } else {
-        return '/static/image/' + this.dungeon.defaultImage
-      }
-    },
+const props = defineProps<Props>()
+const store = useStore()
+const sequences = {
+  medallion: ['Unknown', 'Bombos', 'Ether', 'Quake'],
+  reward: [
+    'Unknown',
+    'GreenPendant',
+    'RedBluePendant',
+    'Crystal',
+    'RedCrystal'
+  ],
+}
 
-    medallionRequired() {
-      switch (this.dungeon.dungeonCode) {
-        case 'MM':
-        case 'TR':
-          return true
-        default:
-          return false
-      }
-    },
-
-    title() {
-      if (this.dungeon.dungeonCode === 'Aga') {
-        return false
-      } else {
-        return this.dungeon.dungeonCode
-      }
-    }
-  },
-
-  methods: {
-    cycleMedallion(event) {
-      event.stopPropagation()
-
-      this.cycleSequence('medallion')
-    },
-
-    openChest(event) {
-      event.stopPropagation()
-
-      let newFoundChests = this.dungeon.foundChests + 1
-      if (newFoundChests > this.dungeon.totalChests) {
-        newFoundChests = 0
-      }
-
-      let data = { foundChests: newFoundChests }
-      this.updateServerState(data)
-    },
-
-    cycleReward(event) {
-      event.stopPropagation()
-
-      this.cycleSequence('reward')
-    },
-
-    cycleSequence(sequence) {
-      let newIndex = this[sequence + 'Number'] + 1
-      if (newIndex >= this[sequence + 'Sequence'].length) {
-        newIndex = 0
-      }
-
-      let data = {}
-      data[sequence] = this[sequence + 'Sequence'][newIndex]
-      this.updateServerState(data)
-    },
-
-    toggleCleared(event) {
-      event.stopPropagation()
-
-      let cleared = !this.dungeon.cleared
-      let data = { cleared: cleared }
-      this.updateServerState(data)
-    },
-
-    updateServerState(data) {
-      let host = window.location.hostname + ':' + this.$store.state.serverConfig.apiPort
-
-      var xhr = new XMLHttpRequest()
-      xhr.open('POST', 'http://' + host + '/dungeon_state/' + this.dungeon.dungeonCode, true)
-      xhr.setRequestHeader('Content-Type', 'application/json')
-      xhr.send(JSON.stringify(data))
-    }
+const sequenceNumbers = computed((): {medallion: number, reward: number} => {
+  return {
+    medallion: sequences["medallion"].indexOf(props.dungeon.medallion),
+    reward: sequences["reward"].indexOf(props.dungeon.reward),
   }
+})
+const getSequenceNumber = <T extends object, U extends keyof T>(obj: T) => (key: U) => obj[key]
+
+const dungeonClass = computed(() => {
+  if (props.dungeon.name === 'Aga' && props.dungeon.cleared) {
+    return 'dungeon false'
+  } else {
+    return 'dungeon'
+  }
+})
+const displayStyle = computed(() => 'background-image: url(' + displayImage.value + ')')
+const chestsStyle = computed(() => 'background-image: url(' + chestImage.value + ')')
+const rewardStyle = computed(() => 'background-image: url(' + rewardImage.value + ')')
+const medallionStyle = computed(() => 'background-image: url(' + medallionImage.value + ')')
+const chestImage = computed(() => '/image/chest' + (props.dungeon.totalChests - props.dungeon.foundChests) + '.png')
+const medallionImage = computed(() => '/image/medallion' + sequenceNumbers.value.medallion + '.png')
+const rewardImage = computed(() => '/image/dungeon' + sequenceNumbers.value.reward + '.png')
+const displayImage = computed(() => {
+  if (props.dungeon.cleared) {
+    return '/image/' + props.dungeon.clearedImage
+  } else {
+    return '/image/' + props.dungeon.defaultImage
+  }
+})
+const medallionRequired = computed(() => {
+  switch (props.dungeon.dungeonCode) {
+    case 'MM':
+    case 'TR':
+      return true
+    default:
+      return false
+  }
+})
+const title = computed(() => {
+  if (props.dungeon.dungeonCode === 'Aga') {
+    return false
+  } else {
+    return props.dungeon.dungeonCode
+  }
+})
+
+function cycleMedallion(event: MouseEvent) {
+  event.stopPropagation()
+
+  cycleSequence('medallion')
+}
+
+function openChest(event: MouseEvent) {
+  event.stopPropagation()
+
+  let newFoundChests = props.dungeon.foundChests + 1
+  if (newFoundChests > props.dungeon.totalChests) {
+    newFoundChests = 0
+  }
+
+  let data = { foundChests: newFoundChests }
+  updateServerState(data)
+}
+
+function cycleReward(event: MouseEvent) {
+  event.stopPropagation()
+
+  cycleSequence('reward')
+}
+
+function cycleSequence(sequence: "medallion" | "reward") {
+  let newIndex = sequenceNumbers.value[sequence] + 1
+  if (newIndex >= sequences[sequence].length) {
+    newIndex = 0
+  }
+
+  let update_data: { medallion?: string, reward?: string } = {}
+  update_data[sequence] = sequences[sequence][newIndex]
+  updateServerState(update_data)
+}
+
+function toggleCleared(event: MouseEvent) {
+  event.stopPropagation()
+
+  let cleared = !props.dungeon.cleared
+  let data = { cleared: cleared }
+  updateServerState(data)
+}
+
+function updateServerState(data: object) {
+  let host = window.location.hostname + ':' + store?.state?.serverConfig?.apiPort
+
+  var xhr = new XMLHttpRequest()
+  xhr.open('POST', 'http://' + host + '/api/dungeon_state/' + props.dungeon.dungeonCode, true)
+  xhr.setRequestHeader('Content-Type', 'application/json')
+  xhr.send(JSON.stringify(data))
 }
 </script>
 

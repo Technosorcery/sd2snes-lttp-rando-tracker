@@ -1,4 +1,5 @@
 use crate::lttp::{
+    app_config::LocalFileConfig,
     AppState,
     GameState,
 };
@@ -16,20 +17,20 @@ use tracing::{
 };
 
 #[tracing::instrument(skip(app_state))]
-pub fn poll_status(app_state: Arc<AppState>, file_path: &str) {
+pub fn poll_status(app_state: Arc<AppState>, config: LocalFileConfig) {
     let loop_start = Instant::now();
     debug!("Starting file update poll cycle");
 
-    let mut f = match File::open(&file_path) {
+    let mut f = match File::open(&config.source) {
         Ok(f) => f,
         Err(e) => {
-            warn!("Unable to open state file {:?}: {}", &file_path, e);
+            warn!("Unable to open state file {:?}: {}", &config.source, e);
             return;
         }
     };
     let mut state_json = String::new();
     if let Err(e) = f.read_to_string(&mut state_json) {
-        warn!("Unable to read state file {:?}: {}", &file_path, e);
+        warn!("Unable to read state file {:?}: {}", &config.source, e);
         return;
     };
 
