@@ -77,38 +77,25 @@ jobs:
     strategy:
       matrix:
         node-version:
-        - 13.x
+        - 16.13.1
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v2.4.0
     - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v1
+      uses: actions/setup-node@v2.5.0
       with:
         node-version: ${{ matrix.node-version }}
-    - name: Get yarn cache dir path
-      id: yarn-cache-dir-path
-      run: echo "::set-output name=dir::$(cd ui && yarn cache dir)"
-    - uses: actions/cache@v2
-      id: yarn-cache
-      name: Cache yarn
-      with:
-        path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
-        key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-        restore-keys: |
-          ${{ runner.os }}-yarn-
+        cache: 'npm'
+        cache-dependency-path: ui/package-lock.json
     - name: Install
       run: |
         cd ui
-        yarn install
-    - name: Lint
-      run: |
-        cd ui
-        yarn lint
+        npm install
     - name: Build
       run: |
         cd ui
-        yarn build
-    - uses: actions/upload-artifact@v2
+        npm run build
+    - uses: actions/upload-artifact@v2.3.1
       with:
         name: ui-dist
         path: ui/dist
@@ -125,17 +112,17 @@ jobs:
         - macOS-latest
     runs-on: ${{ matrix.os }}
     steps:
-    - uses: actions/checkout@v2
-    - uses: actions/download-artifact@v2
+    - uses: actions/checkout@v2.4.0
+    - uses: actions/download-artifact@v2.1.0
       with:
         name: ui-dist
         path: ui/dist
-    - name: Install nightly
+    - name: Install Rust
       uses: actions-rs/toolchain@v1.0.6
       with:
-        toolchain: nightly
+        profile: minimal
         override: true
-    - uses: actions/cache@v2
+    - uses: actions/cache@v2.1.7
       name: Cache cargo
       with:
         path: |
@@ -147,8 +134,6 @@ jobs:
         key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
     - name: Test
       uses: actions-rs/cargo@v1.0.1
-      env:
-        SKIP_UI_BUILD: true
       with:
         command: test
         args: --verbose
@@ -157,17 +142,15 @@ jobs:
       with:
         command: build
         args: --verbose --release
-      env:
-        SKIP_UI_BUILD: true
     - name: Upload release artifact (Windows)
       if: matrix.os == 'windows-latest'
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v2.3.1
       with:
         name: app_${{ matrix.os }}
         path: target/release/sd2snes-lttp-rando-tracker.exe
     - name: Upload release artifact
       if: matrix.os != 'windows-latest'
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v2.3.1
       with:
         name: app_${{ matrix.os }}
         path: target/release/sd2snes-lttp-rando-tracker

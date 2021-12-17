@@ -60,7 +60,7 @@ jobs:
         with:
           name: ui-dist
           path: ui/dist
-      - name: Install nightly
+      - name: Install Rust
         uses: actions-rs/toolchain@v1.0.6
         with:
           profile: minimal
