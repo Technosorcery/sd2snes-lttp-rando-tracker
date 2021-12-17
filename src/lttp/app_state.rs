@@ -1,10 +1,10 @@
 use crate::lttp::{
-    AppConfig,
     DungeonState,
     DungeonUpdate,
     GameState,
     LocationState,
     LocationUpdate,
+    ServerConfig,
 };
 
 use anyhow::{
@@ -19,7 +19,7 @@ pub struct AppState {
     pub dungeon_state:  RwLock<DungeonState>,
     pub game_state:     RwLock<GameState>,
     pub location_state: RwLock<LocationState>,
-    pub app_config:     RwLock<AppConfig>,
+    pub server_config:     RwLock<ServerConfig>,
     pub update_sender:  broadcast::Sender<Update>,
 }
 
@@ -33,10 +33,10 @@ pub enum Update {
 impl AppState {
     #[tracing::instrument(skip(self), err)]
     pub fn update_availabilities(&self) -> Result<()> {
-        tracing::trace!("Getting AppConfig");
-        let app_config = match self.app_config.read() {
-            Ok(ac) => ac.clone(),
-            Err(e) => bail!("Failed to get app config to update available locations: {:?}", e),
+        tracing::trace!("Getting ServerConfig");
+        let server_config = match self.server_config.read() {
+            Ok(sc) => sc.clone(),
+            Err(e) => bail!("Failed to get server config to update available locations: {:?}", e),
         };
         tracing::trace!("Getting GameState");
         let game_state = match self.game_state.read() {
@@ -55,10 +55,10 @@ impl AppState {
         };
 
         tracing::trace!("Updating LocationState");
-        location_state.update_availability(game_state, &dungeon_state.clone(), app_config.logic);
+        location_state.update_availability(game_state, &dungeon_state.clone(), server_config.logic);
 
         tracing::trace!("Updating DungeonState");
-        dungeon_state.update_availability(game_state, app_config.logic);
+        dungeon_state.update_availability(game_state, server_config.logic);
 
         tracing::trace!("Sending update broadcasts");
         let update_sender = self.update_sender.clone();
@@ -74,10 +74,10 @@ impl AppState {
         match self.dungeon_state.write() {
             Ok(mut ds) => {
                 ds.update(dungeon, state);
-                let app_config = match self.app_config.read() {
-                    Ok(ac) => ac.clone(),
+                let server_config = match self.server_config.read() {
+                    Ok(sc) => sc.clone(),
                     Err(e) => {
-                        bail!("Failed to get app config to update dungeon availibility: {:?}", e)
+                        bail!("Failed to get server config to update dungeon availibility: {:?}", e)
                     }
                 };
                 let game_state = match self.game_state.read() {
@@ -86,7 +86,7 @@ impl AppState {
                         bail!("Failed to get game state to update dungeon availibility: {:?}", e)
                     }
                 };
-                ds.update_availability(game_state, app_config.logic);
+                ds.update_availability(game_state, server_config.logic);
 
                 // We can ignore the result as we don't really care if nobody is listening for updates at the moment.
                 let _ = self.update_sender.clone().send(Update::Dungeons);

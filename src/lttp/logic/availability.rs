@@ -2,8 +2,10 @@ use serde::{
     Deserialize,
     Serialize,
 };
+use ts_rs::TS;
 
-#[derive(Debug, Clone, Copy, Deserialize, Serialize, PartialEq)]
+#[derive(Debug, Clone, Copy, Deserialize, Serialize, PartialEq, TS)]
+#[ts(export, export_to = "ui/src/server_types/Availability.ts")]
 #[serde(rename_all = "camelCase")]
 pub enum Availability {
     Unavailable,

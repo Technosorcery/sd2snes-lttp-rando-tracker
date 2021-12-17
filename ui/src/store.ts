@@ -1,196 +1,33 @@
-import { InjectionKey } from 'vue'
+import { AppConfig, InjectionKey } from 'vue'
 import { createStore, useStore as baseUseStore, Store } from 'vuex'
-
-enum ArmorLevel {
-  GreenMail = "GreenMail",
-  BlueMail = "BlueMail",
-  RedMail = "RedMail",
-}
-
-enum Gloves {
-  None = "None",
-  PowerGlove = "PowerGlove",
-  TitansMitt = "TitansMitt",
-}
-
-enum Sword {
-  None = "None",
-  FightersSword = "FightersSword",
-  MasterSword = "MasterSword",
-  TemperedSword = "TemperedSword",
-  GoldenSword = "GoldenSword",
-}
-
-enum Shield {
-  None = "None",
-  FightersShield = "FightersShield",
-  RedShield = "RedShield",
-  MirrorShield = "MirrorShield",
-}
-
-enum BottleContent {
-  NoBottle = "NoBottle",
-  Mushroom = "Mushroom",
-  Empty = "Empty",
-  RedPotion = "RedPotion",
-  GreenPotion = "GreenPotion",
-  BluePotion = "BluePotion",
-  Fairy = "Fairy",
-  Bee = "Bee",
-  MagicBee = "MagicBee",
-}
-
-enum Magic {
-  Normal = "Normal",
-  Half = "Half",
-  Quarter = "Quarter",
-}
+import type { GameState } from "./server_types/GameState"
+import type { Dungeon } from "./server_types/Dungeon"
+import type { Location } from "./server_types/Location"
+import type { ServerConfig } from "./server_types/ServerConfig"
 
 export interface State {
-  caption: string,
-  game?: {
-    armorLevel: ArmorLevel,
-    arrowCapacity: number,
-    arrows: number,
-    bigKey: {
-      desertPalace: boolean,
-      easternPalace: boolean,
-      gannonsTower: boolean,
-      icePalace: boolean,
-      miseryMire: boolean,
-      palaceOfDarkness: boolean,
-      skullWoods: boolean,
-      swampPalace: boolean,
-      thievesTown: boolean,
-      towerOfHera: boolean,
-      turtleRock: boolean,
-    },
-    blueBoomerang: boolean,
-    bomb: number,
-    bombCapacity: number,
-    bombosMedallion: boolean,
-    book: boolean,
-    boots: boolean,
-    bottle: boolean,
-    bottleContent1: BottleContent,
-    bottleContent2: BottleContent,
-    bottleContent3: BottleContent,
-    bottleContent4: BottleContent,
-    bottleCount: number,
-    bow: boolean,
-    caneByrna: boolean
-    caneSomaria: boolean,
-    cape: boolean,
-    crystal: {
-      one: boolean,
-      two: boolean,
-      three: boolean,
-      four: boolean,
-      five: boolean,
-      six: boolean,
-      seven: boolean,
-    },
-    etherMedallion: boolean
-    fireRod: boolean,
-    flippers: boolean,
-    flute: boolean,
-    fluteActivated: boolean,
-    gloves: Gloves,
-    hammer: boolean,
-    heartQuarters: number,
-    hearts: number,
-    hookShot: boolean,
-    iceRod: boolean,
-    lantern: boolean,
-    magicProgression: Magic,
-    maxHearts: number,
-    mirror: boolean,
-    moonPearl: boolean,
-    mushroom: boolean,
-    net: boolean,
-    pendant: {
-      blue: boolean,
-      green: boolean,
-      red: boolean,
-    },
-    powder: boolean,
-    quakeMedallion: boolean,
-    redBoomerang: boolean,
-    rupees: number,
-    shieldLevel: Shield,
-    shovel: boolean,
-    silvers: boolean,
-    smallKeys: number,
-    swordLevel: Sword,
-  },
-  dungeons: {
-    name: string,
-    position: {
-      horizontal: {
-        left: number,
-        top: number,
-      },
-      vertical: {
-        left: number,
-        top: number,
-      },
-    },
-    hoverText: string,
-    totalChests: number,
-    hasReward: boolean,
-    dungeonCode: string,
-    defaultImage: string,
-    clearedImage: string,
-    boss: {
-      name: string,
-      hoverText: string,
-      imageNumber: string,
-    },
-    logic: string,
-  }[],
-  locations: {
-    name: string,
-    hoverText: string,
-    position: {
-      horizontal: {
-        left: number,
-        top: number,
-      },
-      vertical: {
-        left: number,
-        top: number,
-      },
-    },
-    logic: string,
-  }[],
-  serverConfig: {
-    apiPort: number,
-    dataPollRate?: number,
-    logic?: string,
-    dataSource?: Qusb2snes | LocalFile
-  }
-}
-
-interface Qusb2snes {
-  available_devices: string[],
-  selected_device: string,
-  type: "Qusb2snes",
-}
-
-interface LocalFile {
-  source: string,
-  type: "LocalFile",
+  caption?: string,
+  game?: GameState,
+  dungeons: Dungeon[],
+  locations: Location[],
+  serverConfig: ServerConfig,
 }
 
 export const key: InjectionKey<Store<State>> = Symbol()
 
 export const store = createStore({
-  state() {
+  state(): State {
     return {
       caption: "",
       dungeons: [],
       locations: [],
       serverConfig: {
+        dataPollRate: 1000,
+        dataSource: {
+          type: "LocalFile",
+          source: "./example-data.json",
+        },
+        logic: "glitchless",
         apiPort: 8000,
       },
     }

@@ -26,86 +26,13 @@
 
 <script lang="ts">
 export default {
-  name: 'Dungeon',
+  name: 'DungeonItemView',
 }
 </script>
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useStore } from '../../store'
-
-interface DungeonBoss {
-  name: string,
-  hoverText: string,
-  imageNumber: string,
-}
-
-enum DungeonReward {
-  Unknown = "Unknown",
-  GreenPendant = "GreenPendant",
-  RedBluePendant = "RedBluePendant",
-  Crystal = "Crystal",
-  RedCrystal = "RedCrystal",
-}
-
-enum Medallion {
-  Unknown = "Unknown",
-  Bombos = "Bombos",
-  Ether = "Ether",
-  Quake = "Quake",
-}
-
-interface LocationPosition {
-  horizontal: LocationCoordinates,
-  vertical: LocationCoordinates,
-}
-
-interface LocationCoordinates {
-  left: number,
-  top: number,
-}
-
-enum DungeonAvailability {
-  DesertPalace = "DesertPalace",
-  EasternPalace = "EasternPalace",
-  GanonsTower = "GanonsTower",
-  IcePalace = "IcePalace",
-  MiseryMire = "MiseryMire",
-  PalaceOfDarkness = "PalaceOfDarkness",
-  SkullWoods = "SkullWoods",
-  SwampPalace = "SwampPalace",
-  ThievesTown = "ThievesTown",
-  TowerOfHera = "TowerOfHera",
-  TurtleRock = "TurtleRock",
-}
-
-enum Availability {
-  Unavailable = "Unavailable",
-  GlitchPossible = "GlitchPossible",
-  Possible = "Possible",
-  GlitchAgahnim = "GlitchAgahnim",
-  Agahnim = "Agahnim",
-  GlitchAvailable = "GlitchAvailable",
-  Available = "Available",
-}
-
-interface Dungeon {
-  name: string,
-  dungeonCode: string,
-  hoverText: string,
-  totalChests: number,
-  clearedImage: string,
-  defaultImage: string,
-  hasReward: boolean,
-  position?: LocationPosition,
-  boss?: DungeonBoss,
-  foundChests: number,
-  reward: DungeonReward,
-  medallion: Medallion,
-  cleared: boolean,
-  dungeonAvailability: Availability,
-  bossAvailability: Availability,
-  logic?: DungeonAvailability,
-}
+import type { Dungeon } from "../../server_types/Dungeon"
 
 interface Props {
   dungeon: Dungeon,

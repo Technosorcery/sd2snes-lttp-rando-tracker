@@ -6,11 +6,11 @@ mod io;
 mod lttp;
 
 use crate::lttp::{
-    AppConfig,
     AppState,
     DungeonState,
     GameState,
     LocationState,
+    ServerConfig,
 };
 
 use anyhow::{
@@ -114,21 +114,21 @@ async fn main() -> Result<()> {
     }
 
     let data_source = if let Some(file_name) = matches.value_of("file") {
-        lttp::app_config::DataSource::LocalFile(lttp::app_config::LocalFileConfig { source: file_name.to_string() })
+        lttp::server_config::DataSource::LocalFile(lttp::server_config::LocalFileConfig { source: file_name.to_string() })
     } else if let Some(device_name) = matches.value_of("device") {
-        lttp::app_config::DataSource::Qusb2snes(lttp::app_config::Qusb2snesConfig {
+        lttp::server_config::DataSource::Qusb2snes(lttp::server_config::Qusb2snesConfig {
             selected_device: device_name.to_string(),
-            ..lttp::app_config::Qusb2snesConfig::default()
+            ..lttp::server_config::Qusb2snesConfig::default()
         })
     } else {
-        lttp::app_config::DataSource::default()
+        lttp::server_config::DataSource::default()
     };
 
-    let app_config = AppConfig {
+    let server_config = ServerConfig {
         data_poll_rate: 1_000,
         data_source,
         api_port: server_port,
-        ..AppConfig::default()
+        ..ServerConfig::default()
     };
 
     let dungeons = io::logic_files::base_dungeon_data()?;
@@ -143,7 +143,7 @@ async fn main() -> Result<()> {
         location_state: RwLock::new(LocationState {
             locations,
         }),
-        app_config:     RwLock::new(app_config),
+        server_config:     RwLock::new(server_config),
         update_sender:  sender,
     });
     let app = http::build(app_state.clone());

@@ -1,11 +1,11 @@
-pub mod app_config;
 pub mod app_state;
 pub mod item;
 pub mod logic;
+pub mod server_config;
 
 pub use self::{
-    app_config::AppConfig,
     app_state::AppState,
+    server_config::ServerConfig,
 };
 
 use crate::lttp::{
@@ -36,9 +36,11 @@ use serde::{
     Serialize,
 };
 use std::convert::TryFrom;
+use ts_rs::TS;
 
 #[allow(clippy::struct_excessive_bools)]
-#[derive(Debug, Default, Copy, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Default, Copy, Clone, PartialEq, Serialize, Deserialize, TS)]
+#[ts(export, export_to = "ui/src/server_types/GameState.ts")]
 #[serde(rename_all = "camelCase")]
 pub struct GameState {
     // Items
@@ -325,31 +327,34 @@ impl GameState {
     }
 }
 
-#[derive(Debug, Clone, Copy, Default, Serialize, Deserialize, PartialEq)]
-#[serde(deny_unknown_fields, rename_all = "camelCase")]
+#[derive(Debug, Clone, Copy, Default, Serialize, Deserialize, PartialEq, TS)]
+#[ts(export, export_to = "ui/src/server_types/LocationPosition.ts")]
+#[serde(rename_all = "camelCase")]
 pub struct LocationPosition {
     pub horizontal: LocationCoordinates,
     pub vertical:   LocationCoordinates,
 }
 
-#[derive(Debug, Clone, Copy, Default, Serialize, Deserialize, PartialEq)]
-#[serde(deny_unknown_fields, rename_all = "camelCase")]
+#[derive(Debug, Clone, Copy, Default, Serialize, Deserialize, PartialEq, TS)]
+#[ts(export, export_to = "ui/src/server_types/LocationCoordinates.ts")]
+#[serde(rename_all = "camelCase")]
 pub struct LocationCoordinates {
     pub left: f32,
     pub top:  f32,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
-#[serde(deny_unknown_fields, rename_all = "camelCase")]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, TS)]
+#[ts(export, export_to = "ui/src/server_types/Location.ts")]
+#[serde(rename_all = "camelCase")]
 pub struct Location {
     pub name:         String,
     pub hover_text:   String,
     pub position:     LocationPosition,
-    #[serde(skip_deserializing)]
+    #[serde(default)]
     pub cleared:      bool,
     #[serde(skip_serializing)]
     pub logic:        LocationAvailability,
-    #[serde(skip_deserializing)]
+    #[serde(default)]
     pub availability: Availability,
 }
 
@@ -370,13 +375,15 @@ impl Location {
     }
 }
 
-#[derive(Debug, Clone, Copy, Deserialize)]
-#[serde(deny_unknown_fields, rename_all = "camelCase")]
+#[derive(Debug, Clone, Copy, Deserialize, TS)]
+#[ts(export, export_to = "ui/src/server_types/LocationUpdate.ts")]
+#[serde(rename_all = "camelCase")]
 pub struct LocationUpdate {
     pub cleared: Option<bool>,
 }
 
-#[derive(Debug, Clone, Default, Serialize, Deserialize, PartialEq)]
+#[derive(Debug, Clone, Default, Serialize, Deserialize, PartialEq, TS)]
+#[ts(export, export_to = "ui/src/server_types/LocationState.ts")]
 #[serde(rename_all = "camelCase")]
 pub struct LocationState {
     pub locations: Vec<Location>,
@@ -405,16 +412,18 @@ impl LocationState {
     }
 }
 
-#[derive(Debug, Clone, Default, Serialize, Deserialize, PartialEq)]
-#[serde(deny_unknown_fields, rename_all = "camelCase")]
+#[derive(Debug, Clone, Default, Serialize, Deserialize, PartialEq, TS)]
+#[ts(export, export_to = "ui/src/server_types/DungeonBoss.ts")]
+#[serde(rename_all = "camelCase")]
 pub struct DungeonBoss {
     pub name:         String,
     pub hover_text:   String,
     pub image_number: String,
 }
 
-#[derive(Debug, Clone, Default, Serialize, Deserialize, PartialEq)]
-#[serde(deny_unknown_fields, rename_all = "camelCase")]
+#[derive(Debug, Clone, Default, Serialize, Deserialize, PartialEq, TS)]
+#[ts(export, export_to = "ui/src/server_types/Dungeon.ts")]
+#[serde(rename_all = "camelCase")]
 pub struct Dungeon {
     pub name:                 String,
     pub dungeon_code:         String,
@@ -425,19 +434,19 @@ pub struct Dungeon {
     pub has_reward:           bool,
     pub position:             Option<LocationPosition>,
     pub boss:                 Option<DungeonBoss>,
-    #[serde(skip_deserializing)]
+    #[serde(default)]
     pub found_chests:         u8,
-    #[serde(skip_deserializing)]
+    #[serde(default)]
     pub reward:               DungeonReward,
-    #[serde(skip_deserializing)]
+    #[serde(default)]
     pub medallion:            Medallion,
-    #[serde(skip_deserializing)]
+    #[serde(default)]
     pub cleared:              bool,
-    #[serde(skip_deserializing)]
+    #[serde(default)]
     pub dungeon_availability: Availability,
-    #[serde(skip_deserializing)]
+    #[serde(default)]
     pub boss_availability:    Availability,
-    #[serde(skip_serializing)]
+    #[serde(default)]
     pub logic:                Option<DungeonAvailability>,
 }
 
@@ -472,7 +481,8 @@ impl Dungeon {
     }
 }
 
-#[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq)]
+#[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, TS)]
+#[ts(export, export_to = "ui/src/server_types/DungeonReward.ts")]
 pub enum DungeonReward {
     Unknown,
     GreenPendant,
@@ -485,7 +495,8 @@ impl Default for DungeonReward {
     fn default() -> DungeonReward { DungeonReward::Unknown }
 }
 
-#[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq)]
+#[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, TS)]
+#[ts(export, export_to = "ui/src/server_types/Medallion.ts")]
 pub enum Medallion {
     Unknown,
     Bombos,
@@ -497,8 +508,9 @@ impl Default for Medallion {
     fn default() -> Medallion { Medallion::Unknown }
 }
 
-#[derive(Debug, Clone, Copy, Deserialize)]
-#[serde(deny_unknown_fields, rename_all = "camelCase")]
+#[derive(Debug, Clone, Copy, Deserialize, TS)]
+#[ts(export, export_to = "ui/src/server_types/DungeonUpdate.ts")]
+#[serde(rename_all = "camelCase")]
 pub struct DungeonUpdate {
     pub found_chests: Option<u8>,
     pub reward:       Option<DungeonReward>,
@@ -506,8 +518,9 @@ pub struct DungeonUpdate {
     pub cleared:      Option<bool>,
 }
 
-#[derive(Debug, Clone, Default, Serialize, PartialEq)]
-#[serde(deny_unknown_fields, rename_all = "camelCase")]
+#[derive(Debug, Clone, Default, Serialize, PartialEq, TS)]
+#[ts(export, export_to = "ui/src/server_types/DungeonState.ts")]
+#[serde(rename_all = "camelCase")]
 pub struct DungeonState {
     pub dungeons: Vec<Dungeon>,
 }

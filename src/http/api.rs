@@ -54,12 +54,12 @@ pub fn build(app_state: Arc<AppState>) -> Router {
 
 #[allow(clippy::unused_async)]
 async fn get_config(Extension(app_state): Extension<Arc<AppState>>) -> impl IntoResponse {
-    let app_config = match app_state.app_config.read() {
+    let server_config = match app_state.server_config.read() {
         Ok(ac) => ac.clone(),
         Err(e) => return Err(format!("Unable to get app config: {:?}", e)),
     };
 
-    Ok(Json(json!(app_config)))
+    Ok(Json(json!(server_config)))
 }
 
 #[allow(clippy::unused_async)]

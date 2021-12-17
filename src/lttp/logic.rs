@@ -13,9 +13,11 @@ use serde::{
     Deserialize,
     Serialize,
 };
+use ts_rs::TS;
 
 #[allow(clippy::module_name_repetitions)]
-#[derive(Debug, Clone, Copy, PartialEq, PartialOrd, Ord, Eq, Deserialize, Serialize)]
+#[derive(Debug, Clone, Copy, PartialEq, PartialOrd, Ord, Eq, Deserialize, Serialize, TS)]
+#[ts(export, export_to = "ui/src/server_types/RandoLogic.ts")]
 #[serde(rename_all = "camelCase")]
 pub enum RandoLogic {
     Glitchless,

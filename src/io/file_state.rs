@@ -1,7 +1,7 @@
 use crate::lttp::{
-    app_config::LocalFileConfig,
     AppState,
     GameState,
+    server_config::LocalFileConfig,
 };
 
 use std::{

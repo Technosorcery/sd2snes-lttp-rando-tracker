@@ -3,7 +3,7 @@ pub mod logic_files;
 pub mod snes_state;
 
 use crate::lttp::{
-    app_config::DataSource,
+    server_config::DataSource,
     AppState,
 };
 
@@ -26,14 +26,14 @@ pub async fn game_state_poller(app_state: Arc<AppState>) {
         let loop_start = Instant::now();
         debug!("Starting file update poll cycle");
 
-        let sleep_duration = match app_state.app_config.read() {
+        let sleep_duration = match app_state.server_config.read() {
             Ok(ac) => ac.data_poll_rate,
             Err(e) => {
                 error!("Unable to get data polling rate from app config: {:?}", e);
                 continue;
             }
         };
-        let data_poll_source = match app_state.app_config.read() {
+        let data_poll_source = match app_state.server_config.read() {
             Ok(ac) => ac.data_source.clone(),
             Err(e) => {
                 error!("Unable to get data polling source from app config: {:?}", e);
@@ -53,6 +53,6 @@ pub async fn game_state_poller(app_state: Arc<AppState>) {
         }
 
         debug!("File update poll cycle completed in: {:?}", loop_start.elapsed());
-        thread::sleep(Duration::from_millis(sleep_duration));
+        thread::sleep(Duration::from_millis(sleep_duration.into()));
     }
 }

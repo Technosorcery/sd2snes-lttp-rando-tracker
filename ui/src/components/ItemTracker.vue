@@ -9,11 +9,11 @@
     <div class="dungeons">
       <div v-if="showMap" v-for="(row, index) in dungeons" class="tracker-row" :key="index">
         <div class="row-spacer" :style="spacerStyle(row, items)"></div>
-        <Dungeon
+        <DungeonItemView
           v-for="dungeon in dungeonsForRow(row)"
           :key="dungeon.dungeonCode"
           :dungeon="dungeon"
-        ></Dungeon>
+        ></DungeonItemView>
       </div>
     </div>
   </div>
@@ -35,7 +35,7 @@ import Boots from "@/components/items/Boots.vue";
 import Bottle from "@/components/items/Bottle.vue";
 import Bow from "@/components/items/Bow.vue";
 import Cape from "@/components/items/Cape.vue";
-import Dungeon from "@/components/items/Dungeon.vue";
+import DungeonItemView from "@/components/items/DungeonItemView.vue";
 import Ether from "@/components/items/Ether.vue";
 import FireRod from "@/components/items/FireRod.vue";
 import Flippers from "@/components/items/Flippers.vue";
@@ -65,7 +65,7 @@ const components = {
   Bottle,
   Bow,
   Cape,
-  Dungeon,
+  DungeonItemView,
   Ether,
   FireRod,
   Flippers,

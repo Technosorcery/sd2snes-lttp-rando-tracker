@@ -1,12 +1,12 @@
 <template>
   <div class="map-tracker">
     <div id="map" class="map">
-      <Location v-for="poi in locations" :key="poi.name" :location="poi"></Location>
-      <Dungeon
+      <LocationMapView v-for="poi in locations" :key="poi.name" :location="poi"></LocationMapView>
+      <DungeonMapView
         v-for="dungeon in dungeons"
         :key="dungeon.name"
         :location="dungeon"
-      ></Dungeon>
+      ></DungeonMapView>
     </div>
     <div id="caption">
       <span v-html="caption"></span>
@@ -17,8 +17,8 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useStore } from '../store';
-import Dungeon from "@/components/map/Dungeon.vue";
-import Location from "@/components/map/Location.vue";
+import DungeonMapView from "@/components/map/DungeonMapView.vue";
+import LocationMapView from "@/components/map/LocationMapView.vue";
 
 const store = useStore()
 

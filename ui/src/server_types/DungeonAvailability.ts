@@ -1,0 +1,2 @@
+
+export type DungeonAvailability = "desertPalace" | "easternPalace" | "ganonsTower" | "icePalace" | "miseryMire" | "palaceOfDarkness" | "skullWoods" | "swampPalace" | "thievesTown" | "towerOfHera" | "turtleRock";
