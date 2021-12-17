@@ -1,5 +1,12 @@
-mod item;
+pub mod app_state;
+pub mod item;
 pub mod logic;
+pub mod server_config;
+
+pub use self::{
+    app_state::AppState,
+    server_config::ServerConfig,
+};
 
 use crate::lttp::{
     item::{
@@ -24,14 +31,16 @@ use crate::lttp::{
         RandoLogic,
     },
 };
-use failure;
-use serde_derive::{
+use serde::{
     Deserialize,
     Serialize,
 };
 use std::convert::TryFrom;
+use ts_rs::TS;
 
-#[derive(Debug, Default, Copy, Clone, PartialEq, Serialize, Deserialize)]
+#[allow(clippy::struct_excessive_bools)]
+#[derive(Debug, Default, Copy, Clone, PartialEq, Serialize, Deserialize, TS)]
+#[ts(export, export_to = "ui/src/server_types/GameState.ts")]
 #[serde(rename_all = "camelCase")]
 pub struct GameState {
     // Items
@@ -95,7 +104,7 @@ pub struct GameState {
 }
 
 impl TryFrom<Vec<u8>> for GameState {
-    type Error = failure::Error;
+    type Error = anyhow::Error;
 
     fn try_from(response: Vec<u8>) -> Result<GameState, Self::Error> {
         let bow = Bow::try_from(response[0x00])?;
@@ -108,16 +117,16 @@ impl TryFrom<Vec<u8>> for GameState {
 
         let mut bottle_count = 0;
         if bottle1 != Bottle::NoBottle {
-            bottle_count += 1
+            bottle_count += 1;
         };
         if bottle2 != Bottle::NoBottle {
-            bottle_count += 1
+            bottle_count += 1;
         };
         if bottle3 != Bottle::NoBottle {
-            bottle_count += 1
+            bottle_count += 1;
         };
         if bottle4 != Bottle::NoBottle {
-            bottle_count += 1
+            bottle_count += 1;
         };
 
         Ok(GameState {
@@ -251,7 +260,7 @@ impl TryFrom<Vec<u8>> for GameState {
 }
 
 impl GameState {
-    /// Return a new GameState merging in the items from the old GameState.
+    /// Return a new [`GameState`] merging in the items from the old [`GameState`].
     /// Things like bomb count, hearts, rupees, etc are taken from self.
     pub fn merge(&self, old: GameState) -> Self {
         GameState {
@@ -318,31 +327,34 @@ impl GameState {
     }
 }
 
-#[derive(Debug, Clone, Copy, Default, Serialize, Deserialize, PartialEq)]
-#[serde(deny_unknown_fields, rename_all = "camelCase")]
+#[derive(Debug, Clone, Copy, Default, Serialize, Deserialize, PartialEq, TS)]
+#[ts(export, export_to = "ui/src/server_types/LocationPosition.ts")]
+#[serde(rename_all = "camelCase")]
 pub struct LocationPosition {
     pub horizontal: LocationCoordinates,
     pub vertical:   LocationCoordinates,
 }
 
-#[derive(Debug, Clone, Copy, Default, Serialize, Deserialize, PartialEq)]
-#[serde(deny_unknown_fields, rename_all = "camelCase")]
+#[derive(Debug, Clone, Copy, Default, Serialize, Deserialize, PartialEq, TS)]
+#[ts(export, export_to = "ui/src/server_types/LocationCoordinates.ts")]
+#[serde(rename_all = "camelCase")]
 pub struct LocationCoordinates {
     pub left: f32,
     pub top:  f32,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
-#[serde(deny_unknown_fields, rename_all = "camelCase")]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, TS)]
+#[ts(export, export_to = "ui/src/server_types/Location.ts")]
+#[serde(rename_all = "camelCase")]
 pub struct Location {
     pub name:         String,
     pub hover_text:   String,
     pub position:     LocationPosition,
-    #[serde(skip_deserializing)]
+    #[serde(default)]
     pub cleared:      bool,
     #[serde(skip_serializing)]
     pub logic:        LocationAvailability,
-    #[serde(skip_deserializing)]
+    #[serde(default)]
     pub availability: Availability,
 }
 
@@ -359,17 +371,19 @@ impl Location {
         dungeons: &DungeonState,
         logic: &RandoLogic,
     ) {
-        self.availability = self.logic.check(&state, &dungeons, &logic);
+        self.availability = self.logic.check(state, dungeons, logic);
     }
 }
 
-#[derive(Debug, Clone, Copy, Deserialize)]
-#[serde(deny_unknown_fields, rename_all = "camelCase")]
+#[derive(Debug, Clone, Copy, Deserialize, TS)]
+#[ts(export, export_to = "ui/src/server_types/LocationUpdate.ts")]
+#[serde(rename_all = "camelCase")]
 pub struct LocationUpdate {
     pub cleared: Option<bool>,
 }
 
-#[derive(Debug, Clone, Default, Serialize, Deserialize, PartialEq)]
+#[derive(Debug, Clone, Default, Serialize, Deserialize, PartialEq, TS)]
+#[ts(export, export_to = "ui/src/server_types/LocationState.ts")]
 #[serde(rename_all = "camelCase")]
 pub struct LocationState {
     pub locations: Vec<Location>,
@@ -377,10 +391,7 @@ pub struct LocationState {
 
 impl LocationState {
     pub fn get(&self, name: &str) -> Option<Location> {
-        match self.locations.iter().position(|l| l.name == name) {
-            Some(i) => Some(self.locations[i].clone()),
-            None => None,
-        }
+        self.locations.iter().position(|l| l.name == name).map(|i| self.locations[i].clone())
     }
 
     pub fn update(&mut self, name: &str, update: LocationUpdate) {
@@ -392,25 +403,27 @@ impl LocationState {
     pub fn update_availability(
         &mut self,
         game_state: GameState,
-        dungeon_state: DungeonState,
+        dungeon_state: &DungeonState,
         logic: RandoLogic,
     ) {
         self.locations
             .iter_mut()
-            .for_each(|loc| loc.calculate_availability(&game_state, &dungeon_state, &logic));
+            .for_each(|loc| loc.calculate_availability(&game_state, dungeon_state, &logic));
     }
 }
 
-#[derive(Debug, Clone, Default, Serialize, Deserialize, PartialEq)]
-#[serde(deny_unknown_fields, rename_all = "camelCase")]
+#[derive(Debug, Clone, Default, Serialize, Deserialize, PartialEq, TS)]
+#[ts(export, export_to = "ui/src/server_types/DungeonBoss.ts")]
+#[serde(rename_all = "camelCase")]
 pub struct DungeonBoss {
     pub name:         String,
     pub hover_text:   String,
     pub image_number: String,
 }
 
-#[derive(Debug, Clone, Default, Serialize, Deserialize, PartialEq)]
-#[serde(deny_unknown_fields, rename_all = "camelCase")]
+#[derive(Debug, Clone, Default, Serialize, Deserialize, PartialEq, TS)]
+#[ts(export, export_to = "ui/src/server_types/Dungeon.ts")]
+#[serde(rename_all = "camelCase")]
 pub struct Dungeon {
     pub name:                 String,
     pub dungeon_code:         String,
@@ -421,35 +434,35 @@ pub struct Dungeon {
     pub has_reward:           bool,
     pub position:             Option<LocationPosition>,
     pub boss:                 Option<DungeonBoss>,
-    #[serde(skip_deserializing)]
+    #[serde(default)]
     pub found_chests:         u8,
-    #[serde(skip_deserializing)]
+    #[serde(default)]
     pub reward:               DungeonReward,
-    #[serde(skip_deserializing)]
+    #[serde(default)]
     pub medallion:            Medallion,
-    #[serde(skip_deserializing)]
+    #[serde(default)]
     pub cleared:              bool,
-    #[serde(skip_deserializing)]
+    #[serde(default)]
     pub dungeon_availability: Availability,
-    #[serde(skip_deserializing)]
+    #[serde(default)]
     pub boss_availability:    Availability,
-    #[serde(skip_serializing)]
+    #[serde(default)]
     pub logic:                Option<DungeonAvailability>,
 }
 
 impl Dungeon {
     pub fn update(&mut self, update: DungeonUpdate) {
         if let Some(chests) = update.found_chests {
-            self.found_chests = chests
+            self.found_chests = chests;
         }
         if let Some(reward) = update.reward {
-            self.reward = reward
+            self.reward = reward;
         }
         if let Some(medallion) = update.medallion {
-            self.medallion = medallion
+            self.medallion = medallion;
         }
         if let Some(cleared) = update.cleared {
-            self.cleared = cleared
+            self.cleared = cleared;
         }
     }
 
@@ -462,13 +475,14 @@ impl Dungeon {
         logic: &RandoLogic,
     ) {
         if let Some(dungeon_logic) = self.logic {
-            self.dungeon_availability = dungeon_logic.can_get_chest(&state, &dungeons, &logic);
-            self.boss_availability = dungeon_logic.is_beatable(&state, &dungeons, &logic);
+            self.dungeon_availability = dungeon_logic.can_get_chest(state, dungeons, logic);
+            self.boss_availability = dungeon_logic.is_beatable(state, dungeons, logic);
         }
     }
 }
 
-#[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq)]
+#[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, TS)]
+#[ts(export, export_to = "ui/src/server_types/DungeonReward.ts")]
 pub enum DungeonReward {
     Unknown,
     GreenPendant,
@@ -481,7 +495,8 @@ impl Default for DungeonReward {
     fn default() -> DungeonReward { DungeonReward::Unknown }
 }
 
-#[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq)]
+#[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, TS)]
+#[ts(export, export_to = "ui/src/server_types/Medallion.ts")]
 pub enum Medallion {
     Unknown,
     Bombos,
@@ -493,8 +508,9 @@ impl Default for Medallion {
     fn default() -> Medallion { Medallion::Unknown }
 }
 
-#[derive(Debug, Clone, Copy, Deserialize)]
-#[serde(deny_unknown_fields, rename_all = "camelCase")]
+#[derive(Debug, Clone, Copy, Deserialize, TS)]
+#[ts(export, export_to = "ui/src/server_types/DungeonUpdate.ts")]
+#[serde(rename_all = "camelCase")]
 pub struct DungeonUpdate {
     pub found_chests: Option<u8>,
     pub reward:       Option<DungeonReward>,
@@ -502,18 +518,19 @@ pub struct DungeonUpdate {
     pub cleared:      Option<bool>,
 }
 
-#[derive(Debug, Clone, Default, Serialize, PartialEq)]
-#[serde(deny_unknown_fields, rename_all = "camelCase")]
+#[derive(Debug, Clone, Default, Serialize, PartialEq, TS)]
+#[ts(export, export_to = "ui/src/server_types/DungeonState.ts")]
+#[serde(rename_all = "camelCase")]
 pub struct DungeonState {
     pub dungeons: Vec<Dungeon>,
 }
 
 impl DungeonState {
     pub fn get(&self, dungeon_code: &str) -> Option<Dungeon> {
-        match self.dungeons.iter().position(|d| d.dungeon_code == dungeon_code) {
-            Some(i) => Some(self.dungeons[i].clone()),
-            None => None,
-        }
+        self.dungeons
+            .iter()
+            .position(|d| d.dungeon_code == dungeon_code)
+            .map(|i| self.dungeons[i].clone())
     }
 
     pub fn update(&mut self, dungeon_code: &str, update: DungeonUpdate) {
@@ -525,7 +542,7 @@ impl DungeonState {
     pub fn update_availability(&mut self, game_state: GameState, logic: RandoLogic) {
         let dungeon_state = self.clone();
         self.dungeons.iter_mut().for_each(|dungeon| {
-            dungeon.calculate_availability(&game_state, &dungeon_state, &logic)
+            dungeon.calculate_availability(&game_state, &dungeon_state, &logic);
         });
     }
 }

@@ -1,172 +1,169 @@
 <template>
   <div class="item-tracker">
     <div class="items">
-      <div
-        v-for="(row, index) in items"
-        class="tracker-row"
-        :key="index">
-        <div
-          class="row-spacer"
-          :style="spacerStyle(row, items)"></div>
-        <component
-          v-for="item in row"
-          :key="item.name"
-          :is="item.name"></component>
+      <div v-if="showItems" v-for="(row, row_index) in items" class="tracker-row" :key="row_index">
+        <div class="row-spacer" :style="spacerStyle(row, items)"></div>
+        <component v-for="item in row" :key="item.name" :is="item"></component>
       </div>
     </div>
     <div class="dungeons">
-      <div
-        v-for="(row, index) in dungeons"
-        class="tracker-row"
-        :key="index">
-        <div
-          class="row-spacer"
-          :style="spacerStyle(row, items)"></div>
-        <Dungeon
+      <div v-if="showMap" v-for="(row, index) in dungeons" class="tracker-row" :key="index">
+        <div class="row-spacer" :style="spacerStyle(row, items)"></div>
+        <DungeonItemView
           v-for="dungeon in dungeonsForRow(row)"
           :key="dungeon.dungeonCode"
-          :dungeon="dungeon"></Dungeon>
+          :dungeon="dungeon"
+        ></DungeonItemView>
       </div>
     </div>
   </div>
 </template>
 
-<script>
-import Armor from '@/components/items/Armor'
-import Blank from '@/components/items/Blank'
-import Bombos from '@/components/items/Bombos'
-import Book from '@/components/items/Book'
-import Boots from '@/components/items/Boots'
-import Bottle from '@/components/items/Bottle'
-import Bow from '@/components/items/Bow'
-import Cape from '@/components/items/Cape'
-import Dungeon from '@/components/items/Dungeon'
-import Ether from '@/components/items/Ether'
-import FireRod from '@/components/items/FireRod'
-import Flippers from '@/components/items/Flippers'
-import Flute from '@/components/items/Flute'
-import Glove from '@/components/items/Glove'
-import Hammer from '@/components/items/Hammer'
-import HookShot from '@/components/items/HookShot'
-import IceRod from '@/components/items/IceRod'
-import Lantern from '@/components/items/Lantern'
-import Mirror from '@/components/items/Mirror'
-import MoonPearl from '@/components/items/MoonPearl'
-import Mushroom from '@/components/items/Mushroom'
-import Powder from '@/components/items/Powder'
-import Quake from '@/components/items/Quake'
-import Shield from '@/components/items/Shield'
-import Shovel from '@/components/items/Shovel'
-import SilverArrows from '@/components/items/SilverArrows'
-import Somaria from '@/components/items/Somaria'
-import Sword from '@/components/items/Sword'
-
+<script lang="ts">
 export default {
   name: 'ItemTracker',
-  components: {
-    Armor,
-    Blank,
-    Bombos,
+}
+</script>
+<script setup lang="ts">
+import { computed } from 'vue'
+import { useStore } from "../store";
+import Armor from "@/components/items/Armor.vue";
+import Blank from "@/components/items/Blank.vue";
+import Bombos from "@/components/items/Bombos.vue";
+import Book from "@/components/items/Book.vue";
+import Boots from "@/components/items/Boots.vue";
+import Bottle from "@/components/items/Bottle.vue";
+import Bow from "@/components/items/Bow.vue";
+import Cape from "@/components/items/Cape.vue";
+import DungeonItemView from "@/components/items/DungeonItemView.vue";
+import Ether from "@/components/items/Ether.vue";
+import FireRod from "@/components/items/FireRod.vue";
+import Flippers from "@/components/items/Flippers.vue";
+import Flute from "@/components/items/Flute.vue";
+import Glove from "@/components/items/Glove.vue";
+import Hammer from "@/components/items/Hammer.vue";
+import HookShot from "@/components/items/HookShot.vue";
+import IceRod from "@/components/items/IceRod.vue";
+import Lantern from "@/components/items/Lantern.vue";
+import Mirror from "@/components/items/Mirror.vue";
+import MoonPearl from "@/components/items/MoonPearl.vue";
+import Mushroom from "@/components/items/Mushroom.vue";
+import Powder from "@/components/items/Powder.vue";
+import Quake from "@/components/items/Quake.vue";
+import Shield from "@/components/items/Shield.vue";
+import Shovel from "@/components/items/Shovel.vue";
+import SilverArrows from "@/components/items/SilverArrows.vue";
+import Somaria from "@/components/items/Somaria.vue";
+import Sword from "@/components/items/Sword.vue";
+
+const components = {
+  Armor,
+  Blank,
+  Bombos,
+  Book,
+  Boots,
+  Bottle,
+  Bow,
+  Cape,
+  DungeonItemView,
+  Ether,
+  FireRod,
+  Flippers,
+  Flute,
+  Glove,
+  Hammer,
+  HookShot,
+  IceRod,
+  Lantern,
+  Mirror,
+  MoonPearl,
+  Mushroom,
+  Powder,
+  Quake,
+  Shield,
+  Shovel,
+  SilverArrows,
+  Somaria,
+  Sword,
+}
+
+const store = useStore()
+
+const showItems = computed(() => !!store.state.game)
+const showMap = computed(() => store.getters.mappableDungeons.length > 0 && store.getters.mappableLocations.length > 0)
+
+const items = [
+  [
+    Bow,
+    HookShot,
+    Hammer,
+    FireRod,
+    Glove,
+    MoonPearl,
+  ],
+  [
+    Somaria,
+    Lantern,
+    Flute,
     Book,
     Boots,
-    Bottle,
-    Bow,
-    Cape,
-    Dungeon,
-    Ether,
-    FireRod,
     Flippers,
-    Flute,
-    Glove,
-    Hammer,
-    HookShot,
-    IceRod,
-    Lantern,
     Mirror,
-    MoonPearl,
+  ],
+  [
+    Sword,
+    Armor,
+    Shield,
+    Blank,
+    Bombos,
+    Ether,
+    Quake,
+  ],
+  [
+    Shovel,
     Mushroom,
     Powder,
-    Quake,
-    Shield,
-    Shovel,
+    Bottle,
+    Cape,
+    IceRod,
     SilverArrows,
-    Somaria,
-    Sword
-  },
+  ],
+]
 
-  data() {
-    return {
-      items: [
-        [
-          { name: Bow.name },
-          { name: HookShot.name },
-          { name: Hammer.name },
-          { name: FireRod.name },
-          { name: Glove.name },
-          { name: MoonPearl.name }
-        ],
-        [
-          { name: Somaria.name },
-          { name: Lantern.name },
-          { name: Flute.name },
-          { name: Book.name },
-          { name: Boots.name },
-          { name: Flippers.name },
-          { name: Mirror.name }
-        ],
-        [
-          { name: Sword.name },
-          { name: Armor.name },
-          { name: Shield.name },
-          { name: Blank.name },
-          { name: Bombos.name },
-          { name: Ether.name },
-          { name: Quake.name }
-        ],
-        [
-          { name: Shovel.name },
-          { name: Mushroom.name },
-          { name: Powder.name },
-          { name: Bottle.name },
-          { name: Cape.name },
-          { name: IceRod.name },
-          { name: SilverArrows.name }
-        ]
-      ],
-      dungeons: [
-        ['PoD', 'SP', 'SW', 'TT', 'IP', 'MM', 'TR'],
-        ['EP', 'DP', 'ToH', 'Aga']
-      ]
-    }
-  },
+const dungeons = [
+  ["PoD", "SP", "SW", "TT", "IP", "MM", "TR"],
+  ["EP", "DP", "ToH", "Aga"],
+]
 
-  methods: {
-    spacerStyle(currentRow, allRows) {
-      let maxRowLen = Math.max.apply(Math, allRows.map(function (item) { return item.length }))
-      let padding = ((64 * maxRowLen) - (64 * currentRow.length)) / 2
+function spacerStyle(currentRow: any[], allRows: any[]) {
+  let maxRowLen = Math.max.apply(
+    Math,
+    allRows.map(function (item) {
+      return item.length;
+    })
+  );
+  let padding = (64 * maxRowLen - 64 * currentRow.length) / 2;
 
-      return 'width: ' + padding + 'px;'
-    },
+  return "width: " + padding + "px;";
+}
 
-    dungeonForCode(code) {
-      return this.$store.getters.getDungeonByDungeonCode(code)
-    },
+function dungeonForCode(code: string) {
+  return store.getters.getDungeonByDungeonCode(code);
+}
 
-    dungeonsForRow(row) {
-      let foundDungeons = []
-      for (var i = 0, numDungeons = row.length; i < numDungeons; i++) {
-        let dungeon = this.dungeonForCode(row[i])
-        if (dungeon) {
-          foundDungeons.push(dungeon)
-        }
-      }
-      return foundDungeons
+function dungeonsForRow(row: string[]) {
+  let foundDungeons = [];
+  for (var i = 0, numDungeons = row.length; i < numDungeons; i++) {
+    let dungeon = dungeonForCode(row[i]);
+    if (dungeon) {
+      foundDungeons.push(dungeon);
     }
   }
+
+  return foundDungeons;
 }
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
 .item-tracker {
   left: 0;

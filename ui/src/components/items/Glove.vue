@@ -2,23 +2,26 @@
   <div class="item" :class="gloveState"></div>
 </template>
 
-<script>
+<script lang="ts">
 export default {
   name: 'Glove',
-  computed: {
-    gloveState() {
-      if (!this.$store.state.game.gloves) {
-        return
-      }
-      if (this.$store.state.game.gloves === 'None') {
-        return 'nogloves'
-      }
-      return this.$store.state.game.gloves.toLowerCase()
-    }
-  }
 }
 </script>
+<script setup lang="ts">
+import { computed } from 'vue'
+import { useStore } from '../../store'
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
+const store = useStore()
+const gloveState = computed(() => {
+  if (!store?.state?.game?.gloves) {
+    return
+  }
+  if (store?.state?.game?.gloves === 'None') {
+    return 'nogloves'
+  }
+  return store?.state?.game?.gloves.toLowerCase()
+})
+</script>
+
 <style scoped>
 </style>

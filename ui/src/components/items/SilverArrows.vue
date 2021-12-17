@@ -2,17 +2,18 @@
   <div class="item silvers" :class="silversState"></div>
 </template>
 
-<script>
+<script lang="ts">
 export default {
   name: 'SilverArrows',
-  computed: {
-    silversState() {
-      return this.$store.state.game.silvers ? 'true' : 'false'
-    }
-  }
 }
 </script>
+<script setup lang="ts">
+import { computed } from 'vue'
+import { useStore } from '../../store'
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
+const store = useStore()
+const silversState = computed(() => store?.state?.game?.silvers ? 'true' : 'false')
+</script>
+
 <style scoped>
 </style>

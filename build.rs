@@ -1,15 +1,20 @@
-use includedir_codegen;
-
-use includedir_codegen::Compression;
+use anyhow::Result;
 use std::process::Command;
+use vergen::{
+    vergen,
+    Config,
+};
 
-fn main() {
+fn main() -> Result<()> {
     build_ui_files();
-    package_extra_files();
+
+    let mut vergen_config = Config::default();
+    *vergen_config.git_mut().semver_dirty_mut() = Some("-dirty");
+    vergen(vergen_config)
 }
 
 fn build_ui_files() {
-    if let Ok(_) = std::env::var("SKIP_UI_BUILD") {
+    if std::env::var("BUILD_UI").is_err() {
         return;
     }
 
@@ -34,16 +39,4 @@ fn build_ui_files() {
     if !ui_build_status.success() {
         panic!("Could not build UI");
     }
-}
-
-fn package_extra_files() {
-    includedir_codegen::start("UI_FILES")
-        .dir("ui/dist", Compression::Gzip)
-        .build("ui_files.rs")
-        .unwrap();
-
-    includedir_codegen::start("LOGIC_FILES")
-        .dir("logic", Compression::Gzip)
-        .build("logic_files.rs")
-        .unwrap();
 }

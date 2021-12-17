@@ -1,0 +1,2 @@
+
+export interface BigKey { easternPalace: boolean, desertPalace: boolean, towerOfHera: boolean, palaceOfDarkness: boolean, swampPalace: boolean, skullWoods: boolean, thievesTown: boolean, icePalace: boolean, miseryMire: boolean, turtleRock: boolean, gannonsTower: boolean, }

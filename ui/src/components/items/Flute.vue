@@ -2,23 +2,26 @@
   <div class="item flute" :class="fluteState"></div>
 </template>
 
-<script>
+<script lang="ts">
 export default {
   name: 'Flute',
-  computed: {
-    fluteState() {
-      if (this.$store.state.game.fluteActivated) {
-        return 'true'
-      } else if (this.$store.state.game.flute) {
-        return 'unactivated'
-      }
-
-      return 'false'
-    }
-  }
 }
 </script>
+<script setup lang="ts">
+import { computed } from 'vue'
+import { useStore } from '../../store'
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
+const store = useStore()
+const fluteState = computed(() => {
+  if (store?.state?.game?.fluteActivated) {
+    return 'true'
+  } else if (store?.state?.game?.flute) {
+    return 'unactivated'
+  }
+
+  return 'false'
+})
+</script>
+
 <style scoped>
 </style>
