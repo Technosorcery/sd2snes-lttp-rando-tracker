@@ -19,7 +19,7 @@ pub struct AppState {
     pub dungeon_state:  RwLock<DungeonState>,
     pub game_state:     RwLock<GameState>,
     pub location_state: RwLock<LocationState>,
-    pub server_config:     RwLock<ServerConfig>,
+    pub server_config:  RwLock<ServerConfig>,
     pub update_sender:  broadcast::Sender<Update>,
 }
 

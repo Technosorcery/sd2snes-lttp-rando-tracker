@@ -22,7 +22,11 @@ pub enum DataSource {
 }
 
 impl Default for DataSource {
-    fn default() -> DataSource { DataSource::LocalFile(LocalFileConfig { source: "example-data.json".to_string() }) }
+    fn default() -> DataSource {
+        DataSource::LocalFile(LocalFileConfig {
+            source: "example-data.json".to_string(),
+        })
+    }
 }
 
 #[derive(Debug, Clone, Default, Serialize, TS)]

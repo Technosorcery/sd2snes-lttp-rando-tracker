@@ -1,7 +1,7 @@
 use crate::lttp::{
+    server_config::Qusb2snesConfig,
     AppState,
     GameState,
-    server_config::Qusb2snesConfig,
 };
 
 use anyhow::{

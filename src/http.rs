@@ -39,14 +39,14 @@ use tower_http::{
 macro_rules! initialize_asset {
     ($relative_path:literal, $absolute_path: literal) => {
         UiAsset {
-            relative_path: $relative_path,
-            media_type: sync::Lazy::new(|| {
+            relative_path:  $relative_path,
+            media_type:     sync::Lazy::new(|| {
                 let media_type = mime_guess::from_path($relative_path).first_or_octet_stream();
                 String::from(media_type.essence_str())
             }),
-            contents_bytes: include_bytes!($absolute_path)
+            contents_bytes: include_bytes!($absolute_path),
         }
-    }
+    };
 }
 
 #[iftree::include_file_tree(
@@ -57,20 +57,27 @@ macro_rules! initialize_asset {
 )]
 #[derive(Debug)]
 pub struct UiAsset {
-    relative_path: &'static str,
-    media_type: sync::Lazy<String>,
-    contents_bytes:  &'static [u8],
+    relative_path:  &'static str,
+    media_type:     sync::Lazy<String>,
+    contents_bytes: &'static [u8],
 }
 
 static UI_ASSET_MAP: sync::Lazy<HashMap<&str, &UiAsset>> =
     sync::Lazy::new(|| ASSETS.iter().map(|asset| (asset.relative_path, asset)).collect());
 
 pub fn build(app_state: Arc<AppState>) -> Router {
-    Router::new().nest("/api", api::build(app_state)).route("/ui/*path", get(get_ui_file)).route("/image/*path", get(get_image_file)).layer(
-        ServiceBuilder::new()
-            .layer(SetResponseHeaderLayer::overriding(CONTENT_LENGTH, content_length_from_response))
-            .layer(TraceLayer::new_for_http()),
-    )
+    Router::new()
+        .nest("/api", api::build(app_state))
+        .route("/ui/*path", get(get_ui_file))
+        .route("/image/*path", get(get_image_file))
+        .layer(
+            ServiceBuilder::new()
+                .layer(SetResponseHeaderLayer::overriding(
+                    CONTENT_LENGTH,
+                    content_length_from_response,
+                ))
+                .layer(TraceLayer::new_for_http()),
+        )
 }
 
 fn content_length_from_response<B>(response: &Response<B>) -> Option<HeaderValue>

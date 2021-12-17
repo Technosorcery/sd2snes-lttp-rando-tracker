@@ -114,7 +114,9 @@ async fn main() -> Result<()> {
     }
 
     let data_source = if let Some(file_name) = matches.value_of("file") {
-        lttp::server_config::DataSource::LocalFile(lttp::server_config::LocalFileConfig { source: file_name.to_string() })
+        lttp::server_config::DataSource::LocalFile(lttp::server_config::LocalFileConfig {
+            source: file_name.to_string(),
+        })
     } else if let Some(device_name) = matches.value_of("device") {
         lttp::server_config::DataSource::Qusb2snes(lttp::server_config::Qusb2snesConfig {
             selected_device: device_name.to_string(),
@@ -143,7 +145,7 @@ async fn main() -> Result<()> {
         location_state: RwLock::new(LocationState {
             locations,
         }),
-        server_config:     RwLock::new(server_config),
+        server_config:  RwLock::new(server_config),
         update_sender:  sender,
     });
     let app = http::build(app_state.clone());

@@ -13,13 +13,13 @@ use crate::lttp::{
 use axum::{
     extract::{
         self,
-        Extension,
-        Path,
         ws::{
             Message,
             WebSocket,
             WebSocketUpgrade,
-        }
+        },
+        Extension,
+        Path,
     },
     response::{
         IntoResponse,
@@ -38,8 +38,7 @@ use tower::ServiceBuilder;
 use tower_http::cors::CorsLayer;
 
 pub fn build(app_state: Arc<AppState>) -> Router {
-    let cors_layer =
-        CorsLayer::permissive();
+    let cors_layer = CorsLayer::permissive();
 
     Router::new()
         .route("/config", get(get_config))
@@ -136,22 +135,23 @@ async fn websocket_upgrade_handler(
 }
 
 #[allow(clippy::unused_async)]
-async fn websocket_handler(
-    mut socket: WebSocket,
-    Extension(app_state): Extension<Arc<AppState>>,
-) {
+async fn websocket_handler(mut socket: WebSocket, Extension(app_state): Extension<Arc<AppState>>) {
     if let Some(game_state) = clone_game_state(app_state.clone()) {
         if let Ok(message) = serde_json::to_string(&websocket::ServerMessage::Item(game_state)) {
             socket.send(Message::Text(message)).await.ok();
         }
     }
     if let Some(dungeon_state) = clone_dungeon_state(app_state.clone()) {
-        if let Ok(message) = serde_json::to_string(&websocket::ServerMessage::Dungeon(dungeon_state.dungeons)) {
+        if let Ok(message) =
+            serde_json::to_string(&websocket::ServerMessage::Dungeon(dungeon_state.dungeons))
+        {
             socket.send(Message::Text(message)).await.ok();
         }
     }
     if let Some(location_state) = clone_location_state(app_state.clone()) {
-        if let Ok(message) = serde_json::to_string(&websocket::ServerMessage::Location(location_state.locations)) {
+        if let Ok(message) =
+            serde_json::to_string(&websocket::ServerMessage::Location(location_state.locations))
+        {
             socket.send(Message::Text(message)).await.ok();
         }
     }
@@ -160,9 +160,17 @@ async fn websocket_handler(
 
     while let Ok(update_type) = updates.recv().await {
         let update_message = match update_type {
-            Update::Items => clone_game_state(app_state.clone()).map(|gs| websocket::ServerMessage::Item(gs)),
-            Update::Dungeons => clone_dungeon_state(app_state.clone()).map(|ds| websocket::ServerMessage::Dungeon(ds.dungeons)),
-            Update::Locations => clone_location_state(app_state.clone()).map(|ls| websocket::ServerMessage::Location(ls.locations)),
+            Update::Items => {
+                clone_game_state(app_state.clone()).map(|gs| websocket::ServerMessage::Item(gs))
+            }
+            Update::Dungeons => {
+                clone_dungeon_state(app_state.clone())
+                    .map(|ds| websocket::ServerMessage::Dungeon(ds.dungeons))
+            }
+            Update::Locations => {
+                clone_location_state(app_state.clone())
+                    .map(|ls| websocket::ServerMessage::Location(ls.locations))
+            }
         };
 
         if let Some(message) = update_message {
