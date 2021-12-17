@@ -15,7 +15,6 @@ use std::collections::HashMap;
 pub struct LogicAsset {
     relative_path: &'static str,
     contents_str:  &'static str,
-    get_str:       fn() -> std::borrow::Cow<'static, str>,
 }
 
 static LOGIC_ASSET_MAP: sync::Lazy<HashMap<&str, &LogicAsset>> =
@@ -26,7 +25,7 @@ pub fn base_dungeon_data() -> Result<Vec<Dungeon>> {
         .get("logic/dungeon_locations.yaml")
         .context("Unable to load base dungeon data")?;
 
-    serde_yaml::from_str::<Vec<Dungeon>>(&(dungeon_file.get_str)())
+    serde_yaml::from_str::<Vec<Dungeon>>(&dungeon_file.contents_str)
         .context("Unable to parse base dungeon data")
 }
 
@@ -35,6 +34,6 @@ pub fn base_location_data() -> Result<Vec<Location>> {
         .get("logic/poi_locations.yaml")
         .context("Unable to load base location data")?;
 
-    serde_yaml::from_str::<Vec<Location>>(&(location_file.get_str)())
+    serde_yaml::from_str::<Vec<Location>>(&location_file.contents_str)
         .context("Unable to parse base location data")
 }
