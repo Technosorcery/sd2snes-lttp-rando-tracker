@@ -33,7 +33,10 @@ use std::{
 };
 use tokio::sync::broadcast;
 use tracing::Level;
-use tracing_subscriber::filter::EnvFilter;
+use tracing_subscriber::{
+    filter::EnvFilter,
+    prelude::*,
+};
 
 #[allow(clippy::too_many_lines)]
 #[tokio::main]
@@ -106,10 +109,21 @@ async fn main() -> Result<()> {
         };
 
     if std::env::var_os("RUST_LOG").is_none() {
-        std::env::set_var("RUST_LOG", "sd2snes_lttp_rando_tracker=info,tower_http=debug");
+        use std::ops::Add;
+        let mut rust_log_setting = "sd2snes_lttp_rando_tracker=info,tower_http=debug".to_owned();
+        if log_level == Level::TRACE {
+            rust_log_setting = rust_log_setting.add(",tokio=trace,runtime=trace");
+        };
+        std::env::set_var("RUST_LOG", rust_log_setting);
     }
+    let console_layer = console_subscriber::spawn();
     let filter = EnvFilter::from_default_env().add_directive(log_level.into());
-    if let Err(e) = tracing_subscriber::fmt().with_env_filter(filter).try_init() {
+    if let Err(e) = tracing_subscriber::registry()
+        .with(console_layer)
+        .with(tracing_subscriber::fmt::layer())
+        .with(filter)
+        .try_init()
+    {
         bail!("Unable to initialize logging: {:?}", e);
     }
 

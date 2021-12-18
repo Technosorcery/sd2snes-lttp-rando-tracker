@@ -9,12 +9,12 @@ use crate::lttp::{
 
 use std::{
     sync::Arc,
-    thread,
     time::{
         Duration,
         Instant,
     },
 };
+use tokio::time::sleep;
 use tracing::{
     debug,
     error,
@@ -53,6 +53,6 @@ pub async fn game_state_poller(app_state: Arc<AppState>) {
         }
 
         debug!("File update poll cycle completed in: {:?}", loop_start.elapsed());
-        thread::sleep(Duration::from_millis(sleep_duration.into()));
+        sleep(Duration::from_millis(sleep_duration.into())).await;
     }
 }
