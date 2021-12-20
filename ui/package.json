@@ -7,10 +7,13 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@tailwindcss/forms": "^0.4.0",
     "postcss-cssnext": "^3.1.1",
+    "vee-validate": "^4.5.7",
     "vue": "^3.2.25",
     "vue-router": "^4.0.12",
-    "vuex": "^4.0.2"
+    "vuex": "^4.0.2",
+    "yup": "^0.32.11"
   },
   "devDependencies": {
     "@types/node": "^17.0.0",
