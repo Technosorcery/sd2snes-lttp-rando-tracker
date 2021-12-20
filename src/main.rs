@@ -64,7 +64,7 @@ async fn main() -> Result<()> {
                 .long("file")
                 .takes_value(true),
         )
-        .group(ArgGroup::with_name("source").required(true).args(&["device", "file"]))
+        .group(ArgGroup::with_name("source").args(&["device", "file"]))
         .arg(
             Arg::with_name("verbose")
                 .help("Enable more verbose output")
@@ -127,21 +127,17 @@ async fn main() -> Result<()> {
         bail!("Unable to initialize logging: {:?}", e);
     }
 
-    let data_source = if let Some(file_name) = matches.value_of("file") {
-        lttp::server_config::DataSource::LocalFile(lttp::server_config::LocalFileConfig {
-            source: file_name.to_string(),
-        })
+    let (source_type, data_source) = if let Some(file_name) = matches.value_of("file") {
+        (lttp::server_config::DataSourceType::LocalFile, file_name.to_string())
     } else if let Some(device_name) = matches.value_of("device") {
-        lttp::server_config::DataSource::Qusb2snes(lttp::server_config::Qusb2snesConfig {
-            selected_device: device_name.to_string(),
-            ..lttp::server_config::Qusb2snesConfig::default()
-        })
+        (lttp::server_config::DataSourceType::QUsb2snes, device_name.to_string())
     } else {
-        lttp::server_config::DataSource::default()
+        (lttp::server_config::DataSourceType::default(), String::default())
     };
 
     let server_config = ServerConfig {
         data_poll_rate: 1_000,
+        source_type,
         data_source,
         api_port: server_port,
         ..ServerConfig::default()
@@ -164,8 +160,12 @@ async fn main() -> Result<()> {
     });
     let app = http::build(app_state.clone());
 
+    let game_state_poller_app_state = app_state.clone();
     tokio::spawn(async move {
-        io::game_state_poller(app_state).await;
+        io::game_state_poller(game_state_poller_app_state).await;
+    });
+    tokio::spawn(async move {
+        io::device_list_poller(app_state).await;
     });
 
     axum::Server::bind(&format!("{}:{}", server_address, server_port).parse().unwrap())

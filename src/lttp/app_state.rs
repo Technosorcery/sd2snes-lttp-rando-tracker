@@ -1,4 +1,5 @@
 use crate::lttp::{
+    server_config::ServerConfigUpdate,
     DungeonState,
     DungeonUpdate,
     GameState,
@@ -25,12 +26,42 @@ pub struct AppState {
 
 #[derive(Debug, Copy, Clone)]
 pub enum Update {
+    Config,
     Dungeons,
     Items,
     Locations,
 }
 
 impl AppState {
+    #[tracing::instrument(skip(self), err)]
+    pub fn update_server_config(&self, config_update: ServerConfigUpdate) -> Result<()> {
+        let original_server_config = {
+            match self.server_config.read() {
+                Ok(sc) => sc.clone(),
+                Err(e) => bail!("Unable to get server config for update: {:?}", e),
+            }
+        };
+
+        match self.server_config.write() {
+            Ok(mut sc) => sc.update(config_update),
+            Err(e) => bail!("Unable to update server config: {:?}", e),
+        }
+
+        let new_server_config = {
+            match self.server_config.read() {
+                Ok(sc) => sc.clone(),
+                Err(e) => bail!("Unable to get server config after update: {:?}", e),
+            }
+        };
+
+        if new_server_config != original_server_config {
+            let _ = self.update_sender.clone().send(Update::Config);
+            let _ = self.update_availabilities();
+        }
+
+        Ok(())
+    }
+
     #[tracing::instrument(skip(self), err)]
     pub fn update_availabilities(&self) -> Result<()> {
         tracing::trace!("Getting ServerConfig");
@@ -70,6 +101,7 @@ impl AppState {
         Ok(())
     }
 
+    #[tracing::instrument(skip(self), err)]
     pub fn set_dungeon_state(&self, dungeon: &str, state: DungeonUpdate) -> Result<()> {
         match self.dungeon_state.write() {
             Ok(mut ds) => {
@@ -97,6 +129,7 @@ impl AppState {
         Ok(())
     }
 
+    #[tracing::instrument(skip(self), err)]
     pub fn set_location_state(&self, location: &str, state: LocationUpdate) -> Result<()> {
         match self.location_state.write() {
             Ok(mut ls) => {

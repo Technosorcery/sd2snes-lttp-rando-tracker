@@ -2,12 +2,14 @@ mod websocket;
 
 use crate::lttp::{
     app_state::Update,
+    server_config::ServerConfigUpdate,
     AppState,
     DungeonState,
     DungeonUpdate,
     GameState,
     LocationState,
     LocationUpdate,
+    ServerConfig,
 };
 
 use axum::{
@@ -36,12 +38,13 @@ use serde_json::json;
 use std::sync::Arc;
 use tower::ServiceBuilder;
 use tower_http::cors::CorsLayer;
+use tracing::info;
 
 pub fn build(app_state: Arc<AppState>) -> Router {
     let cors_layer = CorsLayer::permissive();
 
     Router::new()
-        .route("/config", get(get_config))
+        .route("/config", get(get_config).post(post_config))
         .route("/dungeon_state", get(get_dungeon_state))
         .route("/dungeon_state/:dungeon", post(post_dungeon_state))
         .route("/game_state", get(get_game_state))
@@ -56,6 +59,23 @@ async fn get_config(Extension(app_state): Extension<Arc<AppState>>) -> impl Into
     let server_config = match app_state.server_config.read() {
         Ok(ac) => ac.clone(),
         Err(e) => return Err(format!("Unable to get app config: {:?}", e)),
+    };
+
+    Ok(Json(json!(server_config)))
+}
+
+async fn post_config(
+    extract::Json(config_update): extract::Json<ServerConfigUpdate>,
+    Extension(app_state): Extension<Arc<AppState>>,
+) -> impl IntoResponse {
+    info!("Received server config update: {:?}", config_update);
+    if let Err(e) = app_state.update_server_config(config_update) {
+        return Err(format!("Unable to update server config: {:?}", e));
+    };
+
+    let server_config = match app_state.server_config.read() {
+        Ok(sc) => sc.clone(),
+        Err(e) => return Err(format!("Unable to get new server config: {:?}", e)),
     };
 
     Ok(Json(json!(server_config)))
@@ -171,6 +191,10 @@ async fn websocket_handler(mut socket: WebSocket, Extension(app_state): Extensio
                 clone_location_state(app_state.clone())
                     .map(|ls| websocket::ServerMessage::Location(ls.locations))
             }
+            Update::Config => {
+                clone_server_config(app_state.clone())
+                    .map(|sc| websocket::ServerMessage::Config(sc))
+            }
         };
 
         if let Some(message) = update_message {
@@ -200,6 +224,14 @@ fn clone_dungeon_state(app_state: Arc<AppState>) -> Option<DungeonState> {
 fn clone_location_state(app_state: Arc<AppState>) -> Option<LocationState> {
     if let Ok(location_state) = app_state.location_state.read().map(|ls| ls.clone()) {
         Some(location_state)
+    } else {
+        None
+    }
+}
+
+fn clone_server_config(app_state: Arc<AppState>) -> Option<ServerConfig> {
+    if let Ok(server_config) = app_state.server_config.read().map(|sc| sc.clone()) {
+        Some(server_config)
     } else {
         None
     }
