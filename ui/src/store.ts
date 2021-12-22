@@ -1,4 +1,4 @@
-import { AppConfig, InjectionKey } from 'vue'
+import { InjectionKey } from 'vue'
 import { createStore, useStore as baseUseStore, Store } from 'vuex'
 import type { GameState } from "./server_types/GameState"
 import type { Dungeon } from "./server_types/Dungeon"
@@ -22,13 +22,12 @@ export const store = createStore({
       dungeons: [],
       locations: [],
       serverConfig: {
-        dataPollRate: 1000,
-        dataSource: {
-          type: "LocalFile",
-          source: "./example-data.json",
-        },
-        logic: "glitchless",
         apiPort: 8000,
+        dataPollRate: 1000,
+        dataSource: "./example-data.json",
+        logic: "glitchless",
+        qusbDevices: [],
+        sourceType: "LocalFile",
       },
     }
   },
@@ -41,6 +40,9 @@ export const store = createStore({
     },
     setLocationState({ commit }, state) {
       commit('setLocationState', state)
+    },
+    setServerConfig({ commit }, state) {
+      commit('setServerConfig', state)
     },
   
     updateDungeonState({ commit }, data) {
@@ -69,7 +71,10 @@ export const store = createStore({
       return state.dungeons.filter(function (dungeon: any) {
         return !!dungeon.position
       })
-    }  
+    },
+    knownDevices: (state) => {
+      return state.serverConfig.qusbDevices
+    }
   },
   mutations: {
     setItemState(state, serverData) {
@@ -82,6 +87,9 @@ export const store = createStore({
   
     setLocationState(state, locationData) {
       state.locations = locationData
+    },
+    setServerConfig(state, serverConfig) {
+      state.serverConfig = serverConfig
     },
   
     updateCaption(state, data) {

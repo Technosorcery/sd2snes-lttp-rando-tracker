@@ -1,4 +1,4 @@
-import type { DataSource } from "./DataSource";
 import type { RandoLogic } from "./RandoLogic";
+import type { DataSourceType } from "./DataSourceType";
 
-export interface ServerConfig { dataPollRate: number, dataSource: DataSource, logic: RandoLogic, apiPort: number, }
+export interface ServerConfig { apiPort: number, dataPollRate: number, dataSource: string, logic: RandoLogic, qusbDevices: Array<string>, sourceType: DataSourceType, }

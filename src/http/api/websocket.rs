@@ -2,6 +2,7 @@ use crate::lttp::{
     Dungeon,
     GameState,
     Location,
+    ServerConfig,
 };
 
 use serde::{
@@ -15,6 +16,7 @@ pub enum ServerMessage {
     Item(GameState),
     Dungeon(Vec<Dungeon>),
     Location(Vec<Location>),
+    Config(ServerConfig),
 }
 
 #[derive(Debug, Deserialize)]

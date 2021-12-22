@@ -20,6 +20,9 @@ function handleSocketEvent(event: MessageEvent) {
   let myEvent = JSON.parse(event.data)
   let dispatch;
   switch (myEvent.type) {
+    case 'config':
+      dispatch = 'setServerConfig'
+      break
     case 'item':
       dispatch = 'setItemState'
       break
