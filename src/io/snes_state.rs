@@ -39,9 +39,8 @@ pub async fn poll_status(app_state: Arc<AppState>, device: &str) -> Result<()> {
             Err(e) => return Err(anyhow!("Unable to get current game state: {}", e)),
         };
 
-        let new_game_state = GameState::try_from(snes_state)
-            .context("Unable to parse game state from WRAM")?
-            .merge(prev_game_state);
+        let new_game_state =
+            GameState::try_from(snes_state).context("Unable to parse game state from WRAM")?;
         let should_broadcast_update = new_game_state != prev_game_state;
 
         match app_state.game_state.write() {

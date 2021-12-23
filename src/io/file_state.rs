@@ -45,8 +45,7 @@ pub fn poll_status(app_state: Arc<AppState>, source: &str) {
         }
     };
     match serde_json::from_str::<GameState>(&state_json) {
-        Ok(gs) => {
-            let new_gs = gs.merge(prev_game_state);
+        Ok(new_gs) => {
             let should_broadcast_update = new_gs != prev_game_state;
 
             match app_state.game_state.write() {
