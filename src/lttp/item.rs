@@ -81,9 +81,10 @@ impl TryFrom<u8> for Bow {
 #[derive(Debug, Copy, Clone, PartialEq, Serialize, Deserialize, TS)]
 #[ts(export, export_to = "ui/src/server_types/Boomerang.ts")]
 pub enum Boomerang {
-    None = 0,
-    Blue = 1,
-    Red  = 2,
+    None,
+    Blue,
+    Red,
+    Both,
 }
 
 impl Default for Boomerang {
@@ -94,11 +95,14 @@ impl TryFrom<u8> for Boomerang {
     type Error = anyhow::Error;
 
     fn try_from(number: u8) -> Result<Boomerang, Self::Error> {
-        match number {
-            0 => Ok(Boomerang::None),
-            1 => Ok(Boomerang::Blue),
-            2 => Ok(Boomerang::Red),
-            _ => Err(anyhow!("Unknown boomerang flag: 0x{:X}", number)),
+        if number & 0b11000000 == 0b11000000 {
+            Ok(Boomerang::Both)
+        } else if number & 0b10000000 == 0b10000000 {
+            Ok(Boomerang::Blue)
+        } else if number & 0b01000000 == 0b01000000 {
+            Ok(Boomerang::Red)
+        } else {
+            Ok(Boomerang::None)
         }
     }
 }

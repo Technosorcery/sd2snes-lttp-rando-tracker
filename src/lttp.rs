@@ -115,6 +115,7 @@ impl TryFrom<Vec<u8>> for GameState {
         let shovel = Shovel::try_from(response[0x4C])?;
         let shroom = Shroom::try_from(response[0x4C])?;
         let powder = Powder::try_from(response[0x4C])?;
+        let boomerang = Boomerang::try_from(response[0x4C])?;
 
         let bottle1 = Bottle::try_from(response[0x1C])?;
         let bottle2 = Bottle::try_from(response[0x1D])?;
@@ -137,8 +138,8 @@ impl TryFrom<Vec<u8>> for GameState {
 
         Ok(GameState {
             bow: bow != Bow::None,
-            blue_boomerang: Boomerang::try_from(response[0x01])? == Boomerang::Blue,
-            red_boomerang: Boomerang::try_from(response[0x01])? == Boomerang::Red,
+            blue_boomerang: boomerang == Boomerang::Blue || boomerang == Boomerang::Both,
+            red_boomerang: boomerang == Boomerang::Red || boomerang == Boomerang::Both,
             hook_shot: response[0x02] > 0,
             bomb: response[0x03],
             mushroom: shroom == Shroom::Available || shroom == Shroom::Used,
@@ -272,8 +273,8 @@ impl GameState {
     pub fn merge(&self, old: GameState) -> Self {
         GameState {
             bow:              self.bow || old.bow,
-            blue_boomerang:   self.blue_boomerang || old.blue_boomerang,
-            red_boomerang:    self.red_boomerang || old.red_boomerang,
+            blue_boomerang:   self.blue_boomerang,
+            red_boomerang:    self.red_boomerang,
             hook_shot:        self.hook_shot,
             bomb:             self.bomb,
             mushroom:         self.mushroom,
