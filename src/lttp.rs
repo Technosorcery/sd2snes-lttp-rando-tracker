@@ -20,9 +20,10 @@ use crate::lttp::{
         Gloves,
         Magic,
         Pendant,
+        Powder,
         Shield,
         Shovel,
-        ShroomPowder,
+        Shroom,
         Sword,
     },
     logic::{
@@ -51,6 +52,7 @@ pub struct GameState {
     pub hook_shot:        bool,
     pub bomb:             u8,
     pub mushroom:         bool,
+    pub mushroom_used:    bool,
     pub powder:           bool,
     pub fire_rod:         bool,
     pub ice_rod:          bool,
@@ -111,6 +113,8 @@ impl TryFrom<Vec<u8>> for GameState {
         let bow = Bow::try_from(response[0x00])?;
         let flute = Flute::try_from(response[0x4C])?;
         let shovel = Shovel::try_from(response[0x4C])?;
+        let shroom = Shroom::try_from(response[0x4C])?;
+        let powder = Powder::try_from(response[0x4C])?;
 
         let bottle1 = Bottle::try_from(response[0x1C])?;
         let bottle2 = Bottle::try_from(response[0x1D])?;
@@ -137,8 +141,9 @@ impl TryFrom<Vec<u8>> for GameState {
             red_boomerang: Boomerang::try_from(response[0x01])? == Boomerang::Red,
             hook_shot: response[0x02] > 0,
             bomb: response[0x03],
-            mushroom: ShroomPowder::try_from(response[0x04])? == ShroomPowder::Shroom,
-            powder: ShroomPowder::try_from(response[0x04])? == ShroomPowder::Powder,
+            mushroom: shroom == Shroom::Available || shroom == Shroom::Used,
+            mushroom_used: shroom == Shroom::Used,
+            powder: powder == Powder::Available,
             fire_rod: response[0x05] > 0,
             ice_rod: response[0x06] > 0,
             bombos_medallion: response[0x07] > 0,
@@ -271,8 +276,9 @@ impl GameState {
             red_boomerang:    self.red_boomerang || old.red_boomerang,
             hook_shot:        self.hook_shot,
             bomb:             self.bomb,
-            mushroom:         self.mushroom || old.mushroom,
-            powder:           self.powder || old.powder,
+            mushroom:         self.mushroom,
+            mushroom_used:    self.mushroom_used,
+            powder:           self.powder,
             fire_rod:         self.fire_rod,
             ice_rod:          self.ice_rod,
             bombos_medallion: self.bombos_medallion,

@@ -104,6 +104,53 @@ impl TryFrom<u8> for Boomerang {
 }
 
 #[derive(Debug, Copy, Clone, PartialEq, Serialize, Deserialize)]
+pub enum Shroom {
+    None,
+    Available,
+    Used,
+}
+
+impl Default for Shroom {
+    fn default() -> Shroom { Shroom::None }
+}
+
+impl TryFrom<u8> for Shroom {
+    type Error = anyhow::Error;
+
+    fn try_from(number: u8) -> Result<Shroom, Self::Error> {
+        if number & 0b101000 == 0b101000 {
+            Ok(Shroom::Available)
+        } else if number & 0b001000 == 0b001000 {
+            Ok(Shroom::Used)
+        } else {
+            Ok(Shroom::None)
+        }
+    }
+}
+
+#[derive(Debug, Copy, Clone, PartialEq, Serialize, Deserialize)]
+pub enum Powder {
+    None,
+    Available,
+}
+
+impl Default for Powder {
+    fn default() -> Powder { Powder::None }
+}
+
+impl TryFrom<u8> for Powder {
+    type Error = anyhow::Error;
+
+    fn try_from(number: u8) -> Result<Powder, Self::Error> {
+        if number & 0b010000 == 0b010000 {
+            Ok(Powder::Available)
+        } else {
+            Ok(Powder::None)
+        }
+    }
+}
+
+#[derive(Debug, Copy, Clone, PartialEq, Serialize, Deserialize)]
 pub enum ShroomPowder {
     None   = 0,
     Shroom = 1,
