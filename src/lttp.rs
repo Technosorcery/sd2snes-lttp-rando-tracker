@@ -16,11 +16,12 @@ use crate::lttp::{
         Bottle,
         Bow,
         Crystal,
-        FluteShovel,
+        Flute,
         Gloves,
         Magic,
         Pendant,
         Shield,
+        Shovel,
         ShroomPowder,
         Sword,
     },
@@ -108,7 +109,8 @@ impl TryFrom<Vec<u8>> for GameState {
 
     fn try_from(response: Vec<u8>) -> Result<GameState, Self::Error> {
         let bow = Bow::try_from(response[0x00])?;
-        let flute_shovel = FluteShovel::try_from(response[0x0C])?;
+        let flute = Flute::try_from(response[0x4C])?;
+        let shovel = Shovel::try_from(response[0x4C])?;
 
         let bottle1 = Bottle::try_from(response[0x1C])?;
         let bottle2 = Bottle::try_from(response[0x1D])?;
@@ -144,9 +146,9 @@ impl TryFrom<Vec<u8>> for GameState {
             quake_medallion: response[0x09] > 0,
             lantern: response[0x0A] > 0,
             hammer: response[0x0B] > 0,
-            flute: flute_shovel == FluteShovel::Flute || flute_shovel == FluteShovel::FluteAndBird,
-            flute_activated: flute_shovel == FluteShovel::FluteAndBird,
-            shovel: FluteShovel::try_from(response[0x0C])? == FluteShovel::Shovel,
+            flute: flute == Flute::Unactivated || flute == Flute::Activated,
+            flute_activated: flute == Flute::Activated,
+            shovel: shovel == Shovel::Acquired,
             net: response[0x0D] > 0,
             book: response[0x0E] > 0,
             bottle: response[0x0F] > 0,
@@ -280,7 +282,7 @@ impl GameState {
             hammer:           self.hammer,
             flute:            self.flute,
             flute_activated:  self.flute_activated,
-            shovel:           self.shovel || old.shovel,
+            shovel:           self.shovel,
             net:              self.net,
             book:             self.book,
             bottle:           self.bottle,
