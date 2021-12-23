@@ -52,11 +52,10 @@ pub struct Crystal {
 #[derive(Debug, Copy, Clone, PartialEq, Serialize, Deserialize, TS)]
 #[ts(export, export_to = "ui/src/server_types/Bow.ts")]
 pub enum Bow {
-    None             = 0,
-    Wood             = 1,
-    WoodWithArrows   = 2,
-    Silver           = 3,
-    SilverWithArrows = 4,
+    None,
+    Wood,
+    Silver,
+    WoodAndSilver,
 }
 
 impl Default for Bow {
@@ -67,13 +66,14 @@ impl TryFrom<u8> for Bow {
     type Error = anyhow::Error;
 
     fn try_from(number: u8) -> Result<Bow, Self::Error> {
-        match number {
-            0 => Ok(Bow::None),
-            1 => Ok(Bow::Wood),
-            2 => Ok(Bow::WoodWithArrows),
-            3 => Ok(Bow::Silver),
-            4 => Ok(Bow::SilverWithArrows),
-            _ => Err(anyhow!("Unknown bow flag: 0x{:X}", number)),
+        if number & 0b11000000 == 0b11000000 {
+            Ok(Bow::WoodAndSilver)
+        } else if number & 0b10000000 == 0b10000000 {
+            Ok(Bow::Wood)
+        } else if number & 0b01000000 == 0b01000000 {
+            Ok(Bow::Silver)
+        } else {
+            Ok(Bow::None)
         }
     }
 }

@@ -110,7 +110,7 @@ impl TryFrom<Vec<u8>> for GameState {
     type Error = anyhow::Error;
 
     fn try_from(response: Vec<u8>) -> Result<GameState, Self::Error> {
-        let bow = Bow::try_from(response[0x00])?;
+        let bow = Bow::try_from(response[0x4E])?;
         let flute = Flute::try_from(response[0x4C])?;
         let shovel = Shovel::try_from(response[0x4C])?;
         let shroom = Shroom::try_from(response[0x4C])?;
@@ -137,7 +137,7 @@ impl TryFrom<Vec<u8>> for GameState {
         };
 
         Ok(GameState {
-            bow: bow != Bow::None,
+            bow: bow == Bow::Wood || bow == Bow::WoodAndSilver,
             blue_boomerang: boomerang == Boomerang::Blue || boomerang == Boomerang::Both,
             red_boomerang: boomerang == Boomerang::Red || boomerang == Boomerang::Both,
             hook_shot: response[0x02] > 0,
@@ -163,7 +163,7 @@ impl TryFrom<Vec<u8>> for GameState {
             cane_byrna: response[0x11] > 0,
             cape: response[0x12] > 0,
             mirror: response[0x13] > 0,
-            silvers: bow == Bow::Silver || bow == Bow::SilverWithArrows,
+            silvers: bow == Bow::Silver || bow == Bow::WoodAndSilver,
 
             gloves: Gloves::try_from(response[0x14])?,
             boots: response[0x15] > 0,
