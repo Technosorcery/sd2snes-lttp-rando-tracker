@@ -7,7 +7,7 @@ on:
       - trying
   pull_request:
     branches:
-      - master
+      - main
 jobs:
   web-ui:
     name: Vue.js app
