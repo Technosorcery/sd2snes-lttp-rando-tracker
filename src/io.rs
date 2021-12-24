@@ -71,23 +71,22 @@ pub async fn device_list_poller(app_state: Arc<AppState>) {
                 continue;
             }
         };
-        match client.device_list().await {
-            Ok(results::Result {
-                results: results::ResultData::Text(dev_list),
-            }) => {
-                let mut server_config = match app_state.server_config.write() {
-                    Ok(sc) => sc,
-                    Err(e) => {
-                        error!("Unable to get server config to update device list: {:?}", e);
-                        continue;
-                    }
-                };
-                server_config.qusb_devices = dev_list;
-            }
-            _ => {
-                debug!("Unable to get device list from QUsb2snes server.");
-                continue;
-            }
-        }
+
+        if let Ok(results::Result {
+            results: results::ResultData::Text(dev_list),
+        }) = client.device_list().await
+        {
+            let mut server_config = match app_state.server_config.write() {
+                Ok(sc) => sc,
+                Err(e) => {
+                    error!("Unable to get server config to update device list: {:?}", e);
+                    continue;
+                }
+            };
+            server_config.qusb_devices = dev_list;
+        } else {
+            debug!("Unable to get device list from QUsb2snes server.");
+            continue;
+        };
     }
 }

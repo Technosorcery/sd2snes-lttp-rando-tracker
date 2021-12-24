@@ -41,7 +41,7 @@ use std::convert::TryFrom;
 use ts_rs::TS;
 
 #[allow(clippy::struct_excessive_bools)]
-#[derive(Debug, Default, Copy, Clone, PartialEq, Serialize, Deserialize, TS)]
+#[derive(Debug, Default, Clone, PartialEq, Serialize, Deserialize, TS)]
 #[ts(export, export_to = "ui/src/server_types/GameState.ts")]
 #[serde(rename_all = "camelCase")]
 pub struct GameState {
@@ -109,6 +109,7 @@ pub struct GameState {
 impl TryFrom<Vec<u8>> for GameState {
     type Error = anyhow::Error;
 
+    #[allow(clippy::too_many_lines)]
     fn try_from(response: Vec<u8>) -> Result<GameState, Self::Error> {
         let bow = Bow::try_from(response[0x4E])?;
         let flute = Flute::try_from(response[0x4C])?;
@@ -309,7 +310,7 @@ impl Location {
         &mut self,
         state: &GameState,
         dungeons: &DungeonState,
-        logic: &RandoLogic,
+        logic: RandoLogic,
     ) {
         self.availability = self.logic.check(state, dungeons, logic);
     }
@@ -342,13 +343,13 @@ impl LocationState {
 
     pub fn update_availability(
         &mut self,
-        game_state: GameState,
+        game_state: &GameState,
         dungeon_state: &DungeonState,
         logic: RandoLogic,
     ) {
         self.locations
             .iter_mut()
-            .for_each(|loc| loc.calculate_availability(&game_state, dungeon_state, &logic));
+            .for_each(|loc| loc.calculate_availability(game_state, dungeon_state, logic));
     }
 }
 
@@ -412,7 +413,7 @@ impl Dungeon {
         &mut self,
         state: &GameState,
         dungeons: &DungeonState,
-        logic: &RandoLogic,
+        logic: RandoLogic,
     ) {
         if let Some(dungeon_logic) = self.logic {
             self.dungeon_availability = dungeon_logic.can_get_chest(state, dungeons, logic);
@@ -479,10 +480,10 @@ impl DungeonState {
         }
     }
 
-    pub fn update_availability(&mut self, game_state: GameState, logic: RandoLogic) {
+    pub fn update_availability(&mut self, game_state: &GameState, logic: RandoLogic) {
         let dungeon_state = self.clone();
         self.dungeons.iter_mut().for_each(|dungeon| {
-            dungeon.calculate_availability(&game_state, &dungeon_state, &logic);
+            dungeon.calculate_availability(game_state, &dungeon_state, logic);
         });
     }
 }

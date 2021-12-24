@@ -25,7 +25,7 @@ pub fn base_dungeon_data() -> Result<Vec<Dungeon>> {
         .get("logic/dungeon_locations.yaml")
         .context("Unable to load base dungeon data")?;
 
-    serde_yaml::from_str::<Vec<Dungeon>>(&dungeon_file.contents_str)
+    serde_yaml::from_str::<Vec<Dungeon>>(dungeon_file.contents_str)
         .context("Unable to parse base dungeon data")
 }
 
@@ -34,6 +34,6 @@ pub fn base_location_data() -> Result<Vec<Location>> {
         .get("logic/poi_locations.yaml")
         .context("Unable to load base location data")?;
 
-    serde_yaml::from_str::<Vec<Location>>(&location_file.contents_str)
+    serde_yaml::from_str::<Vec<Location>>(location_file.contents_str)
         .context("Unable to parse base location data")
 }

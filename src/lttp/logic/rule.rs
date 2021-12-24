@@ -95,7 +95,7 @@ pub enum Rule {
 }
 
 impl Rule {
-    pub fn check(&self, state: &GameState) -> bool {
+    pub fn check(self, state: &GameState) -> bool {
         #[allow(clippy::match_same_arms)]
         match self {
             Rule::BlueBoomerang => state.blue_boomerang,
@@ -184,7 +184,7 @@ impl Rule {
         }
     }
 
-    pub fn check_quantity(&self, state: &GameState, quantity: u16) -> bool {
+    pub fn check_quantity(self, state: &GameState, quantity: u16) -> bool {
         match self {
             Rule::Bomb => state.bomb >= quantity.try_into().unwrap(),
             Rule::Bottle => state.bottle_count >= quantity.try_into().unwrap(),
@@ -198,9 +198,9 @@ impl Rule {
 
     #[allow(clippy::too_many_lines)]
     pub fn check_with_options(
-        &self,
+        self,
         state: &GameState,
-        logic: &RandoLogic,
+        logic: RandoLogic,
         agahnim_check: bool,
         allow_out_of_logic_glitches: bool,
     ) -> bool {

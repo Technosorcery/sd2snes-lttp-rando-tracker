@@ -66,11 +66,11 @@ impl TryFrom<u8> for Bow {
     type Error = anyhow::Error;
 
     fn try_from(number: u8) -> Result<Bow, Self::Error> {
-        if number & 0b11000000 == 0b11000000 {
+        if number & 0b1100_0000 == 0b1100_0000 {
             Ok(Bow::WoodAndSilver)
-        } else if number & 0b10000000 == 0b10000000 {
+        } else if number & 0b1000_0000 == 0b1000_0000 {
             Ok(Bow::Wood)
-        } else if number & 0b01000000 == 0b01000000 {
+        } else if number & 0b0100_0000 == 0b0100_0000 {
             Ok(Bow::Silver)
         } else {
             Ok(Bow::None)
@@ -95,11 +95,11 @@ impl TryFrom<u8> for Boomerang {
     type Error = anyhow::Error;
 
     fn try_from(number: u8) -> Result<Boomerang, Self::Error> {
-        if number & 0b11000000 == 0b11000000 {
+        if number & 0b1100_0000 == 0b1100_0000 {
             Ok(Boomerang::Both)
-        } else if number & 0b10000000 == 0b10000000 {
+        } else if number & 0b1000_0000 == 0b1000_0000 {
             Ok(Boomerang::Blue)
-        } else if number & 0b01000000 == 0b01000000 {
+        } else if number & 0b0100_0000 == 0b0100_0000 {
             Ok(Boomerang::Red)
         } else {
             Ok(Boomerang::None)
@@ -122,9 +122,9 @@ impl TryFrom<u8> for Shroom {
     type Error = anyhow::Error;
 
     fn try_from(number: u8) -> Result<Shroom, Self::Error> {
-        if number & 0b101000 == 0b101000 {
+        if number & 0b10_1000 == 0b10_1000 {
             Ok(Shroom::Available)
-        } else if number & 0b001000 == 0b001000 {
+        } else if number & 0b00_1000 == 0b00_1000 {
             Ok(Shroom::Used)
         } else {
             Ok(Shroom::None)
@@ -146,7 +146,7 @@ impl TryFrom<u8> for Powder {
     type Error = anyhow::Error;
 
     fn try_from(number: u8) -> Result<Powder, Self::Error> {
-        if number & 0b010000 == 0b010000 {
+        if number & 0b01_0000 == 0b01_0000 {
             Ok(Powder::Available)
         } else {
             Ok(Powder::None)

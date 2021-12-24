@@ -26,7 +26,7 @@ pub async fn poll_status(app_state: Arc<AppState>, device: &str) -> Result<()> {
 
     let mut client = qusb2snes_client::Client::new().await?;
     debug!("Attaching to {}", device);
-    let _ = client.attach(device).await?;
+    client.attach(device).await?;
 
     let region_start = qusb2snes_client::offsets::WRAM + 0x0000_F340;
     let region_length = 0x0200;
