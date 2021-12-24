@@ -122,8 +122,9 @@ async fn get_ui_file(Path(file_name): Path<String>) -> impl IntoResponse {
     Ok((StatusCode::OK, headers, file.contents_bytes.to_vec()))
 }
 
+#[allow(clippy::unused_async)]
 async fn get_image_file(Path(file_name): Path<String>) -> impl IntoResponse {
-    let file = PathBuf::from(file_name.trim_start_matches("/"));
+    let file = PathBuf::from(file_name.trim_start_matches('/'));
     let path = path::Path::new("ui/dist/image/").join(file);
     let path_str = match path.to_str() {
         Some(s) => s,

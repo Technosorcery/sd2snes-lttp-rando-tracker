@@ -49,6 +49,7 @@ impl Default for DataSourceType {
 #[derive(Debug, Clone, Deserialize, TS)]
 #[ts(export, export_to = "ui/src/server_types/ServerConfigUpdate.ts")]
 #[serde(rename_all = "camelCase")]
+#[allow(clippy::module_name_repetitions)]
 pub struct ServerConfigUpdate {
     #[serde(default)]
     pub data_poll_rate: Option<u32>,

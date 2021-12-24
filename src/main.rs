@@ -5,12 +5,15 @@ mod http;
 mod io;
 mod lttp;
 
-use crate::lttp::{
-    AppState,
-    DungeonState,
-    GameState,
-    LocationState,
-    ServerConfig,
+use crate::{
+    io::logic_files,
+    lttp::{
+        AppState,
+        DungeonState,
+        GameState,
+        LocationState,
+        ServerConfig,
+    },
 };
 
 use anyhow::{
@@ -143,8 +146,8 @@ async fn main() -> Result<()> {
         ..ServerConfig::default()
     };
 
-    let dungeons = io::logic_files::base_dungeon_data()?;
-    let locations = io::logic_files::base_location_data()?;
+    let dungeons = logic_files::base_dungeon_data()?;
+    let locations = logic_files::base_location_data()?;
 
     let (sender, _) = broadcast::channel(16);
     let app_state = Arc::new(AppState {

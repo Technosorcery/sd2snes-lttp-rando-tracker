@@ -64,6 +64,7 @@ async fn get_config(Extension(app_state): Extension<Arc<AppState>>) -> impl Into
     Ok(Json(json!(server_config)))
 }
 
+#[allow(clippy::unused_async)]
 async fn post_config(
     extract::Json(config_update): extract::Json<ServerConfigUpdate>,
     Extension(app_state): Extension<Arc<AppState>>,
@@ -121,7 +122,7 @@ async fn post_dungeon_state(
         return Err(format!("Unable to set dungeon state: {:?}", e));
     };
     let new_state = match app_state.dungeon_state.read() {
-        Ok(ds) => ds.get(&dungeon).clone(),
+        Ok(ds) => ds.get(&dungeon),
         Err(e) => return Err(format!("Unable to get dungeon state: {:?}", e)),
     };
 
@@ -139,7 +140,7 @@ async fn post_location_state(
     };
 
     let new_state = match app_state.location_state.read() {
-        Ok(ls) => ls.get(&location).clone(),
+        Ok(ls) => ls.get(&location),
         Err(e) => return Err(format!("Unable to get location state: {:?}", e)),
     };
 
@@ -156,19 +157,19 @@ async fn websocket_upgrade_handler(
 
 #[allow(clippy::unused_async)]
 async fn websocket_handler(mut socket: WebSocket, Extension(app_state): Extension<Arc<AppState>>) {
-    if let Some(game_state) = clone_game_state(app_state.clone()) {
+    if let Some(game_state) = clone_game_state(&app_state) {
         if let Ok(message) = serde_json::to_string(&websocket::ServerMessage::Item(game_state)) {
             socket.send(Message::Text(message)).await.ok();
         }
     }
-    if let Some(dungeon_state) = clone_dungeon_state(app_state.clone()) {
+    if let Some(dungeon_state) = clone_dungeon_state(&app_state) {
         if let Ok(message) =
             serde_json::to_string(&websocket::ServerMessage::Dungeon(dungeon_state.dungeons))
         {
             socket.send(Message::Text(message)).await.ok();
         }
     }
-    if let Some(location_state) = clone_location_state(app_state.clone()) {
+    if let Some(location_state) = clone_location_state(&app_state) {
         if let Ok(message) =
             serde_json::to_string(&websocket::ServerMessage::Location(location_state.locations))
         {
@@ -180,21 +181,16 @@ async fn websocket_handler(mut socket: WebSocket, Extension(app_state): Extensio
 
     while let Ok(update_type) = updates.recv().await {
         let update_message = match update_type {
-            Update::Items => {
-                clone_game_state(app_state.clone()).map(|gs| websocket::ServerMessage::Item(gs))
-            }
+            Update::Items => clone_game_state(&app_state).map(websocket::ServerMessage::Item),
             Update::Dungeons => {
-                clone_dungeon_state(app_state.clone())
+                clone_dungeon_state(&app_state)
                     .map(|ds| websocket::ServerMessage::Dungeon(ds.dungeons))
             }
             Update::Locations => {
-                clone_location_state(app_state.clone())
+                clone_location_state(&app_state)
                     .map(|ls| websocket::ServerMessage::Location(ls.locations))
             }
-            Update::Config => {
-                clone_server_config(app_state.clone())
-                    .map(|sc| websocket::ServerMessage::Config(sc))
-            }
+            Update::Config => clone_server_config(&app_state).map(websocket::ServerMessage::Config),
         };
 
         if let Some(message) = update_message {
@@ -205,7 +201,7 @@ async fn websocket_handler(mut socket: WebSocket, Extension(app_state): Extensio
     }
 }
 
-fn clone_game_state(app_state: Arc<AppState>) -> Option<GameState> {
+fn clone_game_state(app_state: &Arc<AppState>) -> Option<GameState> {
     if let Ok(game_state) = app_state.game_state.read().map(|gs| gs.clone()) {
         Some(game_state)
     } else {
@@ -213,7 +209,7 @@ fn clone_game_state(app_state: Arc<AppState>) -> Option<GameState> {
     }
 }
 
-fn clone_dungeon_state(app_state: Arc<AppState>) -> Option<DungeonState> {
+fn clone_dungeon_state(app_state: &Arc<AppState>) -> Option<DungeonState> {
     if let Ok(dungeon_state) = app_state.dungeon_state.read().map(|ds| ds.clone()) {
         Some(dungeon_state)
     } else {
@@ -221,7 +217,7 @@ fn clone_dungeon_state(app_state: Arc<AppState>) -> Option<DungeonState> {
     }
 }
 
-fn clone_location_state(app_state: Arc<AppState>) -> Option<LocationState> {
+fn clone_location_state(app_state: &Arc<AppState>) -> Option<LocationState> {
     if let Ok(location_state) = app_state.location_state.read().map(|ls| ls.clone()) {
         Some(location_state)
     } else {
@@ -229,7 +225,7 @@ fn clone_location_state(app_state: Arc<AppState>) -> Option<LocationState> {
     }
 }
 
-fn clone_server_config(app_state: Arc<AppState>) -> Option<ServerConfig> {
+fn clone_server_config(app_state: &Arc<AppState>) -> Option<ServerConfig> {
     if let Ok(server_config) = app_state.server_config.read().map(|sc| sc.clone()) {
         Some(server_config)
     } else {
