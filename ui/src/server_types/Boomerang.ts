@@ -1,2 +1,2 @@
 
-export type Boomerang = "None" | "Blue" | "Red";
+export type Boomerang = "None" | "Blue" | "Red" | "Both";

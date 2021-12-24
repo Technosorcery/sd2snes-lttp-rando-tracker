@@ -16,12 +16,14 @@ use crate::lttp::{
         Bottle,
         Bow,
         Crystal,
-        FluteShovel,
+        Flute,
         Gloves,
         Magic,
         Pendant,
+        Powder,
         Shield,
-        ShroomPowder,
+        Shovel,
+        Shroom,
         Sword,
     },
     logic::{
@@ -50,6 +52,7 @@ pub struct GameState {
     pub hook_shot:        bool,
     pub bomb:             u8,
     pub mushroom:         bool,
+    pub mushroom_used:    bool,
     pub powder:           bool,
     pub fire_rod:         bool,
     pub ice_rod:          bool,
@@ -107,8 +110,12 @@ impl TryFrom<Vec<u8>> for GameState {
     type Error = anyhow::Error;
 
     fn try_from(response: Vec<u8>) -> Result<GameState, Self::Error> {
-        let bow = Bow::try_from(response[0x00])?;
-        let flute_shovel = FluteShovel::try_from(response[0x0C])?;
+        let bow = Bow::try_from(response[0x4E])?;
+        let flute = Flute::try_from(response[0x4C])?;
+        let shovel = Shovel::try_from(response[0x4C])?;
+        let shroom = Shroom::try_from(response[0x4C])?;
+        let powder = Powder::try_from(response[0x4C])?;
+        let boomerang = Boomerang::try_from(response[0x4C])?;
 
         let bottle1 = Bottle::try_from(response[0x1C])?;
         let bottle2 = Bottle::try_from(response[0x1D])?;
@@ -130,13 +137,14 @@ impl TryFrom<Vec<u8>> for GameState {
         };
 
         Ok(GameState {
-            bow: bow != Bow::None,
-            blue_boomerang: Boomerang::try_from(response[0x01])? == Boomerang::Blue,
-            red_boomerang: Boomerang::try_from(response[0x01])? == Boomerang::Red,
+            bow: bow == Bow::Wood || bow == Bow::WoodAndSilver,
+            blue_boomerang: boomerang == Boomerang::Blue || boomerang == Boomerang::Both,
+            red_boomerang: boomerang == Boomerang::Red || boomerang == Boomerang::Both,
             hook_shot: response[0x02] > 0,
             bomb: response[0x03],
-            mushroom: ShroomPowder::try_from(response[0x04])? == ShroomPowder::Shroom,
-            powder: ShroomPowder::try_from(response[0x04])? == ShroomPowder::Powder,
+            mushroom: shroom == Shroom::Available || shroom == Shroom::Used,
+            mushroom_used: shroom == Shroom::Used,
+            powder: powder == Powder::Available,
             fire_rod: response[0x05] > 0,
             ice_rod: response[0x06] > 0,
             bombos_medallion: response[0x07] > 0,
@@ -144,9 +152,9 @@ impl TryFrom<Vec<u8>> for GameState {
             quake_medallion: response[0x09] > 0,
             lantern: response[0x0A] > 0,
             hammer: response[0x0B] > 0,
-            flute: flute_shovel == FluteShovel::Flute || flute_shovel == FluteShovel::FluteAndBird,
-            flute_activated: flute_shovel == FluteShovel::FluteAndBird,
-            shovel: FluteShovel::try_from(response[0x0C])? == FluteShovel::Shovel,
+            flute: flute == Flute::Unactivated || flute == Flute::Activated,
+            flute_activated: flute == Flute::Activated,
+            shovel: shovel == Shovel::Acquired,
             net: response[0x0D] > 0,
             book: response[0x0E] > 0,
             bottle: response[0x0F] > 0,
@@ -155,7 +163,7 @@ impl TryFrom<Vec<u8>> for GameState {
             cane_byrna: response[0x11] > 0,
             cape: response[0x12] > 0,
             mirror: response[0x13] > 0,
-            silvers: bow == Bow::Silver || bow == Bow::SilverWithArrows,
+            silvers: bow == Bow::Silver || bow == Bow::WoodAndSilver,
 
             gloves: Gloves::try_from(response[0x14])?,
             boots: response[0x15] > 0,
@@ -256,74 +264,6 @@ impl TryFrom<Vec<u8>> for GameState {
                 seven: response[0x3A] & 0b0100_0000 > 0,
             },
         })
-    }
-}
-
-impl GameState {
-    /// Return a new [`GameState`] merging in the items from the old [`GameState`].
-    /// Things like bomb count, hearts, rupees, etc are taken from self.
-    pub fn merge(&self, old: GameState) -> Self {
-        GameState {
-            bow:              self.bow || old.bow,
-            blue_boomerang:   self.blue_boomerang || old.blue_boomerang,
-            red_boomerang:    self.red_boomerang || old.red_boomerang,
-            hook_shot:        self.hook_shot,
-            bomb:             self.bomb,
-            mushroom:         self.mushroom || old.mushroom,
-            powder:           self.powder || old.powder,
-            fire_rod:         self.fire_rod,
-            ice_rod:          self.ice_rod,
-            bombos_medallion: self.bombos_medallion,
-            ether_medallion:  self.ether_medallion,
-            quake_medallion:  self.quake_medallion,
-            lantern:          self.lantern,
-            hammer:           self.hammer,
-            flute:            self.flute,
-            flute_activated:  self.flute_activated,
-            shovel:           self.shovel || old.shovel,
-            net:              self.net,
-            book:             self.book,
-            bottle:           self.bottle,
-            bottle_count:     self.bottle_count,
-            cane_somaria:     self.cane_somaria,
-            cane_byrna:       self.cane_byrna,
-            cape:             self.cape,
-            mirror:           self.mirror,
-            silvers:          self.silvers || old.silvers,
-
-            gloves:     self.gloves,
-            boots:      self.boots,
-            flippers:   self.flippers,
-            moon_pearl: self.moon_pearl,
-
-            sword_level:  self.sword_level,
-            shield_level: self.shield_level,
-            armor_level:  self.armor_level,
-
-            bottle_content1: self.bottle_content1,
-            bottle_content2: self.bottle_content2,
-            bottle_content3: self.bottle_content3,
-            bottle_content4: self.bottle_content4,
-
-            // Rupees are spread across two bytes, as the randomizer lifted the
-            // 255 Rupee limit, and it's stored little-endian.
-            rupees:         self.rupees,
-            heart_quarters: self.heart_quarters,
-            bomb_capacity:  self.bomb_capacity,
-            hearts:         self.hearts,
-            max_hearts:     self.max_hearts,
-
-            arrows:         self.arrows,
-            arrow_capacity: self.arrow_capacity,
-
-            magic_progression: self.magic_progression,
-
-            small_keys: self.small_keys,
-            big_key:    self.big_key,
-
-            pendant: self.pendant,
-            crystal: self.crystal,
-        }
     }
 }
 

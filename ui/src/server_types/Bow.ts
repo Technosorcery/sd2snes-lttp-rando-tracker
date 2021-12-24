@@ -1,2 +1,2 @@
 
-export type Bow = "None" | "Wood" | "WoodWithArrows" | "Silver" | "SilverWithArrows";
+export type Bow = "None" | "Wood" | "Silver" | "WoodAndSilver";

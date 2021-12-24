@@ -52,11 +52,10 @@ pub struct Crystal {
 #[derive(Debug, Copy, Clone, PartialEq, Serialize, Deserialize, TS)]
 #[ts(export, export_to = "ui/src/server_types/Bow.ts")]
 pub enum Bow {
-    None             = 0,
-    Wood             = 1,
-    WoodWithArrows   = 2,
-    Silver           = 3,
-    SilverWithArrows = 4,
+    None,
+    Wood,
+    Silver,
+    WoodAndSilver,
 }
 
 impl Default for Bow {
@@ -67,13 +66,14 @@ impl TryFrom<u8> for Bow {
     type Error = anyhow::Error;
 
     fn try_from(number: u8) -> Result<Bow, Self::Error> {
-        match number {
-            0 => Ok(Bow::None),
-            1 => Ok(Bow::Wood),
-            2 => Ok(Bow::WoodWithArrows),
-            3 => Ok(Bow::Silver),
-            4 => Ok(Bow::SilverWithArrows),
-            _ => Err(anyhow!("Unknown bow flag: 0x{:X}", number)),
+        if number & 0b11000000 == 0b11000000 {
+            Ok(Bow::WoodAndSilver)
+        } else if number & 0b10000000 == 0b10000000 {
+            Ok(Bow::Wood)
+        } else if number & 0b01000000 == 0b01000000 {
+            Ok(Bow::Silver)
+        } else {
+            Ok(Bow::None)
         }
     }
 }
@@ -81,9 +81,10 @@ impl TryFrom<u8> for Bow {
 #[derive(Debug, Copy, Clone, PartialEq, Serialize, Deserialize, TS)]
 #[ts(export, export_to = "ui/src/server_types/Boomerang.ts")]
 pub enum Boomerang {
-    None = 0,
-    Blue = 1,
-    Red  = 2,
+    None,
+    Blue,
+    Red,
+    Both,
 }
 
 impl Default for Boomerang {
@@ -94,11 +95,61 @@ impl TryFrom<u8> for Boomerang {
     type Error = anyhow::Error;
 
     fn try_from(number: u8) -> Result<Boomerang, Self::Error> {
-        match number {
-            0 => Ok(Boomerang::None),
-            1 => Ok(Boomerang::Blue),
-            2 => Ok(Boomerang::Red),
-            _ => Err(anyhow!("Unknown boomerang flag: 0x{:X}", number)),
+        if number & 0b11000000 == 0b11000000 {
+            Ok(Boomerang::Both)
+        } else if number & 0b10000000 == 0b10000000 {
+            Ok(Boomerang::Blue)
+        } else if number & 0b01000000 == 0b01000000 {
+            Ok(Boomerang::Red)
+        } else {
+            Ok(Boomerang::None)
+        }
+    }
+}
+
+#[derive(Debug, Copy, Clone, PartialEq, Serialize, Deserialize)]
+pub enum Shroom {
+    None,
+    Available,
+    Used,
+}
+
+impl Default for Shroom {
+    fn default() -> Shroom { Shroom::None }
+}
+
+impl TryFrom<u8> for Shroom {
+    type Error = anyhow::Error;
+
+    fn try_from(number: u8) -> Result<Shroom, Self::Error> {
+        if number & 0b101000 == 0b101000 {
+            Ok(Shroom::Available)
+        } else if number & 0b001000 == 0b001000 {
+            Ok(Shroom::Used)
+        } else {
+            Ok(Shroom::None)
+        }
+    }
+}
+
+#[derive(Debug, Copy, Clone, PartialEq, Serialize, Deserialize)]
+pub enum Powder {
+    None,
+    Available,
+}
+
+impl Default for Powder {
+    fn default() -> Powder { Powder::None }
+}
+
+impl TryFrom<u8> for Powder {
+    type Error = anyhow::Error;
+
+    fn try_from(number: u8) -> Result<Powder, Self::Error> {
+        if number & 0b010000 == 0b010000 {
+            Ok(Powder::Available)
+        } else {
+            Ok(Powder::None)
         }
     }
 }
@@ -127,28 +178,49 @@ impl TryFrom<u8> for ShroomPowder {
     }
 }
 
-#[derive(Debug, Copy, Clone, PartialEq, Serialize, Deserialize)]
-pub enum FluteShovel {
-    None         = 0,
-    Shovel       = 1,
-    Flute        = 2,
-    FluteAndBird = 3,
+#[derive(Debug, Clone, Copy, PartialEq, Serialize, Deserialize)]
+pub enum Flute {
+    None,
+    Unactivated,
+    Activated,
 }
 
-impl Default for FluteShovel {
-    fn default() -> FluteShovel { FluteShovel::None }
+impl Default for Flute {
+    fn default() -> Flute { Flute::None }
 }
 
-impl TryFrom<u8> for FluteShovel {
+impl TryFrom<u8> for Flute {
     type Error = anyhow::Error;
 
-    fn try_from(number: u8) -> Result<FluteShovel, Self::Error> {
-        match number {
-            0 => Ok(FluteShovel::None),
-            1 => Ok(FluteShovel::Shovel),
-            2 => Ok(FluteShovel::Flute),
-            3 => Ok(FluteShovel::FluteAndBird),
-            _ => Err(anyhow!("Unknown flute/shovel flag: 0x{:X}", number)),
+    fn try_from(number: u8) -> Result<Flute, Self::Error> {
+        if number & 0b01 == 0b01 {
+            Ok(Flute::Activated)
+        } else if number & 0b10 == 0b10 {
+            Ok(Flute::Unactivated)
+        } else {
+            Ok(Flute::None)
+        }
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Serialize, Deserialize)]
+pub enum Shovel {
+    None,
+    Acquired,
+}
+
+impl Default for Shovel {
+    fn default() -> Shovel { Shovel::None }
+}
+
+impl TryFrom<u8> for Shovel {
+    type Error = anyhow::Error;
+
+    fn try_from(number: u8) -> Result<Shovel, Self::Error> {
+        if number & 0b100 == 0b100 {
+            Ok(Shovel::Acquired)
+        } else {
+            Ok(Shovel::None)
         }
     }
 }
