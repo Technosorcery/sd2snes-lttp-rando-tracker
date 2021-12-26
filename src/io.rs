@@ -7,7 +7,6 @@ use crate::lttp::{
     AppState,
 };
 
-use qusb2snes_client::results;
 use std::{
     sync::Arc,
     time::{
@@ -72,10 +71,7 @@ pub async fn device_list_poller(app_state: Arc<AppState>) {
             }
         };
 
-        if let Ok(results::Result {
-            results: results::ResultData::Text(dev_list),
-        }) = client.device_list().await
-        {
+        if let Ok(dev_list) = client.device_list().await {
             let mut server_config = match app_state.server_config.write() {
                 Ok(sc) => sc,
                 Err(e) => {

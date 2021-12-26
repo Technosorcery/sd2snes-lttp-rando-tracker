@@ -1273,9 +1273,9 @@ dependencies = [
 
 [[package]]
 name = "qusb2snes-client"
-version = "0.2.1"
+version = "0.3.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d2a6b0e503c95d5c90a766425856943269523b05319b826c6ac08efbb79a2b2a"
+checksum = "5a86386ff27d255f8625ccbb4c0ab291ad24638d61115ad0b9bea885d227f965"
 dependencies = [
  "serde",
  "serde_json",
