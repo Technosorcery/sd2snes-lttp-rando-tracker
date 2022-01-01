@@ -5,6 +5,7 @@
   "hookShot": false,
   "bomb": 3,
   "mushroom": false,
+  "mushroomUsed": false,
   "powder": false,
   "fireRod": false,
   "iceRod": false,
