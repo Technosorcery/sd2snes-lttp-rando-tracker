@@ -51,42 +51,42 @@ async fn main() -> Result<()> {
 
     let matches = App::new("SD2SNES LttP Randomizer Tracker")
         .version(version_string)
-        .author(crate_authors!())
+        .author(crate_authors!(", "))
         .about(crate_description!())
         .arg(
-            Arg::with_name("device")
+            Arg::new("device")
                 .help("The SD2SNES device to use in the Qusb2snes server.")
-                .short("d")
+                .short('d')
                 .long("device")
                 .takes_value(true),
         )
         .arg(
-            Arg::with_name("file")
+            Arg::new("file")
                 .help("JSON file to read game state from")
-                .short("f")
+                .short('f')
                 .long("file")
                 .takes_value(true),
         )
-        .group(ArgGroup::with_name("source").args(&["device", "file"]))
+        .group(ArgGroup::new("source").args(&["device", "file"]))
         .arg(
-            Arg::with_name("verbose")
+            Arg::new("verbose")
                 .help("Enable more verbose output")
-                .short("v")
+                .short('v')
                 .long("verbose")
-                .multiple(true),
+                .multiple_occurrences(true),
         )
         .arg(
-            Arg::with_name("port")
+            Arg::new("port")
                 .help("Port number to run the web UI server on")
-                .short("p")
+                .short('p')
                 .long("port")
                 .takes_value(true)
                 .default_value("8000"),
         )
         .arg(
-            Arg::with_name("server-address")
+            Arg::new("server-address")
                 .help("Address to bind the UI & websocket server to")
-                .short("a")
+                .short('a')
                 .long("address")
                 .takes_value(true)
                 .default_value("0.0.0.0"),
