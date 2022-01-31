@@ -137,9 +137,9 @@ dependencies = [
 
 [[package]]
 name = "axum-debug"
-version = "0.3.2"
+version = "0.3.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c9db5dc4828d357f9b15df085afe0271d26d3a831c01361260e73bfbbb327b8f"
+checksum = "86481eea76608eb3e9c3c2273060818369ec6c63e1543f60bc46f1ed6dae386f"
 dependencies = [
  "proc-macro2",
  "quote",
