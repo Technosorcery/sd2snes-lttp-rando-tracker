@@ -26,7 +26,7 @@ tokio = { version = "1.16.1", features = ["full"] }
 tower = "0.4.11"
 tower-http = { version = "0.2.1", features = ["cors", "set-header", "trace"] }
 tracing = "0.1.30"
-tracing-subscriber = { version = "0.3.7", features = ["env-filter"] }
+tracing-subscriber = { version = "0.3.8", features = ["env-filter"] }
 ts-rs = "6.1.2"
 
 [build-dependencies]
