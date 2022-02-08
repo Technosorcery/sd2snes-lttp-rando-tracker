@@ -12,7 +12,7 @@ anyhow = "1.0.53"
 axum = { version = "0.4.5", features = ["ws"] }
 axum-debug = "0.3.3"
 clap = { version = "3.0.14", features = ["cargo"] }
-console-subscriber = "0.1.1"
+console-subscriber = "0.1.2"
 hyper = "0.14.16"
 iftree = "1.0.2"
 mime = "0.3.16"
@@ -24,7 +24,7 @@ serde_json = "1.0.73"
 serde_yaml = "0.8.23"
 tokio = { version = "1.16.1", features = ["full"] }
 tower = "0.4.11"
-tower-http = { version = "0.2.1", features = ["cors", "set-header", "trace"] }
+tower-http = { version = "0.2.2", features = ["cors", "set-header", "trace"] }
 tracing = "0.1.30"
 tracing-subscriber = { version = "0.3.8", features = ["env-filter"] }
 ts-rs = "6.1.2"
