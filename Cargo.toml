@@ -9,9 +9,9 @@ edition = "2018"
 
 [dependencies]
 anyhow = "1.0.55"
-axum = { version = "0.4.7", features = ["ws"] }
+axum = { version = "0.4.8", features = ["ws"] }
 axum-debug = "0.3.3"
-clap = { version = "3.1.3", features = ["cargo"] }
+clap = { version = "3.1.5", features = ["cargo"] }
 console-subscriber = "0.1.3"
 hyper = "0.14.16"
 iftree = "1.0.2"
