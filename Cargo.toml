@@ -8,7 +8,7 @@ include = ["ui/dist"]
 edition = "2018"
 
 [dependencies]
-anyhow = "1.0.55"
+anyhow = "1.0.56"
 axum = { version = "0.4.8", features = ["ws"] }
 axum-debug = "0.3.3"
 clap = { version = "3.1.6", features = ["cargo"] }
@@ -30,5 +30,5 @@ tracing-subscriber = { version = "0.3.9", features = ["env-filter"] }
 ts-rs = "6.1.2"
 
 [build-dependencies]
-anyhow = "1.0.55"
+anyhow = "1.0.56"
 vergen = { version = "6.0.2", default-features = false, features = ["build", "git", "rustc"] }
