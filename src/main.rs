@@ -23,9 +23,9 @@ use anyhow::{
 use clap::{
     crate_authors,
     crate_description,
-    App,
     Arg,
     ArgGroup,
+    Command,
 };
 use std::{
     env,
@@ -49,7 +49,7 @@ async fn main() -> Result<()> {
         None => env!("VERGEN_BUILD_SEMVER"),
     };
 
-    let matches = App::new("SD2SNES LttP Randomizer Tracker")
+    let matches = Command::new("SD2SNES LttP Randomizer Tracker")
         .version(version_string)
         .author(crate_authors!(", "))
         .about(crate_description!())
