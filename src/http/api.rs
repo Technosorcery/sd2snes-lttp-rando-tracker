@@ -31,7 +31,6 @@ use axum::{
         get,
         post,
     },
-    AddExtensionLayer,
     Router,
 };
 use serde_json::json;
@@ -51,7 +50,7 @@ pub fn build(app_state: Arc<AppState>) -> Router {
         .route("/location_state", get(get_location_state))
         .route("/location_state/:location", post(post_location_state))
         .route("/ws", get(websocket_upgrade_handler))
-        .layer(ServiceBuilder::new().layer(cors_layer).layer(AddExtensionLayer::new(app_state)))
+        .layer(ServiceBuilder::new().layer(cors_layer).layer(Extension(app_state)))
 }
 
 #[allow(clippy::unused_async)]

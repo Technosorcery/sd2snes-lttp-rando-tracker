@@ -1,3 +1,4 @@
+edition = "2021"
 fn_single_line = true
 imports_layout = "Vertical"
 imports_granularity = "Crate"

@@ -36,6 +36,7 @@ use tower_http::{
     trace::TraceLayer,
 };
 
+#[allow(unused_macros)]
 macro_rules! initialize_asset {
     ($relative_path:literal, $absolute_path: literal) => {
         UiAsset {
