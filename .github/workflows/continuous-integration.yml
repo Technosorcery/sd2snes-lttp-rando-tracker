@@ -141,6 +141,16 @@ jobs:
         with:
           override: true
           components: clippy
+      - uses: actions/cache@v2.1.7
+        name: Cache cargo
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            target/
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
       - name: Check workflow permissions
         id: check_permissions
         uses: scherermichael-oss/action-has-permission@1.0.6
