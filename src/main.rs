@@ -23,6 +23,7 @@ use anyhow::{
 use clap::{
     crate_authors,
     crate_description,
+    App,
     Arg,
     ArgGroup,
     Command,
@@ -44,6 +45,7 @@ use tracing_subscriber::{
 #[allow(clippy::too_many_lines)]
 #[tokio::main]
 async fn main() -> Result<()> {
+    let unused = "foo";
     let version_string = match option_env!("VERGEN_GIT_SEMVER") {
         Some(v) => v,
         None => env!("VERGEN_BUILD_SEMVER"),
