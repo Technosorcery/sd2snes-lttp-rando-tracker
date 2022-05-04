@@ -12,7 +12,7 @@
     "postcss-cssnext": "^3.1.1",
     "vee-validate": "^4.5.11",
     "vue": "^3.2.33",
-    "vue-router": "^4.0.14",
+    "vue-router": "^4.0.15",
     "vuex": "^4.0.2",
     "yup": "^0.32.11"
   },
