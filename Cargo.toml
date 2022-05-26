@@ -31,4 +31,4 @@ ts-rs = "6.1.2"
 
 [build-dependencies]
 anyhow = "1.0.57"
-vergen = { version = "7.1.0", default-features = false, features = ["build", "git", "rustc"] }
+vergen = { version = "7.2.0", default-features = false, features = ["build", "git", "rustc"] }
