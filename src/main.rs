@@ -23,7 +23,9 @@ use anyhow::{
 use clap::{
     crate_authors,
     crate_description,
+    value_parser,
     Arg,
+    ArgAction,
     ArgGroup,
     Command,
 };
@@ -70,10 +72,10 @@ async fn main() -> Result<()> {
         .group(ArgGroup::new("source").args(&["device", "file"]))
         .arg(
             Arg::new("verbose")
-                .help("Enable more verbose output")
+                .help("Enable more verbose output (can be provided multiple times to increase verbosity)")
                 .short('v')
                 .long("verbose")
-                .multiple_occurrences(true),
+                .action(ArgAction::Count),
         )
         .arg(
             Arg::new("port")
@@ -81,7 +83,8 @@ async fn main() -> Result<()> {
                 .short('p')
                 .long("port")
                 .takes_value(true)
-                .default_value("8000"),
+                .default_value("8000")
+                .value_parser(value_parser!(u16)),
         )
         .arg(
             Arg::new("server-address")
@@ -89,27 +92,37 @@ async fn main() -> Result<()> {
                 .short('a')
                 .long("address")
                 .takes_value(true)
-                .default_value("0.0.0.0"),
+                .default_value("0.0.0.0")
+                .value_parser(value_parser!(std::net::IpAddr)),
         )
         .get_matches();
 
-    let log_level = match matches.occurrences_of("verbose") {
-        0 => Level::ERROR,
-        1 => Level::WARN,
-        2 => Level::INFO,
-        3 => Level::DEBUG,
-        _ => Level::TRACE,
+    let log_level = match matches.get_one::<u8>("verbose").copied() {
+        None | Some(0) => Level::ERROR,
+        Some(1) => Level::WARN,
+        Some(2) => Level::INFO,
+        Some(3) => Level::DEBUG,
+        Some(_) => Level::TRACE,
     };
 
-    let server_port = match matches.value_of("port").unwrap().parse::<u16>() {
-        Ok(i) => i,
+    let server_port: u16 = match matches.try_get_one("port") {
+        Ok(p) => {
+            match p {
+                Some(i) => *i,
+                None => panic!("No port number provided."),
+            }
+        }
         Err(e) => panic!("Invalid port number: {:?}", e),
     };
-    let server_address =
-        match matches.value_of("server-address").unwrap().parse::<std::net::IpAddr>() {
-            Ok(a) => a,
-            Err(e) => panic!("Invalid address: {}", e),
-        };
+    let server_address: std::net::IpAddr = match matches.try_get_one("server-address") {
+        Ok(a) => {
+            match a {
+                Some(a) => *a,
+                None => panic!("No address provided."),
+            }
+        }
+        Err(e) => panic!("Invalid address: {:?}", e),
+    };
 
     if std::env::var_os("RUST_LOG").is_none() {
         use std::ops::Add;
@@ -130,9 +143,9 @@ async fn main() -> Result<()> {
         bail!("Unable to initialize logging: {:?}", e);
     }
 
-    let (source_type, data_source) = if let Some(file_name) = matches.value_of("file") {
+    let (source_type, data_source) = if let Some(file_name) = matches.get_one::<String>("file") {
         (lttp::server_config::DataSourceType::LocalFile, file_name.to_string())
-    } else if let Some(device_name) = matches.value_of("device") {
+    } else if let Some(device_name) = matches.get_one::<String>("device") {
         (lttp::server_config::DataSourceType::QUsb2snes, device_name.to_string())
     } else {
         (lttp::server_config::DataSourceType::default(), String::default())
