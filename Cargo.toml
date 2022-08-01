@@ -25,7 +25,7 @@ serde_yaml = "0.8.23"
 tokio = { version = "1.19.2", features = ["full"] }
 tower = "0.4.13"
 tower-http = { version = "0.3.4", features = ["cors", "set-header", "trace"] }
-tracing = "0.1.35"
+tracing = "0.1.36"
 tracing-subscriber = { version = "0.3.15", features = ["env-filter"] }
 ts-rs = "6.2.0"
 
