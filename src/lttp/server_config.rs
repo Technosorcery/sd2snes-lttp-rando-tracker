@@ -5,7 +5,7 @@ use serde::{
 };
 use ts_rs::TS;
 
-#[derive(Debug, Clone, Default, PartialEq, Serialize, TS)]
+#[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, TS)]
 #[ts(export, export_to = "ui/src/server_types/ServerConfig.ts")]
 #[serde(rename_all = "camelCase")]
 pub struct ServerConfig {
@@ -35,7 +35,7 @@ impl ServerConfig {
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Deserialize, Serialize, TS)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Deserialize, Serialize, TS)]
 #[ts(export, export_to = "ui/src/server_types/DataSourceType.ts")]
 pub enum DataSourceType {
     LocalFile,

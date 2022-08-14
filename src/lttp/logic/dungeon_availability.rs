@@ -20,7 +20,7 @@ use std::cmp::{
 use tracing::error;
 use ts_rs::TS;
 
-#[derive(Debug, Copy, Clone, Serialize, Deserialize, PartialEq, TS)]
+#[derive(Debug, Copy, Clone, Serialize, Deserialize, PartialEq, Eq, TS)]
 #[ts(export, export_to = "ui/src/server_types/DungeonAvailability.ts")]
 #[serde(rename_all = "camelCase")]
 pub enum DungeonAvailability {
@@ -1406,7 +1406,7 @@ impl DungeonAvailability {
     }
 
     pub fn can_hurt_boss(self, state: &GameState) -> bool {
-        return match self {
+        match self {
             DungeonAvailability::DesertPalace => {
                 Rule::Sword1.check(state)
                     || Rule::Hammer.check(state)
@@ -1429,7 +1429,7 @@ impl DungeonAvailability {
                 error!("can_hurt_boss not yet implemented for {:?}", x);
                 false
             }
-        };
+        }
     }
 
     #[allow(clippy::too_many_lines)]
