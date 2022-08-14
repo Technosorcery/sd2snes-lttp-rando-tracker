@@ -41,7 +41,7 @@ use std::convert::TryFrom;
 use ts_rs::TS;
 
 #[allow(clippy::struct_excessive_bools)]
-#[derive(Debug, Default, Clone, PartialEq, Serialize, Deserialize, TS)]
+#[derive(Debug, Default, Clone, PartialEq, Eq, Serialize, Deserialize, TS)]
 #[ts(export, export_to = "ui/src/server_types/GameState.ts")]
 #[serde(rename_all = "camelCase")]
 pub struct GameState {
@@ -353,7 +353,7 @@ impl LocationState {
     }
 }
 
-#[derive(Debug, Clone, Default, Serialize, Deserialize, PartialEq, TS)]
+#[derive(Debug, Clone, Default, Serialize, Deserialize, PartialEq, Eq, TS)]
 #[ts(export, export_to = "ui/src/server_types/DungeonBoss.ts")]
 #[serde(rename_all = "camelCase")]
 pub struct DungeonBoss {
@@ -422,7 +422,7 @@ impl Dungeon {
     }
 }
 
-#[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, TS)]
+#[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Eq, TS)]
 #[ts(export, export_to = "ui/src/server_types/DungeonReward.ts")]
 pub enum DungeonReward {
     Unknown,
@@ -436,7 +436,7 @@ impl Default for DungeonReward {
     fn default() -> DungeonReward { DungeonReward::Unknown }
 }
 
-#[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, TS)]
+#[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Eq, TS)]
 #[ts(export, export_to = "ui/src/server_types/Medallion.ts")]
 pub enum Medallion {
     Unknown,

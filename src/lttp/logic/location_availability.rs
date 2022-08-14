@@ -14,7 +14,7 @@ use serde::{
 };
 use ts_rs::TS;
 
-#[derive(Debug, Copy, Clone, Serialize, Deserialize, PartialEq, TS)]
+#[derive(Debug, Copy, Clone, Serialize, Deserialize, PartialEq, Eq, TS)]
 #[ts(export, export_to = "ui/src/server_types/LocationAvailability.ts")]
 #[serde(rename_all = "camelCase")]
 pub enum LocationAvailability {

@@ -7,7 +7,7 @@ use std::convert::TryFrom;
 use ts_rs::TS;
 
 #[allow(clippy::struct_excessive_bools)]
-#[derive(Debug, Default, Clone, Copy, PartialEq, Serialize, Deserialize, TS)]
+#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, TS)]
 #[ts(export, export_to = "ui/src/server_types/BigKey.ts")]
 #[serde(rename_all = "camelCase")]
 pub struct BigKey {
@@ -26,7 +26,7 @@ pub struct BigKey {
     pub gannons_tower:      bool,
 }
 
-#[derive(Debug, Default, Clone, Copy, PartialEq, Serialize, Deserialize, TS)]
+#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, TS)]
 #[ts(export, export_to = "ui/src/server_types/Pendant.ts")]
 #[serde(rename_all = "camelCase")]
 pub struct Pendant {
@@ -36,7 +36,7 @@ pub struct Pendant {
 }
 
 #[allow(clippy::struct_excessive_bools)]
-#[derive(Debug, Default, Clone, Copy, PartialEq, Serialize, Deserialize, TS)]
+#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, TS)]
 #[ts(export, export_to = "ui/src/server_types/Crystal.ts")]
 #[serde(rename_all = "camelCase")]
 pub struct Crystal {
@@ -49,7 +49,7 @@ pub struct Crystal {
     pub seven: bool,
 }
 
-#[derive(Debug, Copy, Clone, PartialEq, Serialize, Deserialize, TS)]
+#[derive(Debug, Copy, Clone, PartialEq, Eq, Serialize, Deserialize, TS)]
 #[ts(export, export_to = "ui/src/server_types/Bow.ts")]
 pub enum Bow {
     None,
@@ -78,7 +78,7 @@ impl TryFrom<u8> for Bow {
     }
 }
 
-#[derive(Debug, Copy, Clone, PartialEq, Serialize, Deserialize, TS)]
+#[derive(Debug, Copy, Clone, PartialEq, Eq, Serialize, Deserialize, TS)]
 #[ts(export, export_to = "ui/src/server_types/Boomerang.ts")]
 pub enum Boomerang {
     None,
@@ -107,7 +107,7 @@ impl TryFrom<u8> for Boomerang {
     }
 }
 
-#[derive(Debug, Copy, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Copy, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub enum Shroom {
     None,
     Available,
@@ -132,7 +132,7 @@ impl TryFrom<u8> for Shroom {
     }
 }
 
-#[derive(Debug, Copy, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Copy, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub enum Powder {
     None,
     Available,
@@ -154,7 +154,7 @@ impl TryFrom<u8> for Powder {
     }
 }
 
-#[derive(Debug, Copy, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Copy, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub enum ShroomPowder {
     None   = 0,
     Shroom = 1,
@@ -178,7 +178,7 @@ impl TryFrom<u8> for ShroomPowder {
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 pub enum Flute {
     None,
     Unactivated,
@@ -203,7 +203,7 @@ impl TryFrom<u8> for Flute {
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 pub enum Shovel {
     None,
     Acquired,
@@ -225,7 +225,7 @@ impl TryFrom<u8> for Shovel {
     }
 }
 
-#[derive(Debug, Copy, Clone, PartialEq, PartialOrd, Serialize, Deserialize, TS)]
+#[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Serialize, Deserialize, TS)]
 #[ts(export, export_to = "ui/src/server_types/Gloves.ts")]
 pub enum Gloves {
     None       = 0,
@@ -250,7 +250,7 @@ impl TryFrom<u8> for Gloves {
     }
 }
 
-#[derive(Debug, Copy, Clone, PartialEq, PartialOrd, Serialize, Deserialize, TS)]
+#[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Serialize, Deserialize, TS)]
 #[ts(export, export_to = "ui/src/server_types/Sword.ts")]
 #[allow(clippy::enum_variant_names)]
 pub enum Sword {
@@ -280,7 +280,7 @@ impl TryFrom<u8> for Sword {
     }
 }
 
-#[derive(Debug, Copy, Clone, PartialEq, PartialOrd, Serialize, Deserialize, TS)]
+#[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Serialize, Deserialize, TS)]
 #[ts(export, export_to = "ui/src/server_types/Shield.ts")]
 #[allow(clippy::enum_variant_names)]
 pub enum Shield {
@@ -308,7 +308,7 @@ impl TryFrom<u8> for Shield {
     }
 }
 
-#[derive(Debug, Copy, Clone, PartialEq, PartialOrd, Serialize, Deserialize, TS)]
+#[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Serialize, Deserialize, TS)]
 #[ts(export, export_to = "ui/src/server_types/Armor.ts")]
 #[allow(clippy::enum_variant_names)]
 pub enum Armor {
@@ -334,7 +334,7 @@ impl TryFrom<u8> for Armor {
     }
 }
 
-#[derive(Debug, Copy, Clone, PartialEq, Serialize, Deserialize, TS)]
+#[derive(Debug, Copy, Clone, PartialEq, Eq, Serialize, Deserialize, TS)]
 #[ts(export, export_to = "ui/src/server_types/Bottle.ts")]
 #[allow(clippy::enum_variant_names)]
 pub enum Bottle {
@@ -372,7 +372,7 @@ impl TryFrom<u8> for Bottle {
     }
 }
 
-#[derive(Debug, Copy, Clone, PartialEq, PartialOrd, Serialize, Deserialize, TS)]
+#[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Serialize, Deserialize, TS)]
 #[ts(export, export_to = "ui/src/server_types/Magic.ts")]
 pub enum Magic {
     Normal  = 0,

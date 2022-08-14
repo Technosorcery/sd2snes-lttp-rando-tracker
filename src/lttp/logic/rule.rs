@@ -15,7 +15,7 @@ use serde::Deserialize;
 use std::convert::TryInto;
 use tracing::error;
 
-#[derive(Debug, Clone, Copy, Deserialize, PartialEq)]
+#[derive(Debug, Clone, Copy, Deserialize, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
 pub enum Rule {
     BlueBoomerang,
