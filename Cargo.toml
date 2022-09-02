@@ -11,7 +11,7 @@ edition = "2021"
 anyhow = "1.0.63"
 axum = { version = "0.5.15", features = ["ws"] }
 axum-debug = "0.3.3"
-clap = { version = "3.2.19", features = ["cargo", "deprecated"] }
+clap = { version = "3.2.20", features = ["cargo", "deprecated"] }
 console-subscriber = "0.1.7"
 hyper = "0.14.16"
 iftree = "1.0.2"
