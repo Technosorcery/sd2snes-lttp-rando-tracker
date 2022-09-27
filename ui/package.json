@@ -11,7 +11,7 @@
     "postcss-calc": "^8.2.4",
     "postcss-cssnext": "^3.1.1",
     "vee-validate": "^4.6.9",
-    "vue": "^3.2.38",
+    "vue": "^3.2.39",
     "vue-router": "^4.1.4",
     "vuex": "^4.0.2",
     "yup": "^0.32.11"
