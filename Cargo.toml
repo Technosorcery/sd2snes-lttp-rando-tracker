@@ -9,7 +9,7 @@ edition = "2021"
 
 [dependencies]
 anyhow = "1.0.66"
-axum = { version = "0.5.17", features = ["ws"] }
+axum = { version = "0.6.0", features = ["ws"] }
 axum-debug = "0.3.3"
 clap = { version = "3.2.22", features = ["cargo", "deprecated"] }
 console-subscriber = "0.1.7"
