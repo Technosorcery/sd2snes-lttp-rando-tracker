@@ -13,7 +13,7 @@ jobs:
       - name: Download Linux binary
         uses: actions/download-artifact@v3.0.2
         with:
-          name: app_ubuntu-latest-app
+          name: app_ubuntu-latest
           path: app/ubuntu
       - name: Create Linux Release Artifact
         run: |
