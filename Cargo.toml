@@ -1,7 +1,7 @@
 [package]
 name = "sd2snes-lttp-rando-tracker"
 description = "Automatically track progress in a Link to the Past randomizer run using a USB2SNES modified SD2SNES."
-version = "2.0.0"
+version = "2.0.1"
 authors = ["Jacob Helwig <jacob@technosorcery.net>"]
 build = "build.rs"
 include = ["ui/dist"]
@@ -31,4 +31,8 @@ ts-rs = "6.2.0"
 
 [build-dependencies]
 anyhow = "1.0.66"
-vergen = { version = "7.4.3", default-features = false, features = ["build", "git", "rustc"] }
+vergen = { version = "7.4.3", default-features = false, features = [
+  "build",
+  "git",
+  "rustc",
+] }
