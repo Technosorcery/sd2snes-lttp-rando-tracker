@@ -15,6 +15,7 @@ use axum::{
     },
     response::{
         IntoResponse,
+        Redirect,
         Response,
     },
     routing::get,
@@ -69,6 +70,7 @@ static UI_ASSET_MAP: sync::Lazy<HashMap<&str, &UiAsset>> =
 pub fn build(app_state: Arc<AppState>) -> Router {
     Router::new()
         .nest("/api", api::build(app_state))
+        .route("/", get(|| async { Redirect::permanent("/ui/") }))
         .route("/ui/*path", get(get_ui_file))
         .route("/image/*path", get(get_image_file))
         .layer(

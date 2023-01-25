@@ -43,11 +43,10 @@ This should be shown in the QUsb2snes device listing.
 
 After starting sd2snes-rando-tracker, it will let you know what address & port
 the UI HTTP server was started on. By default, the HTTP server binds to all
-addresses on port 8000. Open `http://localhost:8000` in your browser to view the
-UI. If you wish to only view the item/dungeon tracker, or the map, you can go to
-`http://localhost:8000/#/items` and `http://localhost:8000/#/map`, respectively.
-These limited views can be handy for use with things like the browser capture in
-OBS Studio.
+addresses on port 8000. Open `http://localhost:8000/ui/` in your browser to
+view the UI.
+
+Displaying only the item list, or only the map is unsupported at this time.
 
 Additional help is available via the `--help` flag. You can use `--file <file>`
 to test things using the `example-data.json` file in the repository, if you do

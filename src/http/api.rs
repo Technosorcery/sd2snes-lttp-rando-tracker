@@ -57,7 +57,7 @@ pub fn build(app_state: Arc<AppState>) -> Router {
 async fn get_config(Extension(app_state): Extension<Arc<AppState>>) -> impl IntoResponse {
     let server_config = match app_state.server_config.read() {
         Ok(ac) => ac.clone(),
-        Err(e) => return Err(format!("Unable to get app config: {:?}", e)),
+        Err(e) => return Err(format!("Unable to get app config: {e:?}")),
     };
 
     Ok(Json(json!(server_config)))
@@ -70,12 +70,12 @@ async fn post_config(
 ) -> impl IntoResponse {
     info!("Received server config update: {:?}", config_update);
     if let Err(e) = app_state.update_server_config(config_update) {
-        return Err(format!("Unable to update server config: {:?}", e));
+        return Err(format!("Unable to update server config: {e:?}"));
     };
 
     let server_config = match app_state.server_config.read() {
         Ok(sc) => sc.clone(),
-        Err(e) => return Err(format!("Unable to get new server config: {:?}", e)),
+        Err(e) => return Err(format!("Unable to get new server config: {e:?}")),
     };
 
     Ok(Json(json!(server_config)))
@@ -85,7 +85,7 @@ async fn post_config(
 async fn get_game_state(Extension(app_state): Extension<Arc<AppState>>) -> impl IntoResponse {
     let game_state = match app_state.game_state.read() {
         Ok(gs) => gs.clone(),
-        Err(e) => return Err(format!("Unable to get game state: {:?}", e)),
+        Err(e) => return Err(format!("Unable to get game state: {e:?}")),
     };
 
     Ok(Json(json!(game_state)))
@@ -95,7 +95,7 @@ async fn get_game_state(Extension(app_state): Extension<Arc<AppState>>) -> impl 
 async fn get_location_state(Extension(app_state): Extension<Arc<AppState>>) -> impl IntoResponse {
     let location_state = match app_state.location_state.read() {
         Ok(ls) => ls.clone(),
-        Err(e) => return Err(format!("Unable to get location state: {:?}", e)),
+        Err(e) => return Err(format!("Unable to get location state: {e:?}")),
     };
 
     Ok(Json(json!(location_state.locations)))
@@ -105,7 +105,7 @@ async fn get_location_state(Extension(app_state): Extension<Arc<AppState>>) -> i
 async fn get_dungeon_state(Extension(app_state): Extension<Arc<AppState>>) -> impl IntoResponse {
     let dungeon_state = match app_state.dungeon_state.read() {
         Ok(ds) => ds.clone(),
-        Err(e) => return Err(format!("Unable to get dungeon state: {:?}", e)),
+        Err(e) => return Err(format!("Unable to get dungeon state: {e:?}")),
     };
 
     Ok(Json(json!(dungeon_state.dungeons)))
@@ -118,11 +118,11 @@ async fn post_dungeon_state(
     Extension(app_state): Extension<Arc<AppState>>,
 ) -> impl IntoResponse {
     if let Err(e) = app_state.set_dungeon_state(&dungeon, dungeon_update) {
-        return Err(format!("Unable to set dungeon state: {:?}", e));
+        return Err(format!("Unable to set dungeon state: {e:?}"));
     };
     let new_state = match app_state.dungeon_state.read() {
         Ok(ds) => ds.get(&dungeon),
-        Err(e) => return Err(format!("Unable to get dungeon state: {:?}", e)),
+        Err(e) => return Err(format!("Unable to get dungeon state: {e:?}")),
     };
 
     Ok(Json(json!(new_state)))
@@ -135,12 +135,12 @@ async fn post_location_state(
     Extension(app_state): Extension<Arc<AppState>>,
 ) -> impl IntoResponse {
     if let Err(e) = app_state.set_location_state(&location, location_update) {
-        return Err(format!("Unable to set location state: {:?}", e));
+        return Err(format!("Unable to set location state: {e:?}"));
     };
 
     let new_state = match app_state.location_state.read() {
         Ok(ls) => ls.get(&location),
-        Err(e) => return Err(format!("Unable to get location state: {:?}", e)),
+        Err(e) => return Err(format!("Unable to get location state: {e:?}")),
     };
 
     Ok(Json(json!(new_state)))
