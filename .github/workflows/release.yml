@@ -2,155 +2,122 @@ name: Release
 on:
   push:
     tags:
-    - v*
+      - v*
 jobs:
   create-release:
     name: Create draft release
     needs:
-    - rust-app
+      - rust-app
     runs-on: ubuntu-latest
     steps:
-    - name: Download Linux binary
-      uses: actions/download-artifact@v2
-      with:
-        name: app_ubuntu-latest
-        path: app/ubuntu
-    - name: Create Linux Release Artifact
-      run: |
-        tar -czvf sd2snes-lttp-rando-tracker-linux-release.tar.gz -C app/ubuntu .
-    - name: Download Windows binary
-      uses: actions/download-artifact@v2
-      with:
-        name: app_windows-latest
-        path: app/windows
-    - name: Create Windows Release Artifact
-      run: |
-        zip --junk-paths sd2snes-lttp-rando-tracker-windows-release.zip app/windows/sd2snes-*
-    - name: Download macOS binary
-      uses: actions/download-artifact@v2
-      with:
-        name: app_macOS-latest
-        path: app/macos
-    - name: Create MacOS Release Artifact
-      run: |
-        tar -czvf sd2snes-lttp-rando-tracker-macos-release.tar.gz -C app/macos .
-    - name: Create release
-      id: create_release
-      uses: actions/create-release@v1.0.0
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        tag_name: ${{ github.ref }}
-        release_name: ${{ github.ref }}
-        draft: true
-        prerelease: false
-    - name: Upload Linux Release Asset
-      uses: actions/upload-release-asset@v1.0.1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./sd2snes-lttp-rando-tracker-linux-release.tar.gz
-        asset_name: sd2snes-lttp-rando-tracker-linux-${{ github.ref }}-release.tar.gz
-        asset_content_type: application/gzip
-    - name: Upload Windows Release Asset
-      uses: actions/upload-release-asset@v1.0.0
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./sd2snes-lttp-rando-tracker-windows-release.zip
-        asset_name: sd2snes-lttp-rando-tracker-windows-${{ github.ref }}-release.zip
-        asset_content_type: application/zip
-    - name: Upload MacOS Release Asset
-      uses: actions/upload-release-asset@v1.0.0
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./sd2snes-lttp-rando-tracker-macos-release.tar.gz
-        asset_name: sd2snes-lttp-rando-tracker-macos-${{ github.ref }}-release.tar.gz
-        asset_content_type: application/gzip
+      - name: Download Linux binary
+        uses: actions/download-artifact@v3.0.2
+        with:
+          name: app_ubuntu-latest-app
+          path: app/ubuntu
+      - name: Create Linux Release Artifact
+        run: |
+          tar -czvf sd2snes-lttp-rando-tracker-linux-release.tar.gz -C app/ubuntu .
+      - name: Download Windows binary
+        uses: actions/download-artifact@v3.0.2
+        with:
+          name: app_windows-latest
+          path: app/windows
+      - name: Create Windows Release Artifact
+        run: |
+          zip --junk-paths sd2snes-lttp-rando-tracker-windows-release.zip app/windows/sd2snes-*
+      - name: Download macOS binary
+        uses: actions/download-artifact@v3.0.2
+        with:
+          name: app_macOS-latest
+          path: app/macos
+      - name: Create macOS Release Artifact
+        run: |
+          tar -czvf sd2snes-lttp-rando-tracker-macos-release.tar.gz -C app/macos .
+      - name: Create release
+        id: create_release
+        uses: softprops/action-gh-release@v1
+        with:
+          draft: true
+          prerelease: false
+          files: |
+            sd2snes-*-release.*
 
   web-ui:
     name: Vue.js app
     strategy:
       matrix:
         node-version:
-        - 16.13.1
+          - 18.13.0
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2.4.0
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v2.5.0
-      with:
-        node-version: ${{ matrix.node-version }}
-        cache: 'npm'
-        cache-dependency-path: ui/package-lock.json
-    - name: Install
-      run: |
-        cd ui
-        npm install
-    - name: Build
-      run: |
-        cd ui
-        npm run build
-    - uses: actions/upload-artifact@v2.3.1
-      with:
-        name: ui-dist
-        path: ui/dist
+      - uses: actions/checkout@v3.3.0
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3.6.0
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: "npm"
+          cache-dependency-path: ui/package-lock.json
+      - name: Install
+        run: |
+          cd ui
+          npm install
+      - name: Build
+        run: |
+          cd ui
+          npm run build
+      - uses: actions/upload-artifact@v3.1.2
+        with:
+          name: ui-dist
+          path: ui/dist
 
   rust-app:
     name: Rust app
     needs:
-    - web-ui
+      - web-ui
     strategy:
       matrix:
         os:
-        - ubuntu-latest
-        - windows-latest
-        - macOS-latest
+          - ubuntu-latest
+          - windows-latest
+          - macOS-latest
     runs-on: ${{ matrix.os }}
     steps:
-    - uses: actions/checkout@v2.4.0
-    - uses: actions/download-artifact@v2.1.0
-      with:
-        name: ui-dist
-        path: ui/dist
-    - name: Install Rust
-      uses: actions-rs/toolchain@v1.0.6
-      with:
-        profile: minimal
-        override: true
-    - uses: actions/cache@v2.1.7
-      name: Cache cargo
-      with:
-        path: |
-          ~/.cargo/bin/
-          ~/.cargo/registry/index/
-          ~/.cargo/registry/cache/
-          ~/.cargo/git/db/
-          target/
-        key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
-    - name: Test
-      uses: actions-rs/cargo@v1.0.1
-      with:
-        command: test
-        args: --verbose
-    - name: Build
-      uses: actions-rs/cargo@v1.0.1
-      with:
-        command: build
-        args: --verbose --release
-    - name: Upload release artifact (Windows)
-      if: matrix.os == 'windows-latest'
-      uses: actions/upload-artifact@v2.3.1
-      with:
-        name: app_${{ matrix.os }}
-        path: target/release/sd2snes-lttp-rando-tracker.exe
-    - name: Upload release artifact
-      if: matrix.os != 'windows-latest'
-      uses: actions/upload-artifact@v2.3.1
-      with:
-        name: app_${{ matrix.os }}
-        path: target/release/sd2snes-lttp-rando-tracker
+      - uses: actions/checkout@v3.3.0
+      - uses: actions/download-artifact@v3.0.2
+        with:
+          name: ui-dist
+          path: ui/dist
+      - name: Install Rust
+        uses: actions-rs/toolchain@v1.0.6
+        with:
+          profile: minimal
+          override: true
+      - uses: actions/cache@v3.2.3
+        name: Cache cargo
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            target/
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+      - name: Test
+        uses: actions-rs/cargo@v1.0.1
+        with:
+          command: test
+          args: --verbose
+      - name: Build
+        uses: actions-rs/cargo@v1.0.1
+        with:
+          command: build
+          args: --verbose --release
+      - name: Upload release artifact
+        uses: actions/upload-artifact@v3.1.2
+        with:
+          name: app_${{ matrix.os }}
+          path: |
+            target/release/sd2snes-lttp-rando-tracker*
+            !**/*.d
+            !**/*.pdb
