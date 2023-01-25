@@ -112,7 +112,7 @@ async fn main() -> Result<()> {
                 None => panic!("No port number provided."),
             }
         }
-        Err(e) => panic!("Invalid port number: {:?}", e),
+        Err(e) => panic!("Invalid port number: {e:?}"),
     };
     let server_address: std::net::IpAddr = match matches.try_get_one("server-address") {
         Ok(a) => {
@@ -121,7 +121,7 @@ async fn main() -> Result<()> {
                 None => panic!("No address provided."),
             }
         }
-        Err(e) => panic!("Invalid address: {:?}", e),
+        Err(e) => panic!("Invalid address: {e:?}"),
     };
 
     if std::env::var_os("RUST_LOG").is_none() {
@@ -184,7 +184,7 @@ async fn main() -> Result<()> {
         io::device_list_poller(app_state).await;
     });
 
-    axum::Server::bind(&format!("{}:{}", server_address, server_port).parse().unwrap())
+    axum::Server::bind(&format!("{server_address}:{server_port}").parse().unwrap())
         .serve(app.into_make_service())
         .await
         .unwrap();
