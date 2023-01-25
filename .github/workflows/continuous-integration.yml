@@ -18,17 +18,17 @@ jobs:
     strategy:
       matrix:
         node-version:
-          - 16.13.1
+          - 18.13.0
 
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2.4.0
+      - uses: actions/checkout@v3.3.0
       - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v2.5.0
+        uses: actions/setup-node@v3.6.0
         with:
           node-version: ${{ matrix.node-version }}
-          cache: 'npm'
+          cache: "npm"
           cache-dependency-path: ui/package-lock.json
       - name: Install
         run: |
@@ -38,7 +38,7 @@ jobs:
         run: |
           cd ui
           npm run build
-      - uses: actions/upload-artifact@v2.3.1
+      - uses: actions/upload-artifact@v3.1.2
         with:
           name: ui-dist
           path: ui/dist/
@@ -58,8 +58,8 @@ jobs:
     runs-on: ${{ matrix.os }}
 
     steps:
-      - uses: actions/checkout@v2.4.0
-      - uses: actions/download-artifact@v2.1.0
+      - uses: actions/checkout@v3.3.0
+      - uses: actions/download-artifact@v3.0.2
         with:
           name: ui-dist
           path: ui/dist
@@ -68,7 +68,7 @@ jobs:
         with:
           profile: minimal
           override: true
-      - uses: actions/cache@v2.1.7
+      - uses: actions/cache@v3.2.3
         name: Cache cargo
         with:
           path: |
@@ -90,24 +90,20 @@ jobs:
           args: --verbose
         env:
           SKIP_UI_BUILD: true
-      - name: Upload debug artifact (Windows)
-        if: matrix.os == 'windows-latest'
-        uses: actions/upload-artifact@v2.3.1
-        with:
-          name: debug_${{ matrix.os }}
-          path: target/debug/sd2snes-lttp-rando-tracker.exe
       - name: Upload debug artifact
-        if: matrix.os != 'windows-latest'
-        uses: actions/upload-artifact@v2.3.1
+        uses: actions/upload-artifact@v3.1.2
         with:
           name: debug_${{ matrix.os }}
-          path: target/debug/sd2snes-lttp-rando-tracker
+          path: |
+            target/debug/sd2snes-lttp-rando-tracker*
+            !**/*.d
+            !**/*.pdb
 
   rustfmt-check:
     name: Check rustfmt
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2.4.0
+      - uses: actions/checkout@v3.3.0
       - name: Install Rust nightly
         uses: actions-rs/toolchain@v1.0.6
         with:
@@ -115,7 +111,7 @@ jobs:
           components: rustfmt
           toolchain: nightly
           override: true
-      - uses: actions/cache@v2.1.7
+      - uses: actions/cache@v3.2.3
         name: Cache cargo
         with:
           path: |
@@ -135,13 +131,13 @@ jobs:
     name: Check cargo clippy
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2.4.0
+      - uses: actions/checkout@v3.3.0
       - name: Install Rust
         uses: actions-rs/toolchain@v1.0.6
         with:
           override: true
           components: clippy
-      - uses: actions/cache@v2.1.7
+      - uses: actions/cache@v3.2.3
         name: Cache cargo
         with:
           path: |
@@ -171,5 +167,5 @@ jobs:
   cargo-deny:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
-    - uses: EmbarkStudios/cargo-deny-action@v1
+      - uses: actions/checkout@v3.3.0
+      - uses: EmbarkStudios/cargo-deny-action@v1
