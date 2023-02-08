@@ -14,7 +14,7 @@
     "vue": "^3.2.45",
     "vue-router": "^4.1.4",
     "vuex": "^4.0.2",
-    "yup": "^0.32.11"
+    "yup": "^1.0.0"
   },
   "devDependencies": {
     "@types/node": "^18.8.3",
