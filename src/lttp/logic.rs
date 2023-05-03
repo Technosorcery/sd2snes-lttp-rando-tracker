@@ -19,12 +19,10 @@ use ts_rs::TS;
 #[derive(Debug, Clone, Copy, PartialEq, PartialOrd, Ord, Eq, Deserialize, Serialize, TS)]
 #[ts(export, export_to = "ui/src/server_types/RandoLogic.ts")]
 #[serde(rename_all = "camelCase")]
+#[derive(Default)]
 pub enum RandoLogic {
+    #[default]
     Glitchless,
     OverWorldGlitches,
     MajorGlitches,
-}
-
-impl Default for RandoLogic {
-    fn default() -> RandoLogic { RandoLogic::Glitchless }
 }

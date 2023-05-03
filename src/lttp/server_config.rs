@@ -37,13 +37,11 @@ impl ServerConfig {
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Deserialize, Serialize, TS)]
 #[ts(export, export_to = "ui/src/server_types/DataSourceType.ts")]
+#[derive(Default)]
 pub enum DataSourceType {
     LocalFile,
+    #[default]
     QUsb2snes,
-}
-
-impl Default for DataSourceType {
-    fn default() -> DataSourceType { DataSourceType::QUsb2snes }
 }
 
 #[derive(Debug, Clone, Deserialize, TS)]

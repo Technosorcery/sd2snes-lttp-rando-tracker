@@ -424,7 +424,9 @@ impl Dungeon {
 
 #[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Eq, TS)]
 #[ts(export, export_to = "ui/src/server_types/DungeonReward.ts")]
+#[derive(Default)]
 pub enum DungeonReward {
+    #[default]
     Unknown,
     GreenPendant,
     RedBluePendant,
@@ -432,21 +434,15 @@ pub enum DungeonReward {
     RedCrystal,
 }
 
-impl Default for DungeonReward {
-    fn default() -> DungeonReward { DungeonReward::Unknown }
-}
-
 #[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Eq, TS)]
 #[ts(export, export_to = "ui/src/server_types/Medallion.ts")]
+#[derive(Default)]
 pub enum Medallion {
+    #[default]
     Unknown,
     Bombos,
     Ether,
     Quake,
-}
-
-impl Default for Medallion {
-    fn default() -> Medallion { Medallion::Unknown }
 }
 
 #[derive(Debug, Clone, Copy, Deserialize, TS)]

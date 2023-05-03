@@ -51,15 +51,13 @@ pub struct Crystal {
 
 #[derive(Debug, Copy, Clone, PartialEq, Eq, Serialize, Deserialize, TS)]
 #[ts(export, export_to = "ui/src/server_types/Bow.ts")]
+#[derive(Default)]
 pub enum Bow {
+    #[default]
     None,
     Wood,
     Silver,
     WoodAndSilver,
-}
-
-impl Default for Bow {
-    fn default() -> Bow { Bow::None }
 }
 
 impl TryFrom<u8> for Bow {
@@ -80,15 +78,13 @@ impl TryFrom<u8> for Bow {
 
 #[derive(Debug, Copy, Clone, PartialEq, Eq, Serialize, Deserialize, TS)]
 #[ts(export, export_to = "ui/src/server_types/Boomerang.ts")]
+#[derive(Default)]
 pub enum Boomerang {
+    #[default]
     None,
     Blue,
     Red,
     Both,
-}
-
-impl Default for Boomerang {
-    fn default() -> Boomerang { Boomerang::None }
 }
 
 impl TryFrom<u8> for Boomerang {
@@ -107,15 +103,12 @@ impl TryFrom<u8> for Boomerang {
     }
 }
 
-#[derive(Debug, Copy, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Copy, Clone, PartialEq, Eq, Serialize, Deserialize, Default)]
 pub enum Shroom {
+    #[default]
     None,
     Available,
     Used,
-}
-
-impl Default for Shroom {
-    fn default() -> Shroom { Shroom::None }
 }
 
 impl TryFrom<u8> for Shroom {
@@ -132,14 +125,11 @@ impl TryFrom<u8> for Shroom {
     }
 }
 
-#[derive(Debug, Copy, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Copy, Clone, PartialEq, Eq, Serialize, Deserialize, Default)]
 pub enum Powder {
+    #[default]
     None,
     Available,
-}
-
-impl Default for Powder {
-    fn default() -> Powder { Powder::None }
 }
 
 impl TryFrom<u8> for Powder {
@@ -154,15 +144,12 @@ impl TryFrom<u8> for Powder {
     }
 }
 
-#[derive(Debug, Copy, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Copy, Clone, PartialEq, Eq, Serialize, Deserialize, Default)]
 pub enum ShroomPowder {
+    #[default]
     None   = 0,
     Shroom = 1,
     Powder = 2,
-}
-
-impl Default for ShroomPowder {
-    fn default() -> ShroomPowder { ShroomPowder::None }
 }
 
 impl TryFrom<u8> for ShroomPowder {
@@ -178,15 +165,12 @@ impl TryFrom<u8> for ShroomPowder {
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, Default)]
 pub enum Flute {
+    #[default]
     None,
     Unactivated,
     Activated,
-}
-
-impl Default for Flute {
-    fn default() -> Flute { Flute::None }
 }
 
 impl TryFrom<u8> for Flute {
@@ -203,14 +187,11 @@ impl TryFrom<u8> for Flute {
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, Default)]
 pub enum Shovel {
+    #[default]
     None,
     Acquired,
-}
-
-impl Default for Shovel {
-    fn default() -> Shovel { Shovel::None }
 }
 
 impl TryFrom<u8> for Shovel {
@@ -227,14 +208,12 @@ impl TryFrom<u8> for Shovel {
 
 #[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Serialize, Deserialize, TS)]
 #[ts(export, export_to = "ui/src/server_types/Gloves.ts")]
+#[derive(Default)]
 pub enum Gloves {
+    #[default]
     None       = 0,
     PowerGlove = 1,
     TitansMitt = 2,
-}
-
-impl Default for Gloves {
-    fn default() -> Gloves { Gloves::None }
 }
 
 impl TryFrom<u8> for Gloves {
@@ -253,16 +232,14 @@ impl TryFrom<u8> for Gloves {
 #[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Serialize, Deserialize, TS)]
 #[ts(export, export_to = "ui/src/server_types/Sword.ts")]
 #[allow(clippy::enum_variant_names)]
+#[derive(Default)]
 pub enum Sword {
+    #[default]
     None          = 0,
     FightersSword = 1,
     MasterSword   = 2,
     TemperedSword = 3,
     GoldenSword   = 4,
-}
-
-impl Default for Sword {
-    fn default() -> Sword { Sword::None }
 }
 
 impl TryFrom<u8> for Sword {
@@ -283,15 +260,13 @@ impl TryFrom<u8> for Sword {
 #[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Serialize, Deserialize, TS)]
 #[ts(export, export_to = "ui/src/server_types/Shield.ts")]
 #[allow(clippy::enum_variant_names)]
+#[derive(Default)]
 pub enum Shield {
+    #[default]
     None           = 0,
     FightersShield = 1,
     RedShield      = 2,
     MirrorShield   = 3,
-}
-
-impl Default for Shield {
-    fn default() -> Shield { Shield::None }
 }
 
 impl TryFrom<u8> for Shield {
@@ -311,14 +286,12 @@ impl TryFrom<u8> for Shield {
 #[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Serialize, Deserialize, TS)]
 #[ts(export, export_to = "ui/src/server_types/Armor.ts")]
 #[allow(clippy::enum_variant_names)]
+#[derive(Default)]
 pub enum Armor {
+    #[default]
     GreenMail = 0,
     BlueMail  = 1,
     RedMail   = 2,
-}
-
-impl Default for Armor {
-    fn default() -> Armor { Armor::GreenMail }
 }
 
 impl TryFrom<u8> for Armor {
@@ -337,7 +310,9 @@ impl TryFrom<u8> for Armor {
 #[derive(Debug, Copy, Clone, PartialEq, Eq, Serialize, Deserialize, TS)]
 #[ts(export, export_to = "ui/src/server_types/Bottle.ts")]
 #[allow(clippy::enum_variant_names)]
+#[derive(Default)]
 pub enum Bottle {
+    #[default]
     NoBottle    = 0x00,
     Mushroom    = 0x01,
     Empty       = 0x02,
@@ -347,10 +322,6 @@ pub enum Bottle {
     Fairy       = 0x06,
     Bee         = 0x07,
     MagicBee    = 0x08,
-}
-
-impl Default for Bottle {
-    fn default() -> Bottle { Bottle::NoBottle }
 }
 
 impl TryFrom<u8> for Bottle {
@@ -374,14 +345,12 @@ impl TryFrom<u8> for Bottle {
 
 #[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Serialize, Deserialize, TS)]
 #[ts(export, export_to = "ui/src/server_types/Magic.ts")]
+#[derive(Default)]
 pub enum Magic {
+    #[default]
     Normal  = 0,
     Half    = 1,
     Quarter = 2,
-}
-
-impl Default for Magic {
-    fn default() -> Magic { Magic::Normal }
 }
 
 impl TryFrom<u8> for Magic {

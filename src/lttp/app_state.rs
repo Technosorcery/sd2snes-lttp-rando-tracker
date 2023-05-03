@@ -55,7 +55,7 @@ impl AppState {
         };
 
         if new_server_config != original_server_config {
-            let _ = self.update_sender.clone().send(Update::Config);
+            _ = self.update_sender.clone().send(Update::Config);
             let _unused = self.update_availabilities();
         }
 
@@ -98,9 +98,9 @@ impl AppState {
         tracing::trace!("Sending update broadcasts");
         let update_sender = self.update_sender.clone();
         // Can ignore the result, since it's possible that nothing is listening at the moment.
-        let _ = update_sender.send(Update::Items);
-        let _ = update_sender.send(Update::Locations);
-        let _ = update_sender.send(Update::Dungeons);
+        _ = update_sender.send(Update::Items);
+        _ = update_sender.send(Update::Locations);
+        _ = update_sender.send(Update::Dungeons);
 
         Ok(())
     }
@@ -125,7 +125,7 @@ impl AppState {
                 ds.update_availability(&game_state, server_config.logic);
 
                 // We can ignore the result as we don't really care if nobody is listening for updates at the moment.
-                let _ = self.update_sender.clone().send(Update::Dungeons);
+                _ = self.update_sender.clone().send(Update::Dungeons);
             }
             Err(e) => bail!("Unable to update dungeon state: {:?}", e),
         }
@@ -140,7 +140,7 @@ impl AppState {
                 ls.update(location, state);
 
                 // We can ignore the result as we don't really care if nobody is listening for updates at the moment.
-                let _ = self.update_sender.clone().send(Update::Locations);
+                _ = self.update_sender.clone().send(Update::Locations);
             }
             Err(e) => bail!("Unable to update location state: {:?}", e),
         }
