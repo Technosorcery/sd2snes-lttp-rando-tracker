@@ -98,10 +98,7 @@ where
 async fn get_ui_file(Path(file_name): Path<String>) -> impl IntoResponse {
     let file = PathBuf::from(file_name.trim_start_matches('/'));
     let mut path = path::Path::new("ui/dist/").join(file);
-    let mut path_str = match path.to_str() {
-        Some(s) => s,
-        None => return Err("Invalid UI file name".to_string()),
-    };
+    let Some(mut path_str) = path.to_str() else { return Err("Invalid UI file name".to_string()) };
 
     let file = if let Some(f) = UI_ASSET_MAP.get(&path_str) {
         f
@@ -129,14 +126,9 @@ async fn get_ui_file(Path(file_name): Path<String>) -> impl IntoResponse {
 async fn get_image_file(Path(file_name): Path<String>) -> impl IntoResponse {
     let file = PathBuf::from(file_name.trim_start_matches('/'));
     let path = path::Path::new("ui/dist/image/").join(file);
-    let path_str = match path.to_str() {
-        Some(s) => s,
-        None => return Err("Invalid image file name".to_string()),
-    };
+    let Some(path_str) = path.to_str() else { return Err("Invalid image file name".to_string()) };
 
-    let file = match UI_ASSET_MAP.get(&path_str) {
-        Some(f) => f,
-        None => return Ok((StatusCode::NOT_FOUND, HeaderMap::new(), vec![])),
+    let Some(file) = UI_ASSET_MAP.get(&path_str) else { return Ok((StatusCode::NOT_FOUND, HeaderMap::new(), vec![]))
     };
 
     let mut headers = HeaderMap::new();
