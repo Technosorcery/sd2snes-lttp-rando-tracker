@@ -89,10 +89,8 @@ jobs:
           name: ui-dist
           path: ui/dist
       - name: Install Rust
-        uses: actions-rs/toolchain@v1.0.6
-        with:
-          profile: minimal
-          override: true
+        run:
+          curl https://sh.rustup.rs -sSf | sh -s -- -y
       - uses: actions/cache@v3.2.3
         name: Cache cargo
         with:
@@ -104,15 +102,11 @@ jobs:
             target/
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
       - name: Test
-        uses: actions-rs/cargo@v1.0.1
-        with:
-          command: test
-          args: --verbose
+        run:
+          cargo test --verbose
       - name: Build
-        uses: actions-rs/cargo@v1.0.1
-        with:
-          command: build
-          args: --verbose --release
+        run:
+          cargo build --verbose --release
       - name: Upload release artifact
         uses: actions/upload-artifact@v3.1.2
         with:

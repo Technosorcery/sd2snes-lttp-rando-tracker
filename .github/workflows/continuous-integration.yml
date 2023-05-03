@@ -63,11 +63,9 @@ jobs:
         with:
           name: ui-dist
           path: ui/dist
-      - name: Install Rust
-        uses: actions-rs/toolchain@v1.0.6
-        with:
-          profile: minimal
-          override: true
+      - name: Install Rust (Stable)
+        run:
+          curl https://sh.rustup.rs -sSf | sh -s -- -y
       - uses: actions/cache@v3.2.3
         name: Cache cargo
         with:
@@ -79,15 +77,13 @@ jobs:
             target/
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
       - name: Test
-        uses: actions-rs/cargo@v1.0.1
-        with:
-          command: test
-          args: --verbose
+        run:
+          cargo test --verbose
+        env:
+          SKIP_UI_BUILD: true
       - name: Build
-        uses: actions-rs/cargo@v1.0.1
-        with:
-          command: build
-          args: --verbose
+        run:
+          cargo build --verbose
         env:
           SKIP_UI_BUILD: true
       - name: Upload debug artifact
@@ -105,12 +101,10 @@ jobs:
     steps:
       - uses: actions/checkout@v3.3.0
       - name: Install Rust nightly
-        uses: actions-rs/toolchain@v1.0.6
-        with:
-          profile: minimal
-          components: rustfmt
-          toolchain: nightly
-          override: true
+        run: |
+          curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+          rustup default nightly
+          rustup component add rustfmt
       - uses: actions/cache@v3.2.3
         name: Cache cargo
         with:
@@ -122,10 +116,8 @@ jobs:
             target/
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
       - name: Check rustfmt
-        uses: actions-rs/cargo@v1.0.1
-        with:
-          command: fmt
-          args: -- --check
+        run:
+          cargo +nightly fmt -- --check
 
   clippy-check:
     name: Check cargo clippy
@@ -133,10 +125,10 @@ jobs:
     steps:
       - uses: actions/checkout@v3.3.0
       - name: Install Rust
-        uses: actions-rs/toolchain@v1.0.6
-        with:
-          override: true
-          components: clippy
+        run: |
+          curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+          rustup default stable
+          rustup component add clippy
       - uses: actions/cache@v3.2.3
         name: Cache cargo
         with:
@@ -147,22 +139,9 @@ jobs:
             ~/.cargo/git/db/
             target/
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
-      - name: Check workflow permissions
-        id: check_permissions
-        uses: scherermichael-oss/action-has-permission@1.0.6
-        with:
-          required-permission: write
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Run clippy action to produce annotations
-        uses: actions-rs/clippy-check@v1
-        if: steps.check_permissions.outputs.has-permission
-        with:
-          args: --all-targets -- -D warnings
-          token: ${{ secrets.GITHUB_TOKEN }}
       - name: Run clippy manually without annotations
-        if: ${{ !steps.check_permissions.outputs.has-permission }}
-        run: cargo clippy --all-targets -- -D warnings
+        run:
+          cargo clippy --all-targets -- -D warnings
 
   cargo-deny:
     runs-on: ubuntu-latest
