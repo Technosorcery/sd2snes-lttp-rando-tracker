@@ -1,16 +1,18 @@
 use anyhow::Result;
 use std::process::Command;
-use vergen::{
-    vergen,
-    Config,
-};
 
 fn main() -> Result<()> {
     build_ui_files();
 
-    let mut vergen_config = Config::default();
-    *vergen_config.git_mut().semver_dirty_mut() = Some("-dirty");
-    vergen(vergen_config)
+    vergen::EmitBuilder::builder()
+        .all_cargo()
+        .all_build()
+        .all_git()
+        .all_rustc()
+        .git_describe(true, false, Some("v*"))
+        .emit()?;
+
+    Ok(())
 }
 
 fn build_ui_files() {
