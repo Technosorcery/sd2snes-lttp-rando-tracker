@@ -60,14 +60,14 @@ async fn main() -> Result<()> {
                 .help("The SD2SNES device to use in the Qusb2snes server.")
                 .short('d')
                 .long("device")
-                .takes_value(true),
+                .num_args(1),
         )
         .arg(
             Arg::new("file")
                 .help("JSON file to read game state from")
                 .short('f')
                 .long("file")
-                .takes_value(true),
+                .num_args(1),
         )
         .group(ArgGroup::new("source").args(["device", "file"]))
         .arg(
@@ -82,7 +82,7 @@ async fn main() -> Result<()> {
                 .help("Port number to run the web UI server on")
                 .short('p')
                 .long("port")
-                .takes_value(true)
+                .num_args(1)
                 .default_value("8000")
                 .value_parser(value_parser!(u16)),
         )
@@ -91,7 +91,7 @@ async fn main() -> Result<()> {
                 .help("Address to bind the UI & websocket server to")
                 .short('a')
                 .long("address")
-                .takes_value(true)
+                .num_args(1)
                 .default_value("0.0.0.0")
                 .value_parser(value_parser!(std::net::IpAddr)),
         )
