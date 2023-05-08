@@ -69,7 +69,7 @@ async fn main() -> Result<()> {
                 .long("file")
                 .takes_value(true),
         )
-        .group(ArgGroup::new("source").args(&["device", "file"]))
+        .group(ArgGroup::new("source").args(["device", "file"]))
         .arg(
             Arg::new("verbose")
                 .help("Enable more verbose output (can be provided multiple times to increase verbosity)")
