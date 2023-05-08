@@ -65,8 +65,8 @@ async fn get_config(Extension(app_state): Extension<Arc<AppState>>) -> impl Into
 
 #[allow(clippy::unused_async)]
 async fn post_config(
-    extract::Json(config_update): extract::Json<ServerConfigUpdate>,
     Extension(app_state): Extension<Arc<AppState>>,
+    extract::Json(config_update): extract::Json<ServerConfigUpdate>,
 ) -> impl IntoResponse {
     info!("Received server config update: {:?}", config_update);
     if let Err(e) = app_state.update_server_config(config_update) {
@@ -114,8 +114,8 @@ async fn get_dungeon_state(Extension(app_state): Extension<Arc<AppState>>) -> im
 #[allow(clippy::unused_async)]
 async fn post_dungeon_state(
     Path(dungeon): Path<String>,
-    extract::Json(dungeon_update): extract::Json<DungeonUpdate>,
     Extension(app_state): Extension<Arc<AppState>>,
+    extract::Json(dungeon_update): extract::Json<DungeonUpdate>,
 ) -> impl IntoResponse {
     if let Err(e) = app_state.set_dungeon_state(&dungeon, dungeon_update) {
         return Err(format!("Unable to set dungeon state: {e:?}"));
@@ -131,8 +131,8 @@ async fn post_dungeon_state(
 #[allow(clippy::unused_async)]
 async fn post_location_state(
     Path(location): Path<String>,
-    extract::Json(location_update): extract::Json<LocationUpdate>,
     Extension(app_state): Extension<Arc<AppState>>,
+    extract::Json(location_update): extract::Json<LocationUpdate>,
 ) -> impl IntoResponse {
     if let Err(e) = app_state.set_location_state(&location, location_update) {
         return Err(format!("Unable to set location state: {e:?}"));
