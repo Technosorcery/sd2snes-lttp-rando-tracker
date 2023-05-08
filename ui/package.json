@@ -8,9 +8,9 @@
   },
   "dependencies": {
     "@tailwindcss/forms": "^0.5.3",
-    "postcss-calc": "^9.0.0",
+    "postcss-calc": "^9.0.1",
     "postcss-cssnext": "^3.1.1",
-    "vee-validate": "^4.7.2",
+    "vee-validate": "^4.8.6",
     "vue": "^3.2.45",
     "vue-router": "^4.1.4",
     "vuex": "^4.0.2",
@@ -24,6 +24,6 @@
     "tailwindcss": "^3.3.2",
     "typescript": "^5.0.4",
     "vite": "^2.9.14",
-    "vue-tsc": "^1.0.9"
+    "vue-tsc": "^1.6.4"
   }
 }
