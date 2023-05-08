@@ -1,5 +1,6 @@
 name: Build and test
 on:
+  merge_group:
   push:
     branches:
       - main
@@ -64,8 +65,7 @@ jobs:
           name: ui-dist
           path: ui/dist
       - name: Install Rust (Stable)
-        run:
-          curl https://sh.rustup.rs -sSf | sh -s -- -y
+        run: curl https://sh.rustup.rs -sSf | sh -s -- -y
       - uses: actions/cache@v3.2.3
         name: Cache cargo
         with:
@@ -77,13 +77,11 @@ jobs:
             target/
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
       - name: Test
-        run:
-          cargo test --verbose
+        run: cargo test --verbose
         env:
           SKIP_UI_BUILD: true
       - name: Build
-        run:
-          cargo build --verbose
+        run: cargo build --verbose
         env:
           SKIP_UI_BUILD: true
       - name: Upload debug artifact
@@ -116,8 +114,7 @@ jobs:
             target/
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
       - name: Check rustfmt
-        run:
-          cargo +nightly fmt -- --check
+        run: cargo +nightly fmt -- --check
 
   clippy-check:
     name: Check cargo clippy
@@ -140,8 +137,7 @@ jobs:
             target/
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
       - name: Run clippy manually without annotations
-        run:
-          cargo clippy --all-targets -- -D warnings
+        run: cargo clippy --all-targets -- -D warnings
 
   cargo-deny:
     runs-on: ubuntu-latest
