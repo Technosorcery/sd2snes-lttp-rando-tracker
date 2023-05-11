@@ -10,7 +10,7 @@
     "@tailwindcss/forms": "^0.5.3",
     "postcss-calc": "^9.0.1",
     "postcss-cssnext": "^3.1.1",
-    "vee-validate": "^4.9.2",
+    "vee-validate": "^4.9.3",
     "vue": "^3.2.47",
     "vue-router": "^4.1.6",
     "vuex": "^4.1.0",
