@@ -12,7 +12,7 @@ anyhow = "1.0.66"
 axum = { version = "0.6.18", features = ["ws"] }
 axum-debug = "0.3.3"
 clap = { version = "4.3.11", features = ["cargo", "deprecated"] }
-console-subscriber = "0.1.9"
+console-subscriber = "0.1.10"
 hyper = "0.14.16"
 iftree = "1.0.2"
 mime = "0.3.16"
