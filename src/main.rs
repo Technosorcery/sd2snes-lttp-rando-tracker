@@ -46,10 +46,7 @@ use tracing_subscriber::{
 #[allow(clippy::too_many_lines)]
 #[tokio::main]
 async fn main() -> Result<()> {
-    let version_string = match option_env!("VERGEN_GIT_DESCRIBE") {
-        Some(v) => v,
-        None => env!("CARGO_PKG_VERSION"),
-    };
+    let version_string = option_env!("VERGEN_GIT_DESCRIBE").unwrap_or(env!("CARGO_PKG_VERSION"));
 
     let matches = Command::new("SD2SNES LttP Randomizer Tracker")
         .version(version_string)
