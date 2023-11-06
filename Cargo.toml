@@ -31,7 +31,7 @@ ts-rs = "7.0.0"
 
 [build-dependencies]
 anyhow = "1.0.75"
-vergen = { version = "8.2.5", features = [
+vergen = { version = "8.2.6", features = [
   "build",
   "cargo",
   "git",
